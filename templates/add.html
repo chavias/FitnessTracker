@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
     <title>Add Session</title>
     <script>
         // Set the current date in the date field
@@ -48,12 +56,35 @@
     </script>
 </head>
 <body>
-    <h1>Add a New Session</h1>
+    {% for session in session_data %}
+    <h2>Session on {{ session.date }}</h2>
+    <p>Template: {{ session.template_name or "No template used" }}</p>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Exercise</th>
+                <th>Sets</th>
+                <th>Reps</th>
+                <th>Weight</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for exercise in session.exercises %}
+                <tr>
+                    <td>{{ exercise[0] }}</td>
+                    <td>{{ exercise[1] }}</td>
+                    <td>{{ exercise[2] }}</td>
+                    <td>{{ exercise[3] }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endfor %}
+
+    <!-- <h1>Add a New Session</h1> -->
     <form method="POST">
-        <label for="date">Date:</label>
-        <input type="date" name="date" id="date" required>
         <br>
-        <label for="template">Template:</label>
+        <!-- <label for="template">Template:</label> -->
         <select name="template_id">
             <option value="">Select a Template</option>
             {% for template in templates %}
@@ -61,11 +92,14 @@
             {% endfor %}
         </select>
         <br>
+        <!-- <label for="date">Date:</label> -->
+        <input type="date" name="date" id="date" required>
         <div id="exercise-list">
             <!-- Dynamic rows will be added here -->
-            <button type="button" onclick="addExerciseRow()">Add Exercise</button>
         </div>
+        <button type="button" onclick="addExerciseRow()" style="margin-bottom:1cm;">Add Exercise</button>
         <br>
+
         <button type="submit">Add Session</button>
     </form>
 </body>
