@@ -51,7 +51,7 @@ def homepage():
             FROM training_sessions s
             LEFT JOIN templates t ON s.template_id = t.id
             ORDER BY s.id DESC
-            LIMIT 2
+            LIMIT 10
         """)
         sessions = cursor.fetchall()
 
