@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Session</title>
+    <script>
+        // Set the current date in the date field
+        window.onload = function () {
+            const dateField = document.getElementById("date");
+            const today = new Date();
+            const formattedDate = today.toISOString().split('T')[0];
+            dateField.value = formattedDate;
+        };
+
+        // Add a new exercise row dynamically
+        function addExerciseRow() {
+            const exerciseList = document.getElementById('exercise-list');
+            const newRow = document.createElement('div');
+            newRow.innerHTML = `
+                <div>
+                    <input type="text" name="exercise[]" placeholder="Exercise Name" oninput="loadLastSession(this)" required>
+                    <input type="number" name="sets[]" placeholder="Sets" required>
+                    <input type="number" name="reps[]" placeholder="Reps" required>
+                    <input type="number" name="weight[]" placeholder="Weight (kg)" step="0.1" required>
+                    <button type="button" onclick="removeExerciseRow(this)">Remove</button>
+                </div>`;
+            exerciseList.appendChild(newRow);
+        }
+
+        // Remove an exercise row
+        function removeExerciseRow(button) {
+            button.parentElement.remove();
+        }
+
+        // Fetch the last session data for a specific exercise
+        function loadLastSession(inputField) {
+            const exercise = inputField.value;
+            if (exercise) {
+                fetch(`/get_last_session/${exercise}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const parent = inputField.parentElement;
+                        parent.querySelector('input[name="sets[]"]').value = data.sets || '';
+                        parent.querySelector('input[name="reps[]"]').value = data.reps || '';
+                        parent.querySelector('input[name="weight[]"]').value = data.weight || '';
+                    });
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Add a New Session</h1>
+    <form method="POST">
+        <label for="date">Date:</label>
+        <input type="date" name="date" id="date" required>
+        <br>
+        <label for="template">Template:</label>
+        <select name="template_id">
+            <option value="">Select a Template</option>
+            {% for template in templates %}
+            <option value="{{ template[0] }}">{{ template[1] }}</option>
+            {% endfor %}
+        </select>
+        <br>
+        <div id="exercise-list">
+            <!-- Dynamic rows will be added here -->
+            <button type="button" onclick="addExerciseRow()">Add Exercise</button>
+        </div>
+        <br>
+        <button type="submit">Add Session</button>
+    </form>
+</body>
+</html>

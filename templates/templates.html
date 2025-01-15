@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Templates</title>
+</head>
+<body>
+    <h1>Select a Template</h1>
+    <ul>
+        {% for template in templates %}
+        <li>
+            <strong>{{ template[1] }}</strong> ({{ template[2] }}) - 
+            {{ template[3] }} sets, {{ template[4] }} reps
+        </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

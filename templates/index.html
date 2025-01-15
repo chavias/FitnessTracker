@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitness Tracker</title>
+</head>
+<body>
+    <h1>Recent Training Sessions</h1>
+    {% for session in session_data %}
+        <h2>Session on {{ session.date }}</h2>
+        <p>Template: {{ session.template_name or "No template used" }}</p>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Exercise</th>
+                    <th>Sets</th>
+                    <th>Reps</th>
+                    <th>Weight</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for exercise in session.exercises %}
+                    <tr>
+                        <td>{{ exercise[0] }}</td>
+                        <td>{{ exercise[1] }}</td>
+                        <td>{{ exercise[2] }}</td>
+                        <td>{{ exercise[3] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endfor %}
+</body>
+</html>
