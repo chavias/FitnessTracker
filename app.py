@@ -5,18 +5,25 @@ app = Flask(__name__)
 
 def init_db():
     with sqlite3.connect("fitness.db") as conn:
-        # Templates table: Stores predefined templates for exercises
+        # Templates table: Stores predefined templates
         conn.execute("""
             CREATE TABLE IF NOT EXISTS templates (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                exercise TEXT NOT NULL,
-                default_sets INTEGER,
-                default_reps INTEGER
+                name TEXT NOT NULL
             )
         """)
-        
-        # Training sessions table: Stores session-level data
+
+        # Template exercises table: Stores exercises associated with each template
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS template_exercises (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                template_id INTEGER NOT NULL,
+                exercise TEXT NOT NULL,
+                FOREIGN KEY (template_id) REFERENCES templates (id)
+            )
+        """)
+
+        # Training sessions table (unchanged)
         conn.execute("""
             CREATE TABLE IF NOT EXISTS training_sessions (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -25,8 +32,8 @@ def init_db():
                 FOREIGN KEY (template_id) REFERENCES templates (id)
             )
         """)
-        
-        # Exercises table: Stores individual exercises for each session
+
+        # Exercises table (unchanged)
         conn.execute("""
             CREATE TABLE IF NOT EXISTS exercises (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -38,6 +45,7 @@ def init_db():
                 FOREIGN KEY (session_id) REFERENCES training_sessions (id)
             )
         """)
+
 
 
 @app.route("/")
@@ -76,13 +84,50 @@ def homepage():
     return render_template("index.html", session_data=session_data)
 
 
-@app.route("/templates", methods=["GET"])
+@app.route("/templates", methods=["GET", "POST"])
 def templates():
     with sqlite3.connect("fitness.db") as conn:
         cursor = conn.cursor()
+
+        if request.method == "POST":
+            # Create a new template
+            template_name = request.form["template_name"]
+
+            # Insert the template name
+            cursor.execute("INSERT INTO templates (name) VALUES (?)", (template_name,))
+            template_id = cursor.lastrowid
+
+            # Insert exercises associated with this template
+            exercises = request.form.getlist("exercise[]")
+            # sets = request.form.getlist("sets[]")
+            # reps = request.form.getlist("reps[]")
+            # weights = request.form.getlist("weight[]")
+
+            for exercise in exercises:
+                cursor.execute("""
+                    INSERT INTO template_exercises (template_id, exercise)
+                    VALUES (?, ?)
+                """, (template_id, exercise))
+
+            conn.commit()
+            return redirect("/templates")
+
+        # Fetch all templates and their exercises
         cursor.execute("SELECT * FROM templates")
         templates = cursor.fetchall()
-    return render_template("templates.html", templates=templates)
+
+        template_data = {}
+        for template in templates:
+            template_id = template[0]
+            cursor.execute("""
+                SELECT exercise
+                FROM template_exercises
+                WHERE template_id = ?
+            """, (template_id,))
+            template_data[template_id] = cursor.fetchall()
+
+    return render_template("templates.html", templates=templates, template_data=template_data)
+
 
 
 @app.route("/get_last_session/<exercise>", methods=["GET"])
@@ -113,10 +158,11 @@ def get_last_session(exercise):
 def add_session():
     with sqlite3.connect("fitness.db") as conn:
         cursor = conn.cursor()
-        
+
         if request.method == "POST":
+            # Handle session creation
             date = request.form["date"]
-            template_id = request.form.get("template_id")
+            template_id = request.form["template_id"]
 
             # Insert the session
             cursor.execute("""
@@ -125,7 +171,7 @@ def add_session():
             """, (date, template_id))
             session_id = cursor.lastrowid
 
-            # Insert the exercises for the session
+            # Insert exercises for the session
             exercises = request.form.getlist("exercise[]")
             sets = request.form.getlist("sets[]")
             reps = request.form.getlist("reps[]")
@@ -144,39 +190,40 @@ def add_session():
         cursor.execute("SELECT id, name FROM templates")
         templates = cursor.fetchall()
 
-        # Fetch the exercises for each template
+        # Fetch exercises for each template
         template_exercises = {}
-        for template in templates:
-            template_id = template[0]
+        for template_id, _ in templates:
             cursor.execute("""
-                SELECT exercise, default_sets, default_reps
-                FROM templates
-                WHERE id = ?
+                SELECT exercise
+                FROM template_exercises
+                WHERE template_id = ?
             """, (template_id,))
-            exercises = cursor.fetchall()
-            template_exercises[template_id] = exercises
+            template_exercises[template_id] = cursor.fetchall()
 
-        # Fetch the last session's data for each exercise (weights and reps), independent of template
-        exercise_data = {}
-        for template_id in template_exercises:
-            for exercise, _, _ in template_exercises[template_id]:
-                cursor.execute("""
-                    SELECT sets, reps, weight
-                    FROM exercises
-                    WHERE exercise = ?
-                    ORDER BY session_id DESC
-                    LIMIT 1
-                """, (exercise,))
-                last_exercise_data = cursor.fetchone()
-                if last_exercise_data:
-                    exercise_data[exercise] = last_exercise_data
-                else:
-                    exercise_data[exercise] = (None, None, None)
+        return render_template("add.html", templates=templates, template_exercises=template_exercises)
 
-        return render_template("add.html", templates=templates, 
-                               template_exercises=template_exercises,
-                               exercise_data=exercise_data)
 
+
+@app.route("/get_template/<int:template_id>")
+def get_template(template_id):
+    with sqlite3.connect("fitness.db") as conn:
+        cursor = conn.cursor()
+
+        # Fetch template exercises
+        cursor.execute("""
+            SELECT exercise
+            FROM template_exercises
+            WHERE template_id = ?
+        """, (template_id,))
+        exercises = cursor.fetchall()
+
+        # Convert to JSON-serializable format
+        exercises_data = [
+            {"exercise": row[0]}
+            for row in exercises
+        ]
+
+    return jsonify({"exercises": exercises_data})
 
 
 

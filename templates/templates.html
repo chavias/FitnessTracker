@@ -1,17 +1,66 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Templates</title>
-</head>
-<body>
-    <h1>Select a Template</h1>
-    <ul>
+{% extends 'layout.html' %}
+
+{% block content %}
+<!-- <h1>Manage Templates</h1> -->
+
+<script>
+    // Function to add a new exercise row
+    function addExerciseRow() {
+        const exerciseList = document.getElementById('exercise-list');
+        const newRow = document.createElement('div');
+        newRow.className = 'exercise-row'; // Add a class for styling
+        newRow.innerHTML = `
+            <input type="text" name="exercise[]" placeholder="Exercise Name" required>
+            <button type="button" class="remove-button" onclick="removeExerciseRow(this)">&#10006;</button>
+        `;
+        exerciseList.appendChild(newRow);
+    }
+
+    // Function to remove an exercise row
+    function removeExerciseRow(button) {
+        button.parentElement.remove();
+    }
+</script>
+
+<!-- Form for adding a new template -->
+<h2>Create New Template</h2>
+<form method="POST">
+    <label for="template_name">Template Name:</label>
+    <input type="text" name="template_name" id="template_name" required><br>
+
+    <div id="exercise-list">
+        <div class="exercise-row">
+            <input type="text" name="exercise[]" placeholder="Exercise Name" required>
+            <!-- <input type="number" name="sets[]" placeholder="Sets" style="display:none;">
+            <input type="number" name="reps[]" placeholder="Reps" style="display:none;">
+            <input type="number" name="weight[]" placeholder="Weight (kg)" step="0.5" style="display:none;"> -->
+            <button type="button" onclick="removeExerciseRow(this)">&#10006;</button>
+        </div>
+    </div>
+    <button type="button" onclick="addExerciseRow()">Add Exercise</button><br><br>
+
+    <button type="submit">Create Template</button>
+</form>
+
+<h2>Existing Templates</h2>
+<ul>
+    {% if templates %}
         {% for template in templates %}
-        <li>
-            <strong>{{ template[1] }}</strong> ({{ template[2] }}) - 
-            {{ template[3] }} sets, {{ template[4] }} reps
-        </li>
+            <li>
+                <strong>{{ template[1] }}</strong>
+                <ul>
+                    {% if template[0] in template_data %}
+                        {% for exercise in template_data[template[0]] %}
+                            <li>{{ exercise[0] }} </li>
+                        {% endfor %}
+                    {% else %}
+                        <li>No exercises available for this template.</li>
+                    {% endif %}
+                </ul>
+            </li>
         {% endfor %}
-    </ul>
-</body>
-</html>
+    {% else %}
+        <li>No templates found.</li>
+    {% endif %}
+</ul>
+{% endblock %}
