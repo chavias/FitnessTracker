@@ -26,7 +26,7 @@ th, td {
 }
 
 th {
-    background-color: #3498db;
+    background-color: #5f788a;
     color: white;
 }
 
@@ -73,9 +73,11 @@ form input[type="date"] {
 }
 
 form button {
-    background-color: #3498db;
+    background-color: #444444;
     color: white;
-    padding: 12px 20px;
+    padding: 10px 10px;
+    margin-top: 5px;
+    margin-bottom: 10px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -83,34 +85,56 @@ form button {
 }
 
 form button:hover {
-    background-color: #2980b9;
+    background-color: #10263a;
 }
 
 form button[type="button"] {
-    background-color: #e74c3c;
-    margin-top: 10px;
+    background-color: #5f788a;
 }
 
 form button[type="button"]:hover {
-    background-color: #c0392b;
+    background-color: #295c88;
 }
 
 /* Exercise Rows */
-#exercise-list div {
+#exercise-list {
+    margin-top: 0px; /* Ensures proper spacing */
+}
+
+#exercise-list .exercise-row {
     display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 10px;
+    gap: 10px; /* Space between fields and button */
+    align-items: bottom; /* Ensures vertical alignment */
+    margin-bottom: 0px;
 }
 
 #exercise-list input {
-    width: calc(25% - 10px);
+    flex: 1; /* Makes inputs grow equally */
+    height: 45px; /* Sets the same height as the button */
     padding: 10px;
+    font-size: 14px;
+    box-sizing: border-box; /* Ensures padding is included in the height */
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }
 
 #exercise-list button {
-    width: 100px;
-    align-self: flex-end;
+    width: 45px; /* Same width as height for a square shape */
+    height: 45px; /* Matches input height */
+    padding: 0; /* Removes extra padding */
+    text-align: bottom; /* Centers text horizontally */
+    line-height: 45px; /* Centers text vertically */
+    font-size: 18px;
+    border-radius: 4px; /* Optional for rounded corners */
+    background-color: #811919;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    box-sizing: border-box; /* Includes border in size calculations */
+}
+
+#exercise-list button:hover {
+    background-color: #a04e4e;
 }
 
 /* Responsive Design */

@@ -1,15 +1,6 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+{% extends 'layout.html' %}
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
-    <title>Add Session</title>
+{% block header %}
     <script>
         // Set the current date in the date field
         window.onload = function () {
@@ -19,22 +10,23 @@
             dateField.value = formattedDate;
         };
 
-        // Add a new exercise row dynamically
         function addExerciseRow() {
             const exerciseList = document.getElementById('exercise-list');
             const newRow = document.createElement('div');
+            newRow.className = 'exercise-row'; // Add a class for styling
             newRow.innerHTML = `
-                <div>
-                    <input type="text" name="exercise[]" placeholder="Exercise Name" oninput="loadLastSession(this)" required>
-                    <input type="number" name="sets[]" placeholder="Sets" required>
-                    <input type="number" name="reps[]" placeholder="Reps" required>
-                    <input type="number" name="weight[]" placeholder="Weight (kg)" step="0.1" required>
-                    <button type="button" onclick="removeExerciseRow(this)">Remove</button>
+                <div id="exercise-list">
+                    <div class="exercise-row">
+                        <input type="text" name="exercise[]" placeholder="Exercise Name" oninput="loadLastSession(this)" required>
+                        <input type="number" name="sets[]" placeholder="Sets" required>
+                        <input type="number" name="reps[]" placeholder="Reps" required>
+                        <input type="number" name="weight[]" placeholder="Weight (kg)" step="0.5" required>
+                        <button type="button" class="remove-button" onclick="removeExerciseRow(this)">&#10006;</button>
+                    </div>
                 </div>`;
             exerciseList.appendChild(newRow);
         }
 
-        // Remove an exercise row
         function removeExerciseRow(button) {
             button.parentElement.remove();
         }
@@ -54,32 +46,9 @@
             }
         }
     </script>
-</head>
-<body>
-    {% for session in session_data %}
-    <h2>Session on {{ session.date }}</h2>
-    <p>Template: {{ session.template_name or "No template used" }}</p>
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Exercise</th>
-                <th>Sets</th>
-                <th>Reps</th>
-                <th>Weight</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for exercise in session.exercises %}
-                <tr>
-                    <td>{{ exercise[0] }}</td>
-                    <td>{{ exercise[1] }}</td>
-                    <td>{{ exercise[2] }}</td>
-                    <td>{{ exercise[3] }}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% endfor %}
+{% endblock %}
+
+{% block content %}
     <!-- <h1>Add a New Session</h1> -->
     <form method="POST">
         <br>
@@ -98,8 +67,6 @@
         </div>
         <button type="button" onclick="addExerciseRow()" style="margin-bottom:1cm;">Add Exercise</button>
         <br>
-
         <button type="submit">Add Session</button>
     </form>
-</body>
-</html>
+{% endblock %}
