@@ -23,7 +23,7 @@
 </script>
 
 <!-- Form for adding a new template -->
-<h2>Create New Template</h2>
+<!-- <h2>Create New Template</h2> -->
 <form method="POST">
     <label for="template_name">Template Name:</label>
     <input type="text" name="template_name" id="template_name" required><br>
@@ -42,25 +42,30 @@
     <button type="submit">Create Template</button>
 </form>
 
-<h2>Existing Templates</h2>
-<ul>
-    {% if templates %}
-        {% for template in templates %}
-            <li>
-                <strong>{{ template[1] }}</strong>
-                <ul>
-                    {% if template[0] in template_data %}
-                        {% for exercise in template_data[template[0]] %}
-                            <li>{{ exercise[0] }} </li>
-                        {% endfor %}
-                    {% else %}
-                        <li>No exercises available for this template.</li>
-                    {% endif %}
-                </ul>
-            </li>
-        {% endfor %}
-    {% else %}
-        <li>No templates found.</li>
-    {% endif %}
-</ul>
+<link rel="stylesheet" href="/static/templates.css">
+
+
+<div class="template-section">
+    <!-- <h2>Existing Templates</h2> -->
+    <ul class="template-list">
+        {% if templates %}
+            {% for template in templates %}
+                <li>
+                    <strong>{{ template[1] }}</strong>
+                    <ul>
+                        {% if template[0] in template_data %}
+                            {% for exercise in template_data[template[0]] %}
+                                <li>{{ exercise[0] }}</li>
+                            {% endfor %}
+                        {% else %}
+                            <li>No exercises available for this template.</li>
+                        {% endif %}
+                    </ul>
+                </li>
+            {% endfor %}
+        {% else %}
+            <li class="no-templates">No templates found.</li>
+        {% endif %}
+    </ul>
+</div>
 {% endblock %}
