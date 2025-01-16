@@ -129,8 +129,6 @@ form button[type="button"]:hover {
 }
 
 
-
-
 #exercise-list button {
     width: 45px; /* Same width as height for a square shape */
     height: 45px; /* Matches input height */
