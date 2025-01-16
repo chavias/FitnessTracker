@@ -1,10 +1,11 @@
 {% extends 'layout.html' %}
 
+
 {% block content %}
     <!-- <h1>Recent Training Sessions</h1> -->
     {% for session in session_data %}
         <!-- <h2>Session on {{ session.date }}</h2> -->
-        <h5> {{ session.template_name or "Random" }} session on {{ session.date }}</h5>
+        <h5> {{ session.date }} | {{ session.template_name or "Random" }} session </h5>
         <table border="1">
             <thead>
                 <tr>

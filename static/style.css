@@ -13,16 +13,34 @@ h1, h2 {
 }
 
 /* Session Table */
+/* First column wider */
+table .wide-column {
+    width: 40%; /* Adjust percentage as needed */
+}
+
+/* Smaller input fields for all except first column */
+table .small-input {
+    width: 60px; /* Fixed width for small inputs */
+    padding: 5px; /* Reduce padding for a compact appearance */
+    font-size: 12px; /* Adjust font size */
+}
+
+/* Larger input for exercise name */
+table .exercise-name {
+    width: 100%; /* Let it fill the entire cell */
+    padding: 8px;
+    font-size: 14px;
+}
+
+/* General table styles */
 table {
     width: 100%;
-    border-collapse: collapse;
     margin: 10px 0;
 }
 
 th, td {
-    padding: 12px;
     text-align: left;
-    border: 1px solid #ddd;
+    vertical-align: middle;
 }
 
 th {
@@ -34,9 +52,6 @@ tr:nth-child(even) {
     background-color: #f2f2f2;
 }
 
-table th, table td {
-    min-width: 120px;
-}
 
 /* Form Styles */
 form {
@@ -56,11 +71,12 @@ form label {
 
 form select, form input {
     width: 100%;
-    padding: 10px;
+    padding: 5px;
     margin-top: 5px;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
     border: 1px solid #ccc;
-    border-radius: 4px;
+    border-radius: 5px;
+    text-align: center;
     font-size: 16px;
 }
 
@@ -75,13 +91,17 @@ form input[type="date"] {
 form button {
     background-color: #444444;
     color: white;
-    padding: 10px 10px;
+    padding: 5px;
     margin-top: 5px;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    text-align: center;
     font-size: 16px;
+    display: flex; /* Enables flexbox for vertical alignment */
+    align-items: center; /* Centers content vertically */
+    justify-content: center; /* Centers content horizontally */
 }
 
 form button:hover {
