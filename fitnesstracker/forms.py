@@ -16,4 +16,4 @@ class RegistrationFrom(FlaskForm):
     remember = BooleanField('Remember Me')
     submit = SubmitField('Login')
 
-class TrainingSessionFrom(FlaskForm);
+# class TrainingSessionFrom(FlaskForm);

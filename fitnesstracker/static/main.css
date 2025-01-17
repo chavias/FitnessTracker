@@ -1,0 +1,205 @@
+/* Global Styles */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #fafafa;
+  color: #333333;
+  margin: 0px;
+  padding: 0px;
+  margin-top: 5rem;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #444444;
+}
+
+h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* Header and Navbar */
+.bg-steel {
+  background-color: #5f788a;
+}
+
+.site-header .navbar-nav .nav-link {
+  color: #cbd5db;
+}
+
+.site-header .navbar-nav .nav-link:hover {
+  color: #ffffff;
+}
+
+.site-header .navbar-nav .nav-link.active {
+  font-weight: 500;
+}
+
+/* Content Section */
+.content-section, .template-section {
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  max-width: 600px;
+  margin: 20px auto;
+}
+
+.template-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.template-list > li {
+  margin-bottom: 20px;
+  padding: 10px;
+  background-color: #f1f1f1;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.template-list strong {
+  font-size: 18px;
+  color: #2c3e50;
+}
+
+.template-list ul {
+  margin-top: 10px;
+  padding-left: 20px;
+}
+
+.template-list ul li {
+  margin-bottom: 5px;
+  color: #555;
+}
+
+/* Table Styles */
+table {
+  width: 100%;
+  margin: 10px 0;
+  border-collapse: collapse;
+}
+
+th, td {
+  text-align: left;
+  vertical-align: middle;
+  padding: 10px;
+}
+
+th {
+  background-color: #5f788a;
+  color: white;
+}
+
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+/* Form Styles */
+form {
+  background-color: #ffffff;
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  margin: 20px auto;
+}
+
+form label {
+  font-weight: bold;
+  margin-top: 10px;
+  display: block;
+}
+
+form select, form input, form button {
+  width: 100%;
+  padding: 5px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+form select {
+  background-color: #f9f9f9;
+}
+
+form input[type="date"] {
+  background-color: #fff;
+}
+
+form button {
+  background-color: #444444;
+  color: white;
+  padding: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  text-align: center;
+}
+
+form button:hover {
+  background-color: #10263a;
+}
+
+form button[type="button"] {
+  background-color: #5f788a;
+}
+
+form button[type="button"]:hover {
+  background-color: #295c88;
+}
+
+/* Exercise Rows */
+#exercise-list {
+  margin-top: 0px;
+}
+
+#exercise-list .exercise-row {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  margin-bottom: 0px;
+}
+
+#exercise-list input {
+  flex-grow: 1;
+  padding: 5px;
+}
+
+#exercise-list button {
+  width: 45px;
+  background-color: #811919;
+  color: #fff;
+}
+
+#exercise-list button:hover {
+  background-color: #a04e4e;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  form {
+      padding: 15px;
+  }
+
+  form label, form select, form input, form button {
+      font-size: 14px;
+  }
+
+  table th, table td {
+      padding: 8px;
+  }
+
+  #exercise-list input {
+      width: 100%;
+  }
+}
+
+/* No templates found message */
+.no-templates {
+  color: #888;
+  font-style: italic;
+}

@@ -18,10 +18,10 @@
             <tbody>
                 {% for exercise in session.exercises %}
                     <tr>
-                        <td>{{ exercise[0] }}</td>
-                        <td>{{ exercise[1] }}</td>
-                        <td>{{ exercise[2] }}</td>
-                        <td>{{ exercise[3] }}</td>
+                        <td>{{ exercise.exercise }}</td>
+                        <td>{{ exercise.sets }}</td>
+                        <td>{{ exercise.reps }}</td>
+                        <td>{{ exercise.weight }}</td>
                     </tr>
                 {% endfor %}
             </tbody>

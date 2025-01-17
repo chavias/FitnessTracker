@@ -42,7 +42,7 @@
     <button type="submit">Create Template</button>
 </form>
 
-<link rel="stylesheet" href="/static/templates.css">
+<!-- <link rel="stylesheet" href="/static/templates.css"> -->
 
 
 <div class="template-section">
@@ -51,11 +51,11 @@
         {% if templates %}
             {% for template in templates %}
                 <li>
-                    <strong>{{ template[1] }}</strong>
+                    <strong>{{ template.name }}</strong>
                     <ul>
-                        {% if template[0] in template_data %}
-                            {% for exercise in template_data[template[0]] %}
-                                <li>{{ exercise[0] }}</li>
+                        {% if template.id in template_data %}
+                            {% for exercise in template_data[template.id] %}
+                                <li>{{ exercise }}</li>
                             {% endfor %}
                         {% else %}
                             <li>No exercises available for this template.</li>
