@@ -1,5 +1,5 @@
 from fitnesstracker.models import TrainingSession, Template, TemplateExercise, Exercise
-from flask import render_template, request, redirect, jsonify
+from flask import render_template, request, redirect, jsonify, flash
 from fitnesstracker import app, db
 from datetime import datetime
 
@@ -40,6 +40,7 @@ def templates():
         db.session.add(new_template)
         db.session.commit()
 
+        flash('added template', 'success')
         # Debugging: Check the saved template
         print(f"New Template Added: {new_template.id} - {new_template.name}")
         for exercise in new_template.exercises:
@@ -94,6 +95,7 @@ def add_session():
             db.session.add(new_exercise)
 
         db.session.commit()
+        flash('added session', 'success')
         return redirect("/")
 
     templates = Template.query.all()

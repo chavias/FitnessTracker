@@ -5,6 +5,7 @@
     <!-- <h1>Recent Training Sessions</h1> -->
     {% for session in session_data %}
         <!-- <h2>Session on {{ session.date }}</h2> -->
+    <form method="POST">
         <h5> {{ session.date }}   |   {{ session.template_name or "Random" }} </h5>
         <table border="1">
             <thead>
@@ -26,5 +27,6 @@
                 {% endfor %}
             </tbody>
         </table>
+    </form>
     {% endfor %}
 {% endblock %}
