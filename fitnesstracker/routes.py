@@ -1,5 +1,6 @@
 from fitnesstracker.models import TrainingSession, Template, TemplateExercise, Exercise
-from flask import render_template, request, redirect, jsonify, flash
+from fitnesstracker.forms import ExerciseForm, TemplateForm
+from flask import render_template, request, redirect, jsonify, flash, url_for
 from fitnesstracker import app, db
 from datetime import datetime
 
@@ -23,40 +24,78 @@ def homepage():
 
     return render_template("index.html", session_data=session_data)
 
-@app.route("/templates", methods=["GET", "POST"])
+# @app.route("/templates", methods=["GET", "POST"])
+# def templates():
+#     if request.method == "POST":
+#         # Fetch form data
+#         template_name = request.form["template_name"]
+#         exercises = request.form.getlist("exercise[]")
+
+#         # Create a new Template object
+#         new_template = Template(name=template_name)
+
+#         # Add exercises to the template
+#         new_template.exercises = [TemplateExercise(exercise=exercise) for exercise in exercises]
+
+#         # Save the template and associated exercises
+#         db.session.add(new_template)
+#         db.session.commit()
+
+#         flash('added template', 'success')
+#         # Debugging: Check the saved template
+#         print(f"New Template Added: {new_template.id} - {new_template.name}")
+#         for exercise in new_template.exercises:
+#             print(f"Exercise: {exercise.exercise}")
+
+#         return redirect("/templates")
+
+#     # Query all templates with their exercises
+#     templates = Template.query.all()
+#     print(f"Templates: {templates}")
+
+#     # Create a dictionary to pass data to the template
+#     template_data = {t.id: [e.exercise for e in t.exercises] for t in templates}
+#     print(f"Template Data: {template_data}")
+
+#     return render_template("templates.html", templates=templates, template_data=template_data)
+@app.route('/templates', methods=['GET', 'POST'])
 def templates():
-    if request.method == "POST":
-        # Fetch form data
-        template_name = request.form["template_name"]
-        exercises = request.form.getlist("exercise[]")
+    form = TemplateForm()
 
-        # Create a new Template object
-        new_template = Template(name=template_name)
+    if form.validate_on_submit():
+        if form.submit.data:  # Create Template logic
+            # Fetch form data
+            template_name = form.template_name.data
+            exercises = [exercise.exercise_name.data for exercise in form.exercises]
 
-        # Add exercises to the template
-        new_template.exercises = [TemplateExercise(exercise=exercise) for exercise in exercises]
+            # Create a new Template object
+            new_template = Template(name=template_name)
 
-        # Save the template and associated exercises
-        db.session.add(new_template)
-        db.session.commit()
+            # Add exercises to the template
+            new_template.exercises = [TemplateExercise(exercise=exercise) for exercise in exercises]
 
-        flash('added template', 'success')
-        # Debugging: Check the saved template
-        print(f"New Template Added: {new_template.id} - {new_template.name}")
-        for exercise in new_template.exercises:
-            print(f"Exercise: {exercise.exercise}")
+            # Save the template and associated exercises
+            db.session.add(new_template)
+            db.session.commit()
 
-        return redirect("/templates")
+            flash('Template added successfully!', 'success')
 
-    # Query all templates with their exercises
+            # Debugging: Print saved template and exercises
+            print(f"New Template Added: {new_template.id} - {new_template.name}")
+            for exercise in new_template.exercises:
+                print(f"Exercise: {exercise.exercise}")
+
+            # Redirect to the same page to avoid duplicate form submissions
+            return redirect('/templates')
+
+    # Fetch all templates with their associated exercises
     templates = Template.query.all()
-    print(f"Templates: {templates}")
 
-    # Create a dictionary to pass data to the template
+    # Create a dictionary for rendering template data
     template_data = {t.id: [e.exercise for e in t.exercises] for t in templates}
-    print(f"Template Data: {template_data}")
 
-    return render_template("templates.html", templates=templates, template_data=template_data)
+    return render_template('templates.html', form=form, templates=templates, template_data=template_data)
+
 
 
 

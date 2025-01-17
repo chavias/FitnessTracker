@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, FieldList, FormField
 from wtforms.validators import DataRequired, Length, Email, EqualTo
 
 
@@ -16,4 +16,15 @@ class RegistrationFrom(FlaskForm):
     remember = BooleanField('Remember Me')
     submit = SubmitField('Login')
 
-# class TrainingSessionFrom(FlaskForm);
+# Subform for exercises
+class ExerciseForm(FlaskForm):
+    exercise_name = StringField('Exercise Name', validators=[DataRequired()])
+
+# Form for Templates
+class TemplateForm(FlaskForm):
+    template_name = StringField('Template Name', validators=[DataRequired()])
+    exercises = FieldList(FormField(ExerciseForm), min_entries=1)  # Dynamically add exercise rows
+    add_exercise = SubmitField('Add Exercise')
+    submit = SubmitField('Create Template')
+
+
