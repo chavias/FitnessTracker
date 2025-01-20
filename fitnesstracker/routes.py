@@ -90,7 +90,11 @@ def update_template(template_id):
 
     elif request.method == 'GET':
         # Pre-fill the form with existing exercise data
-        for exercise in template.exercises:
+        form.template_name.data = template.name
+        if template.exercises:
+            form.exercises[0].exercise_name.data = template.exercises[0].exercise  # Set the first exercise
+        # form.exercises = template.exercises
+        for exercise in template.exercises[1:]:
             form.exercises.append_entry({'exercise_name': exercise.exercise})
 
     return render_template('templates.html', form=form, legend='Update template')
