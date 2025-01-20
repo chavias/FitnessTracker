@@ -1,5 +1,5 @@
 from fitnesstracker.models import TrainingSession, Template, TemplateExercise, Exercise
-from fitnesstracker.forms import ExerciseForm, TemplateForm
+from fitnesstracker.forms import TemplateForm
 from flask import render_template, request, redirect, jsonify, flash, url_for
 from fitnesstracker import app, db
 from datetime import datetime
@@ -24,40 +24,7 @@ def homepage():
 
     return render_template("index.html", session_data=session_data)
 
-# @app.route("/templates", methods=["GET", "POST"])
-# def templates():
-#     if request.method == "POST":
-#         # Fetch form data
-#         template_name = request.form["template_name"]
-#         exercises = request.form.getlist("exercise[]")
 
-#         # Create a new Template object
-#         new_template = Template(name=template_name)
-
-#         # Add exercises to the template
-#         new_template.exercises = [TemplateExercise(exercise=exercise) for exercise in exercises]
-
-#         # Save the template and associated exercises
-#         db.session.add(new_template)
-#         db.session.commit()
-
-#         flash('added template', 'success')
-#         # Debugging: Check the saved template
-#         print(f"New Template Added: {new_template.id} - {new_template.name}")
-#         for exercise in new_template.exercises:
-#             print(f"Exercise: {exercise.exercise}")
-
-#         return redirect("/templates")
-
-#     # Query all templates with their exercises
-#     templates = Template.query.all()
-#     print(f"Templates: {templates}")
-
-#     # Create a dictionary to pass data to the template
-#     template_data = {t.id: [e.exercise for e in t.exercises] for t in templates}
-#     print(f"Template Data: {template_data}")
-
-#     return render_template("templates.html", templates=templates, template_data=template_data)
 @app.route('/templates', methods=['GET', 'POST'])
 def templates():
     form = TemplateForm()
@@ -97,6 +64,47 @@ def templates():
     return render_template('templates.html', form=form, templates=templates, template_data=template_data)
 
 
+@app.route("/template/<int:template_id>")
+def template(template_id):
+    template = Template.query.get_or_404(template_id)
+    return render_template('template.html', template=template)
+
+
+@app.route("/template/<int:template_id>/update", methods=['GET', 'POST'])
+def update_template(template_id):
+    template = Template.query.get_or_404(template_id)
+    form = TemplateForm()
+
+    if form.validate_on_submit():
+        # Clear existing exercises (if needed) and add new ones
+        template.exercises = []  # Empty the existing exercises
+
+        # Create new Exercise instances based on form data
+        for exercise_form in form.exercises:
+            exercise = TemplateExercise(exercise=exercise_form.exercise_name.data)
+            template.exercises.append(exercise)  # Add the exercise to the template
+
+        db.session.commit()
+        flash('Your template has been updated!', 'success')
+        return redirect(url_for('template', template_id=template.id))
+
+    elif request.method == 'GET':
+        # Pre-fill the form with existing exercise data
+        for exercise in template.exercises:
+            form.exercises.append_entry({'exercise_name': exercise.exercise})
+
+    return render_template('templates.html', form=form, legend='Update template')
+
+
+
+
+@app.route("/template/<int:template_id>/delete", methods=['POST'])
+def delete_template(template_id):
+    template = Template.query.get_or_404(template_id)
+    db.session.delete(template)
+    db.session.commit()
+    flash('Your template has been deleted!', 'success')
+    return redirect(url_for('homepage'))
 
 
 @app.route("/get_last_session/<exercise>", methods=["GET"])
@@ -107,6 +115,7 @@ def get_last_session(exercise):
         return jsonify({"sets": last_exercise.sets, "reps": last_exercise.reps, "weight": last_exercise.weight})
     else:
         return jsonify({"sets": "", "reps": "", "weight": ""})  # No prior session
+
 
 
 @app.route("/add", methods=["GET", "POST"])

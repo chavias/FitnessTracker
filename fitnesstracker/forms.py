@@ -17,13 +17,13 @@ class RegistrationFrom(FlaskForm):
     submit = SubmitField('Login')
 
 # Subform for exercises
-class ExerciseForm(FlaskForm):
+class ExerciseTemplateForm(FlaskForm):
     exercise_name = StringField('Exercise Name', validators=[DataRequired()])
 
 # Form for Templates
 class TemplateForm(FlaskForm):
     template_name = StringField('Template Name', validators=[DataRequired()])
-    exercises = FieldList(FormField(ExerciseForm), min_entries=1)  # Dynamically add exercise rows
+    exercises = FieldList(FormField(ExerciseTemplateForm), min_entries=1)  # Dynamically add exercise rows
     add_exercise = SubmitField('Add Exercise')
     submit = SubmitField('Create Template')
 

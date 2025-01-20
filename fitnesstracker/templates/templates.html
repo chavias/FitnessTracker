@@ -19,7 +19,6 @@
         exerciseList.appendChild(newRow);
     }
 
-
     function removeExerciseRow(button) {
         const row = button.parentElement;
         row.remove();
@@ -30,31 +29,40 @@
 {% block content %}
 <form method="POST">
     {{ form.hidden_tag() }}
-    <input type="text" name="template_name" 
-        value="{{ form.template_name.data or '' }}" 
-        placeholder="{{ form.template_name.label.text }}" 
-        size="40" required><br><br>
 
+    <!-- Template Name -->
+    <div class="form-group">
+        <label for="template_name">{{ form.template_name.label }}</label>
+        <input type="text" name="template_name" 
+            value="{{ form.template_name.data or '' }}" 
+            placeholder="{{ form.template_name.label.text }}" 
+            size="40" required>
+    </div>
+
+    <!-- Exercises List -->
     <div id="exercise-list">
         {% for subform in form.exercises %}
             <div class="exercise-row">
                 <input type="text" name="exercises-{{ loop.index0 }}-exercise_name" 
                     value="{{ subform.exercise_name.data or '' }}" 
                     placeholder="Exercise Name" required>
-                    {{ subform.csrf_token }}
+                {{ subform.csrf_token }}
                 <button type="button" onclick="removeExerciseRow(this)">&#10006;</button>
             </div>
         {% endfor %}
     </div>
+
+    <!-- Add Exercise Button -->
     <button type="button" onclick="addExerciseRow()">Add Exercise</button><br><br>
+
+    <!-- Submit Button -->
     <button type="submit" name="submit" value="true">Create Template</button>
 </form>
 
-
-<!-- Template Section (Optional for Display) -->
-<div class="template-section">
-    <ul class="template-list">
-        {% if templates %}
+<!-- Display Templates Section -->
+<!-- {% if templates %}
+    <div class="template-section">
+        <ul class="template-list">
             {% for template in templates %}
                 <li>
                     <strong>{{ template.name }}</strong>
@@ -65,9 +73,27 @@
                     </ul>
                 </li>
             {% endfor %}
-        {% else %}
-            <li class="no-templates">No templates found.</li>
-        {% endif %}
-    </ul>
-</div>
+        </ul>
+    </div>
+{% else %}
+    <p>No templates found.</p>
+{% endif %} -->
+
+
+{% for template in templates %}
+<article class="media content-section">
+  <div class="media-body">
+    <div class="article-metadata">
+        <a class="article-title" href="{{ url_for('template', template_id=template.id) }}">{{ template.name }}</a>
+    </div>
+    <p class="article-content">
+        {% for exercise in template_data[template.id] %}
+            <li>{{ exercise }}</li>
+        {% endfor %}
+    </p>
+  </div>
+</article>
+{% endfor %}
+
+
 {% endblock %}
