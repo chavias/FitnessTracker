@@ -1,5 +1,5 @@
-from fitnesstracker.models import TrainingSession, Template, TemplateExercise, Exercise
-from fitnesstracker.forms import TemplateForm
+from fitnesstracker.models import TrainingSession, Template, TemplateExercise, Exercise, ExerciseDetails
+from fitnesstracker.forms import TemplateForm, SessionForm, ExerciseForm, ExerciseDetailForm
 from flask import render_template, request, redirect, jsonify, flash, url_for
 from fitnesstracker import app, db
 from datetime import datetime
@@ -11,10 +11,18 @@ def homepage():
     session_data = []
 
     for session in sessions:
-        exercises = [
-            {"exercise": ex.exercise, "sets": ex.sets, "reps": ex.reps, "weight": ex.weight}
-            for ex in session.exercises
-        ]
+        exercises = []
+        for ex in session.exercises:
+            # Fetch the corresponding details for each exercise (sets, reps, weight)
+            details = [
+                {"sets": detail.repetitions, "reps": detail.repetitions, "weight": detail.weight}
+                for detail in ex.details
+            ]
+            exercises.append({
+                "exercise_name": ex.exercise_name,  # Correct field name
+                "details": details
+            })
+
         session_data.append({
             "session_id": session.id,
             "date": session.date.strftime('%Y-%m-%d'),
@@ -23,6 +31,8 @@ def homepage():
         })
 
     return render_template("index.html", session_data=session_data)
+
+
 
 
 @app.route('/templates', methods=['GET', 'POST'])
@@ -100,8 +110,6 @@ def update_template(template_id):
     return render_template('templates.html', form=form, legend='Update template')
 
 
-
-
 @app.route("/template/<int:template_id>/delete", methods=['POST'])
 def delete_template(template_id):
     template = Template.query.get_or_404(template_id)
@@ -111,53 +119,170 @@ def delete_template(template_id):
     return redirect(url_for('homepage'))
 
 
-@app.route("/get_last_session/<exercise>", methods=["GET"])
-def get_last_session(exercise):
-    last_exercise = Exercise.query.filter_by(exercise=exercise).order_by(Exercise.session_id.desc()).first()
-
-    if last_exercise:
-        return jsonify({"sets": last_exercise.sets, "reps": last_exercise.reps, "weight": last_exercise.weight})
-    else:
-        return jsonify({"sets": "", "reps": "", "weight": ""})  # No prior session
 
 
 
-@app.route("/add", methods=["GET", "POST"])
-def add_session():
-    if request.method == "POST":
-        date = request.form["date"]
-        template_id = request.form["template_id"]
-        exercises = request.form.getlist("exercise[]")
-        sets = request.form.getlist("sets[]")
-        reps = request.form.getlist("reps[]")
-        weights = request.form.getlist("weight[]")
 
-        new_session = TrainingSession(date=datetime.strptime(date, "%Y-%m-%d"), template_id=template_id)
+
+# @app.route("/get_last_session/<exercise>", methods=["GET"])
+# def get_last_session(exercise):
+#     last_exercise = Exercise.query.filter_by(exercise=exercise).order_by(Exercise.session_id.desc()).first()
+
+#     if last_exercise:
+#         return jsonify({"sets": last_exercise.sets, "reps": last_exercise.reps, "weight": last_exercise.weight})
+#     else:
+#         return jsonify({"sets": "", "reps": "", "weight": ""})  # No prior session
+
+
+@app.route('/new_session', methods=['GET', 'POST'])
+def new_session():
+    form = SessionForm()
+
+    # Populate the template dropdown
+    form.template_id.choices = [(template.id, template.name) for template in Template.query.all()]
+
+    # if form.template_id.data and request.method == 'GET':
+    #     selected_template = Template.query.get(form.template_id.data)
+    #     form.exercises.entries.clear()
+    #     for template_exercise in selected_template.exercises:
+    #         # Retrieve the last session data for this exercise
+    #         last_session = Exercise.query.filter_by(exercise_name=template_exercise.exercise).order_by(Exercise.id.desc()).first()
+    #         details = [
+    #             {"repetitions": d.repetitions, "weight": d.weight}
+    #             for d in last_session.details
+    #         ] if last_session else []
+
+    #         # Create the exercise form with pre-filled details
+    #         exercise_form = ExerciseForm(
+    #             name=template_exercise.exercise,
+    #             details=details
+    #         )
+    #         form.exercises.append_entry(exercise_form)
+
+
+    if form.validate_on_submit():
+        # Retrieve selected template ID and name
+        selected_template_id = form.template_id.data
+
+        # Retrieve exercises and details from the form
+        # exercises = []
+        # for exercise_form in form.exercises.entries:
+        #     exercise_details = [
+        #         {"repetitions": detail.repetitions.data, "weight": detail.weight.data}
+        #         for detail in exercise_form.details.entries
+        #     ]
+        #     exercises.append({"name": exercise_form.name, "details": exercise_details})
+
+        exercises = []
+        for exercise_form in form.exercises.entries:
+            exercise_name = exercise_form.form.name.data  # Correctly access .data
+            exercise_details = [
+                {"repetitions": detail.repetitions.data, "weight": detail.weight.data}
+                for detail in exercise_form.form.details.entries
+            ]
+            exercises.append({"name": exercise_name, "details": exercise_details})
+
+    
+        # Save the session to the database
+        print(f"{exercises}")
+        new_session = TrainingSession(
+            date=datetime.utcnow(),
+            template_id=selected_template_id,
+            exercises=[
+                Exercise(
+                    exercise_name=ex["name"],  # Use 'exercise' here to match your model column
+                    details=[
+                        ExerciseDetails(repetitions=det["repetitions"], weight=det["weight"])
+                        for det in ex["details"]
+                    ],
+                )
+                for ex in exercises
+            ],
+        )
+        # print(f"{ exercises["name"] }")
         db.session.add(new_session)
         db.session.commit()
+        flash("Session created successfully!", 'success')
+        return redirect(url_for('homepage'))
 
-        for exercise, set_count, rep_count, weight in zip(exercises, sets, reps, weights):
-            new_exercise = Exercise(
-                session_id=new_session.id,
-                exercise=exercise,
-                sets=int(set_count),
-                reps=int(rep_count),
-                weight=float(weight)
-            )
-            db.session.add(new_exercise)
+    # Pre-fill exercises from a template if the user selects a template
+    if form.template_id.data and request.method == 'GET':
+        selected_template = Template.query.get(form.template_id.data)
+        form.exercises.entries.clear()  # Clear any existing exercises
+        for template_exercise in selected_template.exercises:
+            exercise_form = ExerciseForm(name=template_exercise.exercise)
+            form.exercises.append_entry(exercise_form)
 
-        db.session.commit()
-        flash('added session', 'success')
-        return redirect("/")
-
+            
     templates = Template.query.all()
-    template_exercises = {t.id: [e.exercise for e in t.exercises] for t in templates}
-
-    return render_template("add.html", templates=templates, template_exercises=template_exercises)
+    return render_template('new_session.html', form=form, templates=templates)
 
 
-@app.route("/get_template/<int:template_id>")
+
+
+
+
+@app.route('/get_template/<int:template_id>', methods=['GET'])
 def get_template(template_id):
+    # Fetch the template with the provided ID
     template = Template.query.get_or_404(template_id)
-    exercises = [{"exercise": ex.exercise} for ex in template.exercises]
-    return jsonify({"exercises": exercises})
+    exercises = []
+
+    for template_exercise in template.exercises:
+        # Find the latest exercise session that used this exercise
+        last_exercise = db.session.query(Exercise).join(TrainingSession).filter(
+            Exercise.exercise_name == template_exercise.exercise,
+            TrainingSession.template_id == template.id  # Ensure it's from the right template
+        ).order_by(TrainingSession.date.desc()).first()
+
+        # Get the most recent ExerciseDetails from the latest exercise session
+        if last_exercise:
+            last_exercise_detail = db.session.query(ExerciseDetails).filter(
+                ExerciseDetails.exercise_id == last_exercise.id
+            ).order_by(ExerciseDetails.id.desc()).first()
+
+            if last_exercise_detail:
+                # Use the most recent exercise details if found
+                default_sets = last_exercise_detail.repetitions
+                default_reps = last_exercise_detail.repetitions
+                default_weight = last_exercise_detail.weight
+            else:
+                # Set fallback default values if no ExerciseDetails are found
+                default_sets = 3
+                default_reps = 10
+                default_weight = 20
+        else:
+            # Fallback if no Exercise session was found
+            default_sets = 3
+            default_reps = 10
+            default_weight = 20
+
+        exercises.append({
+            'exercise': template_exercise.exercise,
+            'default_sets': default_sets,
+            'default_reps': default_reps,
+            'default_weight': default_weight
+        })
+
+    return jsonify({'exercises': exercises})
+
+
+@app.route('/get_last_session/<exerciseName>', methods=['GET'])
+def get_last_session(exerciseName):
+    # Query the database for the last session of this exercise
+    last_session = Exercise.query.filter_by(exercise_name=exerciseName).order_by(Exercise.id.desc()).first()
+    if last_session:
+        # Extract details to send back as JSON
+        response = {
+            "details": [
+                {
+                    "repetitions": detail.repetitions,
+                    "weight": detail.weight
+                }
+                for detail in last_session.details
+            ]
+        }
+    else:
+        # No previous session found for the exercise
+        response = {"details": []}
+    return jsonify(response)

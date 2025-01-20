@@ -1,105 +1,202 @@
 {% extends 'layout.html' %}
 
 {% block header %}
-    <meta charset="UTF-8">
-    <title>New Session</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    function loadLastSession(inputField) {
+        const exerciseName = inputField.value.trim(); // Get the entered exercise name
+        if (exerciseName) {
+            fetch(`/get_last_session/${exerciseName}`) // Fetch last session data for the exercise
+                .then(response => response.json())
+                .then(data => {
+                    const parent = inputField.closest('.exercise-item'); // Find the parent exercise row
+                    const detailsDiv = parent.querySelector('.details');
 
-    <script>
-        $(document).ready(function () {
-            let exerciseIndex = {{ form.exercises | length }};
-            const csrf_token = "{{ form.csrf_token._value() }}";  // Get CSRF token value from the parent form
+                    // Clear existing details
+                    detailsDiv.innerHTML = '';
 
-            // Add new exercise
-            $('#addExercise').click(function () {
-                const exerciseHtml = `
-                <div class="exercise-item">
-                    <div>
-                        <label for="exercises-${exerciseIndex}-name">Exercise Name</label>
-                        <input id="exercises-${exerciseIndex}-name" name="exercises-${exerciseIndex}-name" type="text">
-                        <input type="hidden" name="exercises-${exerciseIndex}-csrf_token" value="${csrf_token}">
-                        <button type="button" class="remove-exercise">Remove Exercise</button>
-                    </div>
-                    <div class="details"></div>
-                    <button type="button" class="add-detail">Add Detail</button>
-                </div>`;
-                
-                $('#exerciseList').append(exerciseHtml);
-                exerciseIndex++;
-            });
+                    // Populate details with the fetched data
+                    if (data.details && data.details.length > 0) {
+                        data.details.forEach((detail, index) => {
+                            const newDetail = document.createElement('div');
+                            newDetail.classList.add('detail-item');
 
-            // Remove an exercise
-            $(document).on('click', '.remove-exercise', function () {
-                $(this).closest('.exercise-item').remove();
-            });
+                            newDetail.innerHTML = `
+                                <label for="repetitions-${index}">Repetitions</label>
+                                <input name="reps[]" id="repetitions-${index}" type="number" min="1" value="${detail.repetitions || ''}" required>
+                                
+                                <label for="weight-${index}">Weight (kg)</label>
+                                <input name="weight[]" id="weight-${index}" type="number" min="0" value="${detail.weight || ''}" step="0.1" required>
 
-            // Add a new detail to an exercise
-            $(document).on('click', '.add-detail', function () {
-                const detailsDiv = $(this).siblings('.details');
-                const detailIndex = detailsDiv.children('.detail-item').length;
-                const exerciseIndex = $(this).closest('.exercise-item').index();
+                                <button type="button" onclick="removeDetailRow(this)">Remove Detail</button>
+                            `;
+                            detailsDiv.appendChild(newDetail);
+                        });
+                    } else {
+                        console.warn(`No previous data found for exercise: ${exerciseName}`);
+                    }
+                })
+                .catch(error => console.error('Error loading last session:', error));
+        }
+    }
 
-                const detailHtml = `
-                <div class="detail-item">
-                    <label for="exercises-${exerciseIndex}-details-${detailIndex}-repetitions">Repetitions</label>
-                    <input id="exercises-${exerciseIndex}-details-${detailIndex}-repetitions" 
-                           name="exercises-${exerciseIndex}-details-${detailIndex}-repetitions" type="number">
-                    
-                    <label for="exercises-${exerciseIndex}-details-${detailIndex}-weight">Weight (kg)</label>
-                    <input id="exercises-${exerciseIndex}-details-${detailIndex}-weight" 
-                           name="exercises-${exerciseIndex}-details-${detailIndex}-weight" type="number">
-                    
-                    <button type="button" class="remove-detail">Remove Detail</button>
-                </div>`;
-                
-                detailsDiv.append(detailHtml);
-            });
 
-            // Remove a detail
-            $(document).on('click', '.remove-detail', function () {
-                $(this).closest('.detail-item').remove();
-            });
-        });
-    </script>
+
+
+    // Function to add a new exercise row dynamically
+    function addExerciseRow(exerciseData = {}) {
+        const exerciseList = document.getElementById('exerciseList');
+        const newIndex = exerciseList.children.length; // Determine the new index
+
+        // Get CSRF token
+        const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+
+        // Set default values if available from exerciseData
+        const exerciseName = exerciseData.name || '';
+        const defaultSets = exerciseData.default_sets || '';
+        const defaultReps = exerciseData.default_reps || '';
+        const defaultWeight = exerciseData.default_weight || '';
+
+        // Create a new exercise row
+        const newRow = document.createElement('div');
+        newRow.classList.add('exercise-item');
+        newRow.setAttribute('id', `exercise-${newIndex}`);
+
+        newRow.innerHTML = `
+        <div>
+            <label for="exercises-${newIndex}-name">Exercise Name</label>
+            <input id="exercises-${newIndex}-name" name="exercises-${newIndex}-name" type="text" value="${exerciseName}" required onblur="loadLastSession(this)">
+            <input type="hidden" name="exercises-${newIndex}-csrf_token" value="${csrfToken}">
+            <button type="button" onclick="removeExerciseRow(this)">Remove Exercise</button>
+        </div>
+        <div class="details"></div>
+        <button type="button" class="add-detail" onclick="addDetailRow(${newIndex}, '${defaultSets}', '${defaultReps}', '${defaultWeight}')">Add Detail</button>
+        `;
+
+        exerciseList.appendChild(newRow);
+    }
+
+
+
+
+    // Function to remove an exercise row
+    function removeExerciseRow(button) {
+        const row = button.closest('.exercise-item');
+        row.remove();
+    }
+
+    // Function to add a new detail row to an exercise
+    function addDetailRow(exerciseIndex, defaultSets, defaultReps, defaultWeight) {
+        const detailsDiv = document.getElementById(`exercise-${exerciseIndex}`).querySelector('.details');
+        const detailIndex = detailsDiv.children.length;
+
+        // Get CSRF token
+        const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+
+        const newDetail = document.createElement('div');
+        newDetail.classList.add('detail-item');
+
+        newDetail.innerHTML = `
+            <label for="exercises-${exerciseIndex}-details-${detailIndex}-repetitions">Repetitions</label>
+            <input id="exercises-${exerciseIndex}-details-${detailIndex}-repetitions" name="exercises-${exerciseIndex}-details-${detailIndex}-repetitions" type="number" min="1" value="${defaultReps}" required onblur="loadLastSession(this)" >
+
+            <label for="exercises-${exerciseIndex}-details-${detailIndex}-weight">Weight (kg)</label>
+            <input id="exercises-${exerciseIndex}-details-${detailIndex}-weight" name="exercises-${exerciseIndex}-details-${detailIndex}-weight" type="number" min="0" value="${defaultWeight}" step="0.1" required onblur="loadLastSession(this)" >
+
+            <input type="hidden" name="exercises-${exerciseIndex}-details-${detailIndex}-csrf_token" value="${csrfToken}">
+            <button type="button" onclick="removeDetailRow(this)">Remove Detail</button>
+        `;
+        detailsDiv.appendChild(newDetail);
+    }
+
+    // Function to remove a detail row
+    function removeDetailRow(button) {
+        const detailRow = button.closest('.detail-item');
+        detailRow.remove();
+    }
+
+    function loadTemplate(templateId) {
+        const exerciseList = document.getElementById('exerciseList');
+        exerciseList.innerHTML = ''; // Clear existing fields
+        
+        if (templateId) {
+            fetch(`/get_template/${templateId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.exercises) {
+                    // Add exercises to the list based on the fetched data
+                    data.exercises.forEach(exercise => {
+                        addExerciseRow({
+                            name: exercise.exercise,  // Exercise name from template
+                            default_sets: exercise.default_sets,
+                            default_reps: exercise.default_reps,
+                            default_weight: exercise.default_weight
+                        });
+                    });
+                }
+            })
+            .catch(error => console.error('Error fetching template:', error));
+        }
+    }
+
+</script>
 {% endblock %}
 
 {% block content %}
-    <form method="POST" id="sessionForm">
-        {{ form.hidden_tag() }}  <!-- Hidden CSRF token for the main form -->
-        <div id="exerciseList">
-            {% for exercise_form in form.exercises %}
-                <div class="exercise-item">
-                    <div>
-                        <label>Exercise Name:</label>
-                        {{ exercise_form.name }}
-                        <!-- Manually add CSRF token for each exercise form -->
-                        {{ exercise_form.csrf_token }}
-                        <button type="button" class="remove-exercise">Remove Exercise</button>
-                    </div>
-                    <div class="details">
-                        {% for detail_form in exercise_form.details %}
-                            <div class="detail-item">
-                                {{ detail_form.repetitions.label }} {{ detail_form.repetitions }}
-                                {{ detail_form.weight.label }} {{ detail_form.weight }}
-                                {{ detail_form.csrf_token }}
-                                <button type="button" class="remove-detail">Remove Detail</button>
-                            </div>
-                        {% endfor %}
-                    </div>
-                    <button type="button" class="add-detail">Add Detail</button>
-                </div>
-            {% endfor %}
-        </div>
-        
-        <button type="button" id="addExercise">Add Exercise</button>
-        <button type="submit">{{ form.submit.label }}</button>
-    </form>
+<form method="POST" id="sessionForm">
+    {{ form.hidden_tag() }}  <!-- Hidden CSRF token for the main form -->
 
-    {% if form.errors %}
-        <ul>
-        {% for field, errors in form.errors.items() %}
-            <li><strong>{{ field }}</strong>: {{ errors[0] }}</li>
+    <!-- Template Selection -->
+    <div>
+        <label for="template">Select Template</label>
+        <select name="template_id" id="template" onchange="loadTemplate(this.value)">
+            <option value="">Select a Template</option>
+            {% for template in templates %}
+            <option value="{{ template.id }}">{{ template.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Exercise List -->
+    <div id="exerciseList">
+        {% for exercise_form in form.exercises %}
+        <div class="exercise-item" id="exercise-{{ loop.index0 }}">
+            <div>
+                <label for="exercises-{{ loop.index0 }}-name">{{ exercise_form.name.label }}</label>
+                <input
+                    id="exercises-{{ loop.index0 }}-name"
+                    name="exercises-{{ loop.index0 }}-name"
+                    value="{{ exercise_form.name.data }}"
+                    required
+                    onblur="loadLastSession(this)">
+                
+                {{ exercise_form.csrf_token }}  <!-- CSRF token -->
+                <button type="button" onclick="removeExerciseRow(this)">Remove Exercise</button>
+            </div>
+            <div class="details">
+                {% for detail_form in exercise_form.details %}
+                    <div class="detail-item">
+                        {{ detail_form.repetitions.label }} {{ detail_form.repetitions }}
+                        {{ detail_form.weight.label }} {{ detail_form.weight }}
+                        {{ detail_form.csrf_token }}
+                        <button type="button" onclick="removeDetailRow(this)">Remove Detail</button>
+                    </div>
+                {% endfor %}
+            </div>
+            <button type="button" onclick="addDetailRow({{ loop.index0 }})">Add Detail</button>
+        </div>
         {% endfor %}
-        </ul>
-    {% endif %}
+    </div>
+
+    <!-- Add Exercise Button -->
+    <button type="button" onclick="addExerciseRow()">Add Exercise</button>
+    <button type="submit">{{ form.submit.label }}</button>
+</form>
+
+{% if form.errors %}
+    <ul>
+        {% for field, errors in form.errors.items() %}
+            <li><strong>{{ field }}</strong>: {{ errors }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
 {% endblock %}

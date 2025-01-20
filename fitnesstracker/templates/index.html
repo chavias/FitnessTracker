@@ -1,33 +1,32 @@
 {% extends 'layout.html' %}
 
-
 {% block content %}
 <!-- <h1>Recent Training Sessions</h1> -->
 <!-- <h2>Session on {{ session.date }}</h2> -->
 <div class="content-section">
-            {% for session in session_data %}
-            <!-- <form method="POST"> -->
-                <h5> {{ session.date }} | {{ session.template_name or "Random" }} </h5>
-                <table border="1">
-                    <thead>
-                        <tr>
-                            <th>Exercise</th>
-                            <th>Sets</th>
-                            <th>Reps</th>
-                            <th>Weight</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for exercise in session.exercises %}
-                        <tr>
-                            <td>{{ exercise.exercise }}</td>
-                            <td>{{ exercise.sets }}</td>
-                            <td>{{ exercise.reps }}</td>
-                            <td>{{ exercise.weight }}</td>
-                        </tr>
+    {% for session in session_data %}
+        <h5> {{ session.date }} | {{ session.template_name or "Random" }} </h5>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Exercise</th>
+                    <th>Reps</th>
+                    <th>Weight</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for exercise in session.exercises %}
+                    <tr>
+                        <td>{{ exercise.exercise_name }}</td>  <!-- Correct exercise name -->
+                        {% for detail in exercise.details %}
+                            <td>{{ detail.reps }}</td>  <!-- Repetitions -->
+                            <td>{{ detail.weight }}</td>  <!-- Weight -->
                         {% endfor %}
-                    </tbody>
-                </table>
+                    </tr>
                 {% endfor %}
-            </div>
-    {% endblock %}
+            </tbody>
+        </table>
+    {% endfor %}
+</div>
+{% endblock %}
+
