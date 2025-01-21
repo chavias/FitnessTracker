@@ -150,6 +150,18 @@
 {% endif %} -->
 
 
+{% if form %}
+    <h3>Form Values</h3>
+    <ul>
+        {% for field in form %}
+            <li><strong>{{ field.label }}:</strong> {{ field.data}}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+
+
+
 {% for template in templates %}
 <article class="media content-section">
   <div class="media-body">
@@ -164,6 +176,8 @@
   </div>
 </article>
 {% endfor %}
+
+
 
 
 {% endblock %}

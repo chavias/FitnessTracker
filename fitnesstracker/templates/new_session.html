@@ -2,201 +2,225 @@
 
 {% block header %}
 <script>
-    function loadLastSession(inputField) {
-        const exerciseName = inputField.value.trim(); // Get the entered exercise name
+    function validateForm() {
+        const exercises = document.querySelectorAll('.exercise-row');
+        if (exercises.length === 0) {
+            alert('Please add at least one exercise.');
+            return false;
+        }
+        for (const exercise of exercises) {
+            const name = exercise.querySelector('input[name="exercise[]"]').value.trim();
+            if (!name) {
+                alert('Exercise name cannot be empty.');
+                return false;
+            }
+        }
+        return true;
+    }
+
+    window.onload = function () {
+        const dateField = document.getElementById("date");
+        const today = new Date();
+        const formattedDate = today.toISOString().split('T')[0];
+        dateField.value = formattedDate;
+    };
+
+    let draggedItem = null;
+
+    function loadLastSession(inputField, applyToDetails = false) {
+        const exerciseName = inputField.value.trim();
         if (exerciseName) {
-            fetch(`/get_last_session/${exerciseName}`) // Fetch last session data for the exercise
+            fetch(`/get_last_session/${exerciseName}`)
                 .then(response => response.json())
                 .then(data => {
-                    const parent = inputField.closest('.exercise-item'); // Find the parent exercise row
-                    const detailsDiv = parent.querySelector('.details');
+                    const parent = inputField.closest('.exercise-row');
+                    const detailsList = parent.querySelector('.details-list');
 
-                    // Clear existing details
-                    detailsDiv.innerHTML = '';
+                    if (applyToDetails && data.details) {
+                        const existingRows = detailsList.children.length;
 
-                    // Populate details with the fetched data
-                    if (data.details && data.details.length > 0) {
                         data.details.forEach((detail, index) => {
-                            const newDetail = document.createElement('div');
-                            newDetail.classList.add('detail-item');
-
-                            newDetail.innerHTML = `
-                                <label for="repetitions-${index}">Repetitions</label>
-                                <input name="reps[]" id="repetitions-${index}" type="number" min="1" value="${detail.repetitions || ''}" required>
-                                
-                                <label for="weight-${index}">Weight (kg)</label>
-                                <input name="weight[]" id="weight-${index}" type="number" min="0" value="${detail.weight || ''}" step="0.1" required>
-
-                                <button type="button" onclick="removeDetailRow(this)">Remove Detail</button>
-                            `;
-                            detailsDiv.appendChild(newDetail);
+                            if (index < existingRows) {
+                                const detailRow = detailsList.children[index];
+                                detailRow.querySelector('input[name="repetitions[]"]').value = detail.repetitions;
+                                detailRow.querySelector('input[name="weight[]"]').value = detail.weight;
+                            } else {
+                                addDetailRow(detailsList, detail.repetitions, detail.weight, false);
+                            }
                         });
-                    } else {
-                        console.warn(`No previous data found for exercise: ${exerciseName}`);
                     }
                 })
                 .catch(error => console.error('Error loading last session:', error));
         }
     }
 
+    function addDetailRow(detailsList, repetitions = '', weight = '', triggerAutocomplete = true) {
+        const detailRow = document.createElement('div');
+        detailRow.className = 'detail-row';
 
-
-
-    // Function to add a new exercise row dynamically
-    function addExerciseRow(exerciseData = {}) {
-        const exerciseList = document.getElementById('exerciseList');
-        const newIndex = exerciseList.children.length; // Determine the new index
-
-        // Get CSRF token
-        const csrfToken = document.querySelector('input[name="csrf_token"]').value;
-
-        // Set default values if available from exerciseData
-        const exerciseName = exerciseData.name || '';
-        const defaultSets = exerciseData.default_sets || '';
-        const defaultReps = exerciseData.default_reps || '';
-        const defaultWeight = exerciseData.default_weight || '';
-
-        // Create a new exercise row
-        const newRow = document.createElement('div');
-        newRow.classList.add('exercise-item');
-        newRow.setAttribute('id', `exercise-${newIndex}`);
-
-        newRow.innerHTML = `
-        <div>
-            <label for="exercises-${newIndex}-name">Exercise Name</label>
-            <input id="exercises-${newIndex}-name" name="exercises-${newIndex}-name" type="text" value="${exerciseName}" required onblur="loadLastSession(this)">
-            <input type="hidden" name="exercises-${newIndex}-csrf_token" value="${csrfToken}">
-            <button type="button" onclick="removeExerciseRow(this)">Remove Exercise</button>
-        </div>
-        <div class="details"></div>
-        <button type="button" class="add-detail" onclick="addDetailRow(${newIndex}, '${defaultSets}', '${defaultReps}', '${defaultWeight}')">Add Detail</button>
+        detailRow.innerHTML = `
+            <input type="number" name="repetitions[]" style="width: 30%" placeholder="Reps" value="${repetitions}" required>
+            <input type="number" name="weight[]" style="width: 30%" placeholder="Weight" value="${weight}" step="0.5" required>
+            <button type="button" class="remove-button" onclick="removeDetailRow(this)">&#10006;</button>
         `;
 
-        exerciseList.appendChild(newRow);
-    }
+        detailsList.appendChild(detailRow);
 
-
-
-
-    // Function to remove an exercise row
-    function removeExerciseRow(button) {
-        const row = button.closest('.exercise-item');
-        row.remove();
-    }
-
-    // Function to add a new detail row to an exercise
-    function addDetailRow(exerciseIndex, defaultSets, defaultReps, defaultWeight) {
-        const detailsDiv = document.getElementById(`exercise-${exerciseIndex}`).querySelector('.details');
-        const detailIndex = detailsDiv.children.length;
-
-        // Get CSRF token
-        const csrfToken = document.querySelector('input[name="csrf_token"]').value;
-
-        const newDetail = document.createElement('div');
-        newDetail.classList.add('detail-item');
-
-        newDetail.innerHTML = `
-            <label for="exercises-${exerciseIndex}-details-${detailIndex}-repetitions">Repetitions</label>
-            <input id="exercises-${exerciseIndex}-details-${detailIndex}-repetitions" name="exercises-${exerciseIndex}-details-${detailIndex}-repetitions" type="number" min="1" value="${defaultReps}" required onblur="loadLastSession(this)" >
-
-            <label for="exercises-${exerciseIndex}-details-${detailIndex}-weight">Weight (kg)</label>
-            <input id="exercises-${exerciseIndex}-details-${detailIndex}-weight" name="exercises-${exerciseIndex}-details-${detailIndex}-weight" type="number" min="0" value="${defaultWeight}" step="0.1" required onblur="loadLastSession(this)" >
-
-            <input type="hidden" name="exercises-${exerciseIndex}-details-${detailIndex}-csrf_token" value="${csrfToken}">
-            <button type="button" onclick="removeDetailRow(this)">Remove Detail</button>
-        `;
-        detailsDiv.appendChild(newDetail);
-    }
-
-    // Function to remove a detail row
-    function removeDetailRow(button) {
-        const detailRow = button.closest('.detail-item');
-        detailRow.remove();
-    }
-
-    function loadTemplate(templateId) {
-        const exerciseList = document.getElementById('exerciseList');
-        exerciseList.innerHTML = ''; // Clear existing fields
-        
-        if (templateId) {
-            fetch(`/get_template/${templateId}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.exercises) {
-                    // Add exercises to the list based on the fetched data
-                    data.exercises.forEach(exercise => {
-                        addExerciseRow({
-                            name: exercise.exercise,  // Exercise name from template
-                            default_sets: exercise.default_sets,
-                            default_reps: exercise.default_reps,
-                            default_weight: exercise.default_weight
-                        });
-                    });
-                }
-            })
-            .catch(error => console.error('Error fetching template:', error));
+        if (triggerAutocomplete) {
+            // Ensure only the last row is updated with data
+            const exerciseNameField = detailsList.closest('.exercise-row').querySelector('input[name="exercise[]"]');
+            if (exerciseNameField.value.trim()) {
+                fetch(`/get_last_session/${exerciseNameField.value.trim()}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const lastRow = detailsList.lastElementChild;
+                        const detail = data.details[detailsList.children.length - 1];
+                        if (detail) {
+                            lastRow.querySelector('input[name="repetitions[]"]').value = detail.repetitions;
+                            lastRow.querySelector('input[name="weight[]"]').value = detail.weight;
+                            console.log('Completed details');
+                        }
+                        console.log(detail);
+                    })
+                    .catch(error => console.error('Error autocompleting last detail:', error));
+            }
         }
     }
 
+
+    function addExerciseRow(exercise = '', details = []) {
+        const exerciseList = document.getElementById('exercise-list');
+        const newRow = document.createElement('div');
+        const rowId = `exercise-row-${Date.now()}`;
+
+        newRow.className = 'exercise-row';
+        newRow.id = rowId;
+        newRow.setAttribute('draggable', 'true');
+        newRow.setAttribute('ondragstart', 'drag(event)');
+        newRow.setAttribute('ondragover', 'allowDrop(event)');
+        newRow.setAttribute('ondrop', 'drop(event)');
+
+        newRow.innerHTML = `
+            <input type="text" name="exercise[]" style="width: 80%" value="${exercise}" placeholder="Exercise Name" oninput="loadLastSession(this, true)" required>
+            <div class="details-list">
+                ${details.map(detail => `<div class='detail-row'>
+                    <input type="number" name="repetitions[]" style="width: 30%" value="${detail.repetitions}" placeholder="Reps" required>
+                    <input type="number" name="weight[]" style="width: 30%" value="${detail.weight}" placeholder="Weight" step="0.5" required>
+                    <button type="button" class="remove-button" onclick="removeDetailRow(this)">&#10006;</button>
+                </div>`).join('')}
+            </div>
+            <button type="button" onclick="addDetailRow(this.closest('.exercise-row').querySelector('.details-list'), '', '')">Set</button>
+            <button type="button" class="remove-button" onclick="removeExerciseRow(this)">&#10006;</button>
+        `;
+        console.log(exerciseList);
+        exerciseList.appendChild(newRow);
+        return newRow;
+    }
+
+    function removeDetailRow(button) {
+        button.parentElement.remove();
+    }
+
+    function removeExerciseRow(button) {
+        button.parentElement.remove();
+    }
+
+    function loadTemplate(templateId) {
+        const exerciseList = document.getElementById('exercise-list');
+        exerciseList.innerHTML = '';
+
+        if (templateId) {
+            fetch(`/get_template/${templateId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.exercises) {
+                        data.exercises.forEach(exercise => {
+                            addExerciseRow(exercise.exercise, exercise.details);
+                        });
+                    }
+                })
+                .catch(error => console.error('Error fetching template:', error));
+        }
+    }
+
+    function allowDrop(event) {
+        event.preventDefault();
+    }
+
+    function drag(event) {
+        draggedItem = event.target;
+        event.dataTransfer.setData("text", draggedItem.id);
+    }
+
+    function drop(event) {
+        event.preventDefault();
+        const targetItem = event.target.closest('.exercise-row');
+        if (targetItem && draggedItem !== targetItem) {
+            const parent = draggedItem.parentNode;
+            parent.insertBefore(draggedItem, targetItem.nextSibling);
+        }
+    }
 </script>
 {% endblock %}
 
+
+
 {% block content %}
-<form method="POST" id="sessionForm">
-    {{ form.hidden_tag() }}  <!-- Hidden CSRF token for the main form -->
+<form method="POST">
+    {{ form.hidden_tag() }}
 
-    <!-- Template Selection -->
-    <div>
-        <label for="template">Select Template</label>
-        <select name="template_id" id="template" onchange="loadTemplate(this.value)">
-            <option value="">Select a Template</option>
-            {% for template in templates %}
-            <option value="{{ template.id }}">{{ template.name }}</option>
-            {% endfor %}
-        </select>
-    </div>
+    <select name="template_id" id="template" onchange="loadTemplate(this.value)">
+        <option value="">Select a Template</option>
+        {% for template in templates %}
+        <option value="{{ template.id }}">{{ template.name }}</option>
+        {% endfor %}
+    </select>
+    <br>
 
-    <!-- Exercise List -->
-    <div id="exerciseList">
+    <input type="date" name="date" id="date" required>
+
+    <div id="exercise-list">
         {% for exercise_form in form.exercises %}
-        <div class="exercise-item" id="exercise-{{ loop.index0 }}">
-            <div>
-                <label for="exercises-{{ loop.index0 }}-name">{{ exercise_form.name.label }}</label>
-                <input
-                    id="exercises-{{ loop.index0 }}-name"
-                    name="exercises-{{ loop.index0 }}-name"
-                    value="{{ exercise_form.name.data }}"
-                    required
-                    onblur="loadLastSession(this)">
-                
-                {{ exercise_form.csrf_token }}  <!-- CSRF token -->
-                <button type="button" onclick="removeExerciseRow(this)">Remove Exercise</button>
-            </div>
-            <div class="details">
+        <div class="exercise-row">
+            <input type="text" name="exercise[]" style="width: 80%" value="{{ exercise_form.name.data }}" placeholder="Exercise Name" oninput="loadLastSession(this, true)" required>
+            <div class="details-list">
                 {% for detail_form in exercise_form.details %}
-                    <div class="detail-item">
-                        {{ detail_form.repetitions.label }} {{ detail_form.repetitions }}
-                        {{ detail_form.weight.label }} {{ detail_form.weight }}
-                        {{ detail_form.csrf_token }}
-                        <button type="button" onclick="removeDetailRow(this)">Remove Detail</button>
-                    </div>
+                <div class="detail-row">
+                    <input type="number"  name="repetitions[]" style="width: 30%" value="{{ detail_form.repetitions.data }}" placeholder="Reps" required>
+                    <input type="number" name="weight[]" style="width: 30%" value="{{ detail_form.weight.data }}" placeholder="Weight" step="0.5" required>
+                    <!-- {{ detail_form.repetitions.label }} {{ detail_form.repetitions }}
+                    {{ detail_form.weight.label }} {{ detail_form.weight }} -->
+                    {{ detail_form.csrf_token }}
+                    <button type="button" class="remove-button" onclick="removeDetailRow(this)">&#10006;</button>
+                </div>
                 {% endfor %}
             </div>
-            <button type="button" onclick="addDetailRow({{ loop.index0 }})">Add Detail</button>
+            <button type="button" onclick="addDetailRow(this.closest('.exercise-row').querySelector('.details-list'), '', '')">set</button>
+            <button type="button" class="remove-button" onclick="removeExerciseRow(this)">&#10006;</button>
         </div>
+        {{ exercise_form.csrf_token }}
         {% endfor %}
     </div>
-
-    <!-- Add Exercise Button -->
-    <button type="button" onclick="addExerciseRow()">Add Exercise</button>
-    <button type="submit">{{ form.submit.label }}</button>
+    <button type="button" onclick="addExerciseRow()" style="margin-bottom: 1cm;">Add Exercise</button>
+    <button type="submit" value="true">Submit Session</button>
 </form>
 
 {% if form.errors %}
     <ul>
         {% for field, errors in form.errors.items() %}
-            <li><strong>{{ field }}</strong>: {{ errors }}</li>
+        <li><strong>{{ field }}</strong>: {{ errors }}</li>
         {% endfor %}
     </ul>
 {% endif %}
+
+
+{% if form %}
+    <h3>Form Values</h3>
+    <ul>
+        {% for field in form %}
+            <li><strong>{{ field.label }}:</strong> {{ field.data}}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
 {% endblock %}

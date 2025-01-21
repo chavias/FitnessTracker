@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, FieldList, FormField, IntegerField, FloatField, SelectField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, FieldList, FormField, IntegerField, FloatField, SelectField, DateField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, NumberRange
 
 
@@ -29,24 +29,16 @@ class TemplateForm(FlaskForm):
 
 ''' Session Form '''
 class ExerciseDetailForm(FlaskForm):
-    repetitions = IntegerField('Repetitions', validators=[DataRequired(), NumberRange(min=1)])
-    weight = FloatField('Weight (kg)', validators=[DataRequired(), NumberRange(min=0)])
-    delete = SubmitField('Remove')
+    repetitions = IntegerField("Repetitions", validators=[DataRequired()])
+    weight = IntegerField("Weight", validators=[DataRequired()])
 
 class ExerciseForm(FlaskForm):
-    name = StringField('Exercise Name', validators=[DataRequired()])
+    name = StringField("Exercise Name", validators=[DataRequired()])
     details = FieldList(FormField(ExerciseDetailForm), min_entries=1)
-    add_detail = SubmitField('Add Detail')
-    delete = SubmitField('Remove Exercise')
 
 class SessionForm(FlaskForm):
-    template_id = SelectField(
-        'Template',
-        choices=[],  # Populated dynamically in the route
-        coerce=int,
-        validators=[DataRequired()]
-    )
-    exercises = FieldList(FormField(ExerciseForm), min_entries=0)  # Use FormField for ExerciseForm
-    add_exercise = SubmitField('Add Exercise')
-    submit = SubmitField('Save Session')
+    template_id = SelectField("Template", coerce=int, validators=[DataRequired()])
+    date = DateField("Date", validators=[DataRequired()])
+    exercises = FieldList(FormField(ExerciseForm), min_entries=1)
+    submit = SubmitField("Submit")
 
