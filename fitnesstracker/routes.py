@@ -124,72 +124,69 @@ def delete_template(template_id):
 def new_session():
     form = SessionForm()
 
-    # Populate the template dropdown with templates
-    form.template_id.choices = [(template.id, template.name) for template in Template.query.all()]
-
     if request.method == 'POST':
         # Debug POST data
         print(f"POST data: {request.form}")
-        print(f"Flask form: {form.data}")
         
+        # Extract values from the POST data
+        template_id = request.form.get('template_id')
+        date = datetime.strptime(request.form.get('date'),'%Y-%m-%d').date()
+        exercise_names = request.form.getlist('exercise[]')
+        repetitions = request.form.getlist('repetitions[]')
+        weights = request.form.getlist('weight[]')
+        
+        # Validate required fields
+        errors = []
+        if not date:
+            errors.append("Date is required.")
+        if not exercise_names:
+            errors.append("At least one exercise is required.")
+        if len(repetitions) != len(weights): #or len(repetitions) != len(exercise_names):
+            errors.append("Mismatch repetitions and weights count.")
 
-        # Check if the form validates
-        if form.validate_on_submit():
-            print("Form validation successful")
-            
-            # Process exercises and save the session
-            exercises = []
-            for exercise_form in form.exercises.entries:
-                exercise_name = exercise_form.name.data
-                exercise_details = [
-                    {
-                        "repetitions": detail.repetitions.data,
-                        "weight": detail.weight.data
-                    }
-                    for detail in exercise_form.details.entries
-                ]
-                exercises.append({"name": exercise_name, "details": exercise_details})
+        if errors:
+            print(f"Form errors: {errors}")
+            flash(" ".join(errors), "danger")
+            return render_template('new_session.html', form=form, templates=Template.query.all())
 
-            print(f"Exercises to save: {exercises}")
+        # Process exercises
+        exercises = []
+        for i, name in enumerate(exercise_names):
+            exercises.append({
+                "name": name,
+                "details": [{
+                    "repetitions": repetitions[i],
+                    "weight": weights[i]
+                }]
+            })
+        
+        print(f"Processed exercises: {exercises}")
 
-            # Create a new TrainingSession object and save it
-            new_session = TrainingSession(
-                date=form.date.data,
-                template_id=form.template_id.data,
-                exercises=[
-                    Exercise(
-                        exercise_name=ex["name"],
-                        details=[
-                            ExerciseDetails(repetitions=det["repetitions"], weight=det["weight"])
-                            for det in ex["details"]
-                        ]
-                    )
-                    for ex in exercises
-                ]
-            )
-            db.session.add(new_session)
-            db.session.commit()
-
-            flash("Session created successfully!", "success")
-            return redirect(url_for("new_session"))
-        else:
-            # If validation fails, debug form errors
-            print(f"Form errors: {form.errors}")
-            print(f"Exercises submitted: {form.exercises.entries}")
-
-    elif request.method == 'GET' and form.template_id.data:
-        # Load exercises if a template is selected (for initial GET request)
-        selected_template = Template.query.get(form.template_id.data)
-        form.exercises.entries.clear()
-        for template_exercise in selected_template.exercises:
-            exercise_form = ExerciseForm(name=template_exercise.exercise)
-            for detail in template_exercise.details:
-                exercise_form.details.append_entry(
-                    {"repetitions": detail.repetitions, "weight": detail.weight}
+        # Create a new TrainingSession object and save it
+        new_session = TrainingSession(
+            date=date,
+            template_id=template_id,
+            exercises=[
+                Exercise(
+                    exercise_name=ex["name"],
+                    details=[
+                        ExerciseDetails(repetitions=det["repetitions"], weight=det["weight"])
+                        for det in ex["details"]
+                    ]
                 )
-            form.exercises.append_entry(exercise_form)
+                for ex in exercises
+            ]
+        )
+        db.session.add(new_session)
+        db.session.commit()
 
-    return render_template('new_session.html', form=form, templates=Template.query.all())
+        flash("Session created successfully!", "success")
+        return redirect(url_for("new_session"))
+
+    elif request.method == 'GET':
+        return render_template('new_session.html', form=form, templates=Template.query.all())
+
+
 
 
 

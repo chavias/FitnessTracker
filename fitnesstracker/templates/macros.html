@@ -1,0 +1,33 @@
+{% macro render_exercise_form(subform, index) %}
+<div id="exercise-{{ index }}-form" class="exercise-row" data-index="{{ index }}">
+    {# Input for exercise name #}
+    <input type="text" 
+           name="exercise-{{ index }}-form" 
+           value="{{ subform.name.data }}" 
+           placeholder="Exercise Name" 
+           style="width: 80%" 
+           required>
+
+    {# Render nested detail forms for this exercise #}
+    <div class="details-list">
+        {% for detail_form in subform.details %}
+        <div id="exercise-{{ index }}-detail-{{ loop.index0 }}" class="detail-row" data-index="{{ loop.index0 }}">
+            <input type="number" 
+                   name="exercise[{{ index }}][details][{{ loop.index0 }}][repetitions]" 
+                   value="exercise-{{ index }}-detail-{{ loop.index0 }}"  
+                   placeholder="Reps" 
+                   style="width: 30%" 
+                   required>
+            <input type="number" 
+                   name="exercise[{{ index }}][details][{{ loop.index0 }}][weight]" 
+                   value="{{ detail_form.weight.data }}" 
+                   placeholder="Weight" 
+                   style="width: 30%" 
+                   step="0.5" 
+                   required>
+            <button type="button" class="remove-detail" onclick="removeDetailRow(this)">Remove</button>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endmacro %}
