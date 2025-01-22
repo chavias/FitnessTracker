@@ -153,16 +153,11 @@ def new_session():
         # Process exercises
         exercises = []
         for i, name in enumerate(exercise_names):
-            repetition = int(repetitions[i][0]) if i < len(repetitions) \
-                and isinstance(repetitions[i], list) and repetitions[i] else 0
-            weight = float(weights[i][0]) if i < len(weights)  \
-                and isinstance(weights[i], list) and weights[i] else 0
-
             exercises.append({
                 "name": name,
                 "details": [{
-                    "repetitions": repetition,
-                    "weight": weight,
+                    "repetitions": repetitions[i],
+                    "weight": weights[i],
                 }]
             })
 

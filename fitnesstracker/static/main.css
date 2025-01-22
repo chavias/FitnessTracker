@@ -105,6 +105,7 @@ form label {
 
 form select, form input, form button {
   width: 100%;
+  gap: 2px;
   padding: 5px;
   margin-top: 5px;
   margin-bottom: 5px;
@@ -148,7 +149,7 @@ form button[type="button"]:hover {
 
 #exercise-list .exercise-row {
   display: flex;
-  gap: 5px;
+  gap: 2px;
   align-items: start;
   margin-bottom: 0px;
 
@@ -158,33 +159,43 @@ form button[type="button"]:hover {
   white-space: nowrap; */
 }
 
+.details-list {
+  align-items: start;
+  margin-bottom: 0px;
+  gap: 2px;
+}
+
+.details-list input[name="repetitions[]"] {
+  margin-right: -2px; /* Adjust spacing here */
+}
+
+.details-list input[name="weight[]"] {
+  margin-left: 0; /* Ensure no extra gap on the other side */
+}
+
+
+
 #exercise-list input {
   flex-grow: 3;
   padding: 5px;
 }
 
 #exercise-list button {
-  flex-grow: 0; /* Remove auto-growing behavior */
-  flex-shrink: 0; /* Prevent buttons from shrinking */
-  width: 40px; /* Set a fixed width for all buttons */
-  height: 36px; /* Set a consistent height */
+  width: 30px;
+  flex : 1;
+  flex-shrink: 0;
+  flex-grow: 1;
   background-color: #5f788a;
   color: #fff;
-  border: none;
-  text-align: center;
-  font-size: 16px;
-  border-radius: 4px;
+}
+
+#details-list button {
+  width: 30px; /* Same width as the other buttons */
 }
 
 #exercise-list button:hover {
   background-color: #a04e4e;
 }
-
-.details-list button {
-  width: 40px; /* Same width as the other buttons */
-  height: 36px; /* Consistent height */
-}
-
 
 /* Responsive Design */
 @media (max-width: 768px) {
@@ -209,4 +220,12 @@ form button[type="button"]:hover {
 .no-templates {
   color: #888;
   font-style: italic;
+}
+
+
+/* Animation for swiping left */
+.exercise-row.swipe-left {
+  transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+  transform: translateX(-100%); /* Move out of view */
+  opacity: 0; /* Fade out */
 }

@@ -3,6 +3,44 @@
 
 {% block header %}
 <script>
+    function enableSwipeToRemove() {
+        const exerciseRows = document.querySelectorAll('.exercise-row:not(.swipe-enabled)'); // Only rows not initialized
+
+        exerciseRows.forEach(row => {
+            let startX = 0;
+            let endX = 0;
+            let startY = 0;
+            let endY = 0;
+
+            // Mark the row as initialized
+            row.classList.add('swipe-enabled');
+
+            row.addEventListener('touchstart', (event) => {
+                // Capture starting X and Y positions
+                startX = event.touches[0].clientX;
+                startY = event.touches[0].clientY;
+            });
+
+            row.addEventListener('touchmove', (event) => {
+                // Capture ending X and Y positions during movement
+                endX = event.touches[0].clientX;
+                endY = event.touches[0].clientY;
+            });
+
+            row.addEventListener('touchend', () => {
+                // Calculate swipe distances
+                const deltaX = startX - endX;
+                const deltaY = Math.abs(startY - endY);
+
+                // Trigger swipe-left only if horizontal swipe is significant and vertical movement is minimal
+                if (deltaX > 50 && deltaY < 20) { // Adjust these thresholds as needed
+                    row.classList.add('swipe-left'); // Optional: Add animation class
+                    setTimeout(() => row.remove(), 300); // Remove row after animation
+                }
+            });
+        });
+    }
+
     function validateForm() {
         const exercises = document.querySelectorAll('.exercise-row');
         if (exercises.length === 0) {
@@ -60,12 +98,18 @@
         detailRow.className = 'detail-row';
 
         detailRow.innerHTML = `
-            <input type="number" name="repetitions[]" style="width: 30%" placeholder="Reps" value="${repetitions}" required>
-            <input type="number" name="weight[]" style="width: 30%" placeholder="Weight" value="${weight}" step="0.5" required>
+            <input type="number" name="repetitions[]" style="width: 35%" placeholder="Reps" value="${repetitions}" required>
+            <input type="number" name="weight[]" style="width: 35%" placeholder="Weight" value="${weight}" step="0.5" required>
             <button type="button" onclick="removeDetailRow(this)">&#10006;</button>
         `;
 
         detailsList.appendChild(detailRow);
+
+        // Prevent touch events on the detail row from triggering parent events
+        // detailRow.addEventListener('touchstart', (event) => event.stopPropagation());
+        // detailRow.addEventListener('touchmove', (event) => event.stopPropagation());
+        // detailRow.addEventListener('touchend', (event) => event.stopPropagation());
+
 
         if (triggerAutocomplete) {
             // Ensure only the last row is updated with data
@@ -86,10 +130,12 @@
                     .catch(error => console.error('Error autocompleting last detail:', error));
             }
         }
+        // if (applySwipe) enableSwipeToRemove();
+
     }
 
 
-    function addExerciseRow(exercise = '', details = []) {
+    function addExerciseRow(exercise = '', details = [], remove = false) {
         const exerciseList = document.getElementById('exercise-list');
         const newRow = document.createElement('div');
         const rowId = `exercise-row-${Date.now()}`;
@@ -105,17 +151,18 @@
             <input type="text" name="exercise[]" value="${exercise}" placeholder="Exercise Name" oninput="loadLastSession(this, true)" required>
             <div class="details-list">
                 ${details.map(detail => `<div class='detail-row'>
-                    <input type="number" name="repetitions[]" style="width: 30%" value="${detail.repetitions}" placeholder="R" required>
-                    <input type="number" name="weight[]" style="width: 30%" value="${detail.weight}" placeholder="W" step="0.5" required>
+                    <input type="number" name="repetitions[]" style="width: 35%" value="${detail.repetitions}" placeholder="R" required>
+                    <input type="number" name="weight[]" style="width: 35%" value="${detail.weight}" placeholder="W" step="0.5" required>
                     <button type="button" onclick="removeDetailRow(this)">&#10006;</button>
                 </div>`).join('')}
             </div>
             <button type="button" onclick="addDetailRow(this.closest('.exercise-row').querySelector('.details-list'), '', '')">&#10010</button>
-            <button type="button" onclick="removeExerciseRow(this)">&#10006</button>
         `;
         console.log(exerciseList);
         exerciseList.appendChild(newRow);
-        return newRow;
+        
+        enableSwipeToRemove();
+;
     }
 
     function removeDetailRow(button) {
@@ -185,19 +232,11 @@
                     placeholder="Exercise Name" oninput="loadLastSession(this, true)" required>
                 <div class="details-list">
                     {% for detail_form in exercise_form.details %}
-                    <!-- <div class="detail-row"> -->
-                        <input type="number" name="repetitions[]" style="width: 30%"
-                            value="{{ detail_form.repetitions.data }}" placeholder="Reps" required>
-                        <input type="number" name="weight[]" style="width: 30%" value="{{ detail_form.weight.data }}"
-                            placeholder="Weight" step="0.5" required>
-                        {{ detail_form.csrf_token }}
-                        <button type="button" onclick="removeDetailRow(this)">&#10006;</button>
-                    <!-- </div> -->
+
                     {% endfor %}
                 </div>
                 <button type="button"
                     onclick="addDetailRow(this.closest('.exercise-row').querySelector('.details-list'), '', '')">&#10010;</button>
-                <button type="button" onclick="removeExerciseRow(this)">&#10006;</button>
             </div>
             {{ exercise_form.csrf_token }}
             {% endfor %}
