@@ -24,7 +24,7 @@ class ExerciseTemplateForm(FlaskForm):
 class TemplateForm(FlaskForm):
     template_name = StringField('Template Name', validators=[DataRequired()])
     exercises = FieldList(FormField(ExerciseTemplateForm), min_entries=1)  # Dynamically add exercise rows
-    add_exercise = SubmitField('Add Exercise')
+    # add_exercise = SubmitField('Add Exercise')
     submit = SubmitField('Create Template')
 
 ''' Session Form '''
