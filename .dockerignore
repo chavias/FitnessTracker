@@ -1,3 +1,5 @@
+!.migrations
+
 # git
 **/.git
 **/.gitignore

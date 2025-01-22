@@ -40,3 +40,4 @@ ENV FLASK_APP=run.py
 
 # Command to run the application using Gunicorn
 CMD ["gunicorn", "--bind", "0.0.0.0:5000", "run:app"]
+# CMD ["sh", "-c", "gunicorn --bind 0.0.0.0:5000 run:app && flask db init && flask db upgrade"]
