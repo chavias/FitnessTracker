@@ -2,7 +2,7 @@
 
 services:
   flask:
-    container_name: flaskblog
+    container_name: fitnesstracker
     #image: flaskblog
     restart: unless-stopped
     build:
@@ -11,17 +11,17 @@ services:
     ports:
       - "5000:5000"
     environment:
-      - EMAIL_USER=${EMAIL_USER}
-      - EMAIL_PASS=${EMAIL_PASS}
-      - TLS=${TLS}
-      - SSL=${SSL}
+      # - EMAIL_USER=${EMAIL_USER}
+      # - EMAIL_PASS=${EMAIL_PASS}
+      # - TLS=${TLS}
+      # - SSL=${SSL}
       - SECRET_KEY=${SECRET_KEY}
       - SQLALCHEMY_DATABASE_URI=${SQLALCHEMY_DATABASE_URI}
       - MAIL_SERVER=${MAIL_SERVER}
   
   mariadb:
     image: mariadb:latest
-    container_name: mariadb
+    container_name: mariadb_fitness
     restart: unless-stopped
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
