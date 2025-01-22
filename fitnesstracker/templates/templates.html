@@ -2,31 +2,6 @@
 
 {% block header %}
 <script>
-    function addExerciseRow() {
-        const exerciseList = document.getElementById('exercise-list');
-        const newIndex = exerciseList.children.length;
-
-        // Create a new row
-        const newRow = document.createElement('div');
-        newRow.classList.add('exercise-row');
-
-        // Add input fields and a hidden CSRF token field
-        newRow.innerHTML = `
-            <input type="text" name="exercises-${newIndex}-exercise_name" placeholder="Exercise Name" required>
-            <input type="hidden" name="exercises-${newIndex}-csrf_token" value="${document.querySelector('input[name="csrf_token"]').value}">
-            <button type="button" onclick="removeExerciseRow(this)">&#10006;</button>
-        `;
-        exerciseList.appendChild(newRow);
-    }
-
-    function removeExerciseRow(button) {
-        const row = button.parentElement;
-        row.remove();
-    }
-</script>
-
-
-<script>
     // Global variable to store the dragged element
     let draggedItem = null;
 
@@ -48,7 +23,7 @@
             // Swap the dragged item with the target item
             const parent = draggedItem.parentNode;
             parent.insertBefore(draggedItem, targetItem.nextSibling);
-            
+
             // Update the indices for the input fields after reordering
             updateIndices();
         }
@@ -95,68 +70,40 @@
 {% endblock %}
 
 {% block content %}
-<form method="POST">
-    {{ form.hidden_tag() }}
+<div class="content-section">
+    <form method="POST">
+        {{ form.hidden_tag() }}
 
-    <!-- Template Name -->
-    <div class="form-group">
-        <label for="template_name">{{ form.template_name.label }}</label>
-        <input type="text" name="template_name" 
-            value="{{ form.template_name.data or '' }}" 
-            placeholder="{{ form.template_name.label.text }}" 
-            size="40" required>
-    </div>
+        <!-- Template Name -->
+        <div class="form-group">
+            <input type="text" name="template_name" value="{{ form.template_name.data or '' }}"
+                placeholder="{{ form.template_name.label.text }}" size="40" required>
+        </div>
 
-    <!-- Exercises List -->
-    <div id="exercise-list">
-        {% for subform in form.exercises %}
-            <div class="exercise-row" id="exercise-{{ loop.index0 }}" 
-                 draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)">
-                <input type="text" name="exercises-{{ loop.index0 }}-exercise_name" 
-                    value="{{ subform.exercise_name.data or '' }}" 
-                    placeholder="Exercise Name" required>
+        <!-- Exercises List -->
+        <div id="exercise-list">
+            {% for subform in form.exercises %}
+            <div class="exercise-row" id="exercise-{{ loop.index0 }}" draggable="true" ondragstart="drag(event)"
+                ondragover="allowDrop(event)" ondrop="drop(event)">
+                <input type="text" name="exercises-{{ loop.index0 }}-exercise_name"
+                    value="{{ subform.exercise_name.data or '' }}" placeholder="Exercise Name" required>
                 {{ subform.csrf_token }}
                 <button type="button" onclick="removeExerciseRow(this)">&#10006;</button>
             </div>
-        {% endfor %}
-    </div>
-
-    <!-- Add Exercise Button -->
-    <button type="button" onclick="addExerciseRow()">Add Exercise</button><br><br>
-
-    <!-- Submit Button -->
-    <button type="submit" name="submit" value="true">Create Template</button>
-</form>
-
-
-<!-- Display Templates Section -->
-<!-- {% if templates %}
-    <div class="template-section">
-        <ul class="template-list">
-            {% for template in templates %}
-                <li>
-                    <strong>{{ template.name }}</strong>
-                    <ul>
-                        {% for exercise in template_data[template.id] %}
-                            <li>{{ exercise }}</li>
-                        {% endfor %}
-                    </ul>
-                </li>
             {% endfor %}
-        </ul>
-    </div>
-{% else %}
-    <p>No templates found.</p>
-{% endif %} -->
+        </div>
 
-
+        <button type="button" onclick="addExerciseRow()">Add Exercise</button><br><br>
+        <button type="submit" name="submit" value="true">Create Template</button>
+    </form>
+</div>
 {% if form %}
-    <h3>Form Values</h3>
-    <ul>
-        {% for field in form %}
-            <li><strong>{{ field.label }}:</strong> {{ field.data}}</li>
-        {% endfor %}
-    </ul>
+<h3>Form Values</h3>
+<ul>
+    {% for field in form %}
+    <li><strong>{{ field.label }}:</strong> {{ field.data}}</li>
+    {% endfor %}
+</ul>
 {% endif %}
 
 
@@ -164,16 +111,16 @@
 
 {% for template in templates %}
 <article class="media content-section">
-  <div class="media-body">
-    <div class="article-metadata">
-        <a class="article-title" href="{{ url_for('template', template_id=template.id) }}">{{ template.name }}</a>
-    </div>
-    <p class="article-content">
-        {% for exercise in template_data[template.id] %}
+    <div class="media-body">
+        <div class="article-metadata">
+            <a class="article-title" href="{{ url_for('template', template_id=template.id) }}">{{ template.name }}</a>
+        </div>
+        <p class="article-content">
+            {% for exercise in template_data[template.id] %}
             <li>{{ exercise }}</li>
-        {% endfor %}
-    </p>
-  </div>
+            {% endfor %}
+        </p>
+    </div>
 </article>
 {% endfor %}
 

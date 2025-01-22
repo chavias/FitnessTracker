@@ -1,5 +1,6 @@
 {% extends 'layout.html' %}
 
+
 {% block header %}
 <script>
     function validateForm() {
@@ -61,7 +62,7 @@
         detailRow.innerHTML = `
             <input type="number" name="repetitions[]" style="width: 30%" placeholder="Reps" value="${repetitions}" required>
             <input type="number" name="weight[]" style="width: 30%" placeholder="Weight" value="${weight}" step="0.5" required>
-            <button type="button" class="remove-button" onclick="removeDetailRow(this)">&#10006;</button>
+            <button type="button" onclick="removeDetailRow(this)">&#10006;</button>
         `;
 
         detailsList.appendChild(detailRow);
@@ -101,16 +102,16 @@
         newRow.setAttribute('ondrop', 'drop(event)');
 
         newRow.innerHTML = `
-            <input type="text" name="exercise[]" style="width: 80%" value="${exercise}" placeholder="Exercise Name" oninput="loadLastSession(this, true)" required>
+            <input type="text" name="exercise[]" value="${exercise}" placeholder="Exercise Name" oninput="loadLastSession(this, true)" required>
             <div class="details-list">
                 ${details.map(detail => `<div class='detail-row'>
-                    <input type="number" name="repetitions[]" style="width: 30%" value="${detail.repetitions}" placeholder="Reps" required>
-                    <input type="number" name="weight[]" style="width: 30%" value="${detail.weight}" placeholder="Weight" step="0.5" required>
-                    <button type="button" class="remove-button" onclick="removeDetailRow(this)">&#10006;</button>
+                    <input type="number" name="repetitions[]" style="width: 30%" value="${detail.repetitions}" placeholder="R" required>
+                    <input type="number" name="weight[]" style="width: 30%" value="${detail.weight}" placeholder="W" step="0.5" required>
+                    <button type="button" onclick="removeDetailRow(this)">&#10006;</button>
                 </div>`).join('')}
             </div>
-            <button type="button" onclick="addDetailRow(this.closest('.exercise-row').querySelector('.details-list'), '', '')">Set</button>
-            <button type="button" class="remove-button" onclick="removeExerciseRow(this)">&#10006;</button>
+            <button type="button" onclick="addDetailRow(this.closest('.exercise-row').querySelector('.details-list'), '', '')">&#10010</button>
+            <button type="button" onclick="removeExerciseRow(this)">&#10006</button>
         `;
         console.log(exerciseList);
         exerciseList.appendChild(newRow);
@@ -164,63 +165,63 @@
 {% endblock %}
 
 
-
 {% block content %}
-<form method="POST">
-    {{ form.hidden_tag() }}
+<div class="content-section">
+    <form method="POST">
+        {{ form.hidden_tag() }}
 
-    <select name="template_id" id="template" onchange="loadTemplate(this.value)">
-        <option value="">Select a Template</option>
-        {% for template in templates %}
-        <option value="{{ template.id }}">{{ template.name }}</option>
-        {% endfor %}
-    </select>
-    <br>
-
-    <input type="date" name="date" id="date" required>
-
-    <div id="exercise-list">
-        {% for exercise_form in form.exercises %}
-        <div class="exercise-row">
-            <input type="text" name="exercise[]" style="width: 80%" value="{{ exercise_form.name.data }}" placeholder="Exercise Name" oninput="loadLastSession(this, true)" required>
-            <div class="details-list">
-                {% for detail_form in exercise_form.details %}
-                <div class="detail-row">
-                    <input type="number"  name="repetitions[]" style="width: 30%" value="{{ detail_form.repetitions.data }}" placeholder="Reps" required>
-                    <input type="number" name="weight[]" style="width: 30%" value="{{ detail_form.weight.data }}" placeholder="Weight" step="0.5" required>
-                    <!-- {{ detail_form.repetitions.label }} {{ detail_form.repetitions }}
-                    {{ detail_form.weight.label }} {{ detail_form.weight }} -->
-                    {{ detail_form.csrf_token }}
-                    <button type="button" class="remove-button" onclick="removeDetailRow(this)">&#10006;</button>
+        <select name="template_id" id="template" onchange="loadTemplate(this.value)">
+            <option value="">Select a Template</option>
+            {% for template in templates %}
+            <option value="{{ template.id }}">{{ template.name }}</option>
+            {% endfor %}
+        </select>
+        <br>
+        <input type="date" name="date" id="date" required>
+        <div id="exercise-list">
+            {% for exercise_form in form.exercises %}
+            <div class="exercise-row">
+                <input type="text" name="exercise[]" value="{{ exercise_form.name.data }}"
+                    placeholder="Exercise Name" oninput="loadLastSession(this, true)" required>
+                <div class="details-list">
+                    {% for detail_form in exercise_form.details %}
+                    <!-- <div class="detail-row"> -->
+                        <input type="number" name="repetitions[]" style="width: 30%"
+                            value="{{ detail_form.repetitions.data }}" placeholder="Reps" required>
+                        <input type="number" name="weight[]" style="width: 30%" value="{{ detail_form.weight.data }}"
+                            placeholder="Weight" step="0.5" required>
+                        {{ detail_form.csrf_token }}
+                        <button type="button" onclick="removeDetailRow(this)">&#10006;</button>
+                    <!-- </div> -->
+                    {% endfor %}
                 </div>
-                {% endfor %}
+                <button type="button"
+                    onclick="addDetailRow(this.closest('.exercise-row').querySelector('.details-list'), '', '')">&#10010;</button>
+                <button type="button" onclick="removeExerciseRow(this)">&#10006;</button>
             </div>
-            <button type="button" onclick="addDetailRow(this.closest('.exercise-row').querySelector('.details-list'), '', '')">set</button>
-            <button type="button" class="remove-button" onclick="removeExerciseRow(this)">&#10006;</button>
+            {{ exercise_form.csrf_token }}
+            {% endfor %}
         </div>
-        {{ exercise_form.csrf_token }}
-        {% endfor %}
-    </div>
-    <button type="button" onclick="addExerciseRow()" style="margin-bottom: 1cm;">Add Exercise</button>
-    <button type="submit" value="true">Submit Session</button>
-</form>
+        <button type="button" onclick="addExerciseRow()" style="margin-bottom: 1cm;">Add Exercise</button>
+        <button type="submit" value="true">Submit Session</button>
+    </form>
+</div>
 
 {% if form.errors %}
-    <ul>
-        {% for field, errors in form.errors.items() %}
-        <li><strong>{{ field }}</strong>: {{ errors }}</li>
-        {% endfor %}
-    </ul>
+<ul>
+    {% for field, errors in form.errors.items() %}
+    <li><strong>{{ field }}</strong>: {{ errors }}</li>
+    {% endfor %}
+</ul>
 {% endif %}
 
-
 {% if form %}
-    <h3>Form Values</h3>
-    <ul>
-        {% for field in form %}
-            <li><strong>{{ field.label }}:</strong> {{ field.data}}</li>
-        {% endfor %}
-    </ul>
+<h3>Form Values</h3>
+<ul>
+    {% for field in form %}
+    <li><strong>{{ field.label }}:</strong> {{ field.data}}</li>
+    {% endfor %}
+</ul>
 {% endif %}
 
 {% endblock %}

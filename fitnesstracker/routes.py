@@ -141,28 +141,32 @@ def new_session():
             errors.append("Date is required.")
         if not exercise_names:
             errors.append("At least one exercise is required.")
-        if len(repetitions) != len(weights): #or len(repetitions) != len(exercise_names):
+        if len(repetitions) != len(weights):
             errors.append("Mismatch repetitions and weights count.")
 
         if errors:
             print(f"Form errors: {errors}")
             flash(" ".join(errors), "danger")
-            return render_template('new_session.html', form=form, templates=Template.query.all())
+            return render_template('new_session.html', form=form,
+                                   templates=Template.query.all())
 
         # Process exercises
         exercises = []
         for i, name in enumerate(exercise_names):
+            repetition = int(repetitions[i][0]) if i < len(repetitions) \
+                and isinstance(repetitions[i], list) and repetitions[i] else 0
+            weight = float(weights[i][0]) if i < len(weights)  \
+                and isinstance(weights[i], list) and weights[i] else 0
+
             exercises.append({
                 "name": name,
                 "details": [{
-                    "repetitions": repetitions[i],
-                    "weight": weights[i]
+                    "repetitions": repetition,
+                    "weight": weight,
                 }]
             })
-        
-        print(f"Processed exercises: {exercises}")
 
-        # Create a new TrainingSession object and save it
+        # Create a new TrainingSession
         new_session = TrainingSession(
             date=date,
             template_id=template_id,
@@ -170,13 +174,17 @@ def new_session():
                 Exercise(
                     exercise_name=ex["name"],
                     details=[
-                        ExerciseDetails(repetitions=det["repetitions"], weight=det["weight"])
+                        ExerciseDetails(
+                            repetitions=det["repetitions"],
+                            weight=det["weight"]
+                        )
                         for det in ex["details"]
                     ]
                 )
                 for ex in exercises
             ]
         )
+
         db.session.add(new_session)
         db.session.commit()
 

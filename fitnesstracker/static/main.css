@@ -38,11 +38,10 @@ h2 {
 /* Content Section */
 .content-section, .template-section {
   background-color: #ffffff;
-  padding: 30px;
+  padding: 20px;
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
-  max-width: 600px;
+  margin-bottom: 20px auto;
   margin: 20px auto;
 }
 
@@ -97,15 +96,6 @@ tr:nth-child(even) {
   background-color: #f2f2f2;
 }
 
-/* Form Styles */
-form {
-  background-color: #ffffff;
-  padding: 10px;
-  border-radius: 5px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  max-width: 600px;
-  margin: 20px auto;
-}
 
 form label {
   font-weight: bold;
@@ -134,7 +124,6 @@ form input[type="date"] {
 form button {
   background-color: #444444;
   color: white;
-  padding: 5px;
   font-size: 16px;
   cursor: pointer;
   text-align: center;
@@ -160,24 +149,42 @@ form button[type="button"]:hover {
 #exercise-list .exercise-row {
   display: flex;
   gap: 5px;
-  align-items: center;
+  align-items: start;
   margin-bottom: 0px;
+
+  /* display: inline-block;
+  vertical-align: middle;
+  margin-bottom: 0px;
+  white-space: nowrap; */
 }
 
 #exercise-list input {
-  flex-grow: 1;
+  flex-grow: 3;
   padding: 5px;
 }
 
 #exercise-list button {
-  width: 45px;
-  background-color: #811919;
+  flex-grow: 0; /* Remove auto-growing behavior */
+  flex-shrink: 0; /* Prevent buttons from shrinking */
+  width: 40px; /* Set a fixed width for all buttons */
+  height: 36px; /* Set a consistent height */
+  background-color: #5f788a;
   color: #fff;
+  border: none;
+  text-align: center;
+  font-size: 16px;
+  border-radius: 4px;
 }
 
 #exercise-list button:hover {
   background-color: #a04e4e;
 }
+
+.details-list button {
+  width: 40px; /* Same width as the other buttons */
+  height: 36px; /* Consistent height */
+}
+
 
 /* Responsive Design */
 @media (max-width: 768px) {
