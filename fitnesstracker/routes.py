@@ -125,17 +125,15 @@ def new_session():
     form = SessionForm()
 
     if request.method == 'POST':
-        # Debug POST data
-        print(f"POST data: {request.form}")
         
-        # Extract values from the POST data
+        # Not using flask forms because of its complicated indexing
         template_id = request.form.get('template_id')
         date = datetime.strptime(request.form.get('date'),'%Y-%m-%d').date()
         exercise_names = request.form.getlist('exercise[]')
         repetitions = request.form.getlist('repetitions[]')
         weights = request.form.getlist('weight[]')
-        
-        # Validate required fields
+
+        # Handling errors because flask forms is not used
         errors = []
         if not date:
             errors.append("Date is required.")
@@ -150,18 +148,26 @@ def new_session():
             return render_template('new_session.html', form=form,
                                    templates=Template.query.all())
 
-        # Process exercises
-        exercises = []
-        for i, name in enumerate(exercise_names):
-            exercises.append({
-                "name": name,
-                "details": [{
-                    "repetitions": repetitions[i],
-                    "weight": weights[i],
-                }]
-            })
+        # Determine the sets corresponding of to each exercise
+        exercise_details = []
+        start_index = 0
 
-        # Create a new TrainingSession
+        for exercise in exercise_names:
+            # Determine how many sets this exercise has
+            num_sets = len(repetitions) // len(exercise_names)
+
+            # Slice the repetitions and weights for this exercise
+            exercise_reps = repetitions[start_index:start_index + num_sets]
+            exercise_weights = weights[start_index:start_index + num_sets]
+            start_index += num_sets
+
+            # Add details for this exercise
+            details = [
+                {"repetitions": rep, "weight": wt}
+                for rep, wt in zip(exercise_reps, exercise_weights)
+            ]
+            exercise_details.append({"name": exercise, "details": details})
+
         new_session = TrainingSession(
             date=date,
             template_id=template_id,
@@ -176,7 +182,7 @@ def new_session():
                         for det in ex["details"]
                     ]
                 )
-                for ex in exercises
+                for ex in exercise_details
             ]
         )
 
@@ -184,13 +190,10 @@ def new_session():
         db.session.commit()
 
         flash("Session created successfully!", "success")
-        return redirect(url_for("new_session"))
+        return redirect(url_for("homepage"))
 
     elif request.method == 'GET':
         return render_template('new_session.html', form=form, templates=Template.query.all())
-
-
-
 
 
 

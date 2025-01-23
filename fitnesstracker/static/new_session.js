@@ -1,3 +1,5 @@
+let draggedItem = null;
+
 function enableSwipeToRemove() {
     const exerciseRows = document.querySelectorAll('.exercise-row:not(.swipe-enabled)'); // Only rows not initialized
 
@@ -36,6 +38,7 @@ function enableSwipeToRemove() {
     });
 }
 
+
 function validateForm() {
     const exercises = document.querySelectorAll('.exercise-row');
     if (exercises.length === 0) {
@@ -52,6 +55,7 @@ function validateForm() {
     return true;
 }
 
+
 window.onload = function () {
     const dateField = document.getElementById("date");
     const today = new Date();
@@ -59,7 +63,6 @@ window.onload = function () {
     dateField.value = formattedDate;
 };
 
-let draggedItem = null;
 
 function loadLastSession(inputField, applyToDetails = false) {
     const exerciseName = inputField.value.trim();
@@ -88,6 +91,7 @@ function loadLastSession(inputField, applyToDetails = false) {
     }
 }
 
+
 function addDetailRow(detailsList, repetitions = '', weight = '', triggerAutocomplete = true) {
     const detailRow = document.createElement('div');
     detailRow.className = 'detail-row';
@@ -95,8 +99,7 @@ function addDetailRow(detailsList, repetitions = '', weight = '', triggerAutocom
     detailRow.innerHTML = `
         <input type="number" name="repetitions[]" style="width: 35%" placeholder="Reps" value="${repetitions}" required>
         <input type="number" name="weight[]" style="width: 35%" placeholder="Weight" value="${weight}" step="0.5" required>
-        <button type="button" onclick="removeDetailRow(this)">&#10006;</button>
-    `;
+        <button type="button" onclick="removeDetailRow(this)">&#10006;</button>`;
 
     detailsList.appendChild(detailRow);
 
@@ -104,7 +107,6 @@ function addDetailRow(detailsList, repetitions = '', weight = '', triggerAutocom
     // detailRow.addEventListener('touchstart', (event) => event.stopPropagation());
     // detailRow.addEventListener('touchmove', (event) => event.stopPropagation());
     // detailRow.addEventListener('touchend', (event) => event.stopPropagation());
-
 
     if (triggerAutocomplete) {
         // Ensure only the last row is updated with data
@@ -125,8 +127,6 @@ function addDetailRow(detailsList, repetitions = '', weight = '', triggerAutocom
                 .catch(error => console.error('Error autocompleting last detail:', error));
         }
     }
-    // if (applySwipe) enableSwipeToRemove();
-
 }
 
 
@@ -155,18 +155,20 @@ function addExerciseRow(exercise = '', details = [], remove = false) {
     `;
     console.log(exerciseList);
     exerciseList.appendChild(newRow);
-    
+
     enableSwipeToRemove();
-;
 }
+
 
 function removeDetailRow(button) {
     button.parentElement.remove();
 }
 
+
 function removeExerciseRow(button) {
     button.parentElement.remove();
 }
+
 
 function loadTemplate(templateId) {
     const exerciseList = document.getElementById('exercise-list');
@@ -186,14 +188,17 @@ function loadTemplate(templateId) {
     }
 }
 
+
 function allowDrop(event) {
     event.preventDefault();
 }
+
 
 function drag(event) {
     draggedItem = event.target;
     event.dataTransfer.setData("text", draggedItem.id);
 }
+
 
 function drop(event) {
     event.preventDefault();
