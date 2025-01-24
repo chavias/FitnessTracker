@@ -3,8 +3,6 @@
 {% block content %}
 <div class="content-section">
     <form method="POST">
-        {{ form.hidden_tag() }}
-
         <select name="template_id" id="template" onchange="loadTemplate(this.value)">
             <option value="">Select a Template</option>
             {% for template in templates %}

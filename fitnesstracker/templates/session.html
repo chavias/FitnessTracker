@@ -1,35 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Session</title>
-</head>
-<body>
-    <h1>Session: {{ form.name.data }}</h1>
-    <form method="POST">
-        {{ form.hidden_tag() }}
-        
-        {{ form.name.label }} {{ form.name(size=30) }}
-        <ul>
-            {% for exercise_form in form.exercises %}
-                <li>
-                    {{ exercise_form.name.label }} {{ exercise_form.name(size=30) }}
-                    <ul>
-                        {% for detail_form in exercise_form.details %}
-                            <li>
-                                {{ detail_form.repetitions.label }} {{ detail_form.repetitions(size=5) }}
-                                {{ detail_form.weight.label }} {{ detail_form.weight(size=5) }}
-                                {{ detail_form.delete() }}
-                            </li>
-                        {% endfor %}
-                    </ul>
-                    {{ exercise_form.add_detail() }}
-                    {{ exercise_form.delete() }}
-                </li>
+{% extends "layout.html" %}
+{% block content %}
+<article class="media content-section">
+    <div class="media-body">
+        <div class="article-metadata">
+            <!-- <a class="mr-2" href="#">{{ session.template.name }}</a> -->
+            <small class="text-muted">{{ session.date.strftime('%Y-%m-%d') }}</small>
+        </div>
+        <h2 class="article-title">{{ session.template.name }}</h2>
+        {% for exercise in session.exercises %}
+        <p class="article-content">{{ exercise.exercise_name}} :
+            {% for detail in exercise.details%}
+            {{detail.repetitions}} / {{ detail.weight }} &nbsp;
             {% endfor %}
-        </ul>
-        {{ form.add_exercise() }}
-        {{ form.submit() }}
-    </form>
-</body>
-</html>
+        </p>
+        {% endfor %}
+    </div>
+</article>
+{% endblock content %}

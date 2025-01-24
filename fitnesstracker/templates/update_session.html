@@ -1,0 +1,63 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="content-section">
+    <h2>Update Training Session</h2>
+    <form method="POST">
+        <!-- CSRF Token -->
+
+        <!-- Template Dropdown -->
+        <label for="template">Select Template:</label>
+        <select name="template_id" id="template" onchange="loadTemplate(this.value)">
+            <option value="">Select a Template</option>
+            {% for template in templates %}
+            <option value="{{ template.id }}" {% if template.id == session.template_id %}selected{% endif %}>
+                {{ template.name }}
+            </option>
+            {% endfor %}
+        </select>
+        <br><br>
+
+        <!-- Date Input -->
+        <label for="date">Date:</label>
+        <input type="date" name="date" id="date" value="{{ session.date }}" required>
+        <br><br>
+
+        <!-- Exercise List -->
+        <div id="exercise-list">
+            {% for exercise in session.exercises %}
+            <div class="exercise-row">
+                <!-- Exercise Name -->
+                <input type="text" name="exercise[]" value="{{ exercise.name }}" placeholder="Exercise Name" 
+                       oninput="loadLastSession(this, true)" required>
+                <div class="details-list">
+                    {% for detail in exercise.details %}
+                    <div class="detail-row">
+                        <input type="number" name="repetitions[]" value="{{ detail.repetitions }}" 
+                               placeholder="Repetitions" required>
+                        <input type="number" name="weight[]" value="{{ detail.weight }}" placeholder="Weight" required>
+                    </div>
+                    {% endfor %}
+                </div>
+                <!-- Add Detail Button -->
+                <button type="button" 
+                        onclick="addDetailRow(this.closest('.exercise-row').querySelector('.details-list'), '', '')">
+                    &#10010;
+                </button>
+                <br><br>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Add Exercise Button -->
+        <button type="button" onclick="addExerciseRow()" style="margin-bottom: 1cm;">Add Exercise</button>
+        <br>
+
+        <!-- Submit Button -->
+        <button type="submit" value="true">Update Session</button>
+    </form>
+</div>
+
+<script src="static/new_session.js"></script>
+
+{% endblock %}

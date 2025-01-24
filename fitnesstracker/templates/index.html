@@ -1,29 +1,22 @@
-{% extends 'layout.html' %}
-
+{% extends "layout.html" %}
 {% block content %}
-<div class="content-section">
-    {% for session in session_data %}
-    <h5> {{ session.date }} | {{ session.template_name or "Random" }} </h5>
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Exercise</th>
-                <th>Reps</th>
-                <th>Weight</th>
-            </tr>
-        </thead>
-        <tbody>
+    {% for session in sessions %}
+        <article class="media content-section">
+          <div class="media-body">
+            <div class="article-metadata">
+              <!-- <a class="mr-2" href="#">{{ session.template.name }}</a> -->
+              <small class="text-muted">{{ session.date.strftime('%Y-%m-%d') }}</small>
+            </div>
+            <h2><a class="article-title" href="{{ url_for('session', session_id=session.id) }}">{{ session.template.name }}</a></h2>
             {% for exercise in session.exercises %}
-            <tr>
-                <td>{{ exercise.exercise_name }}</td> <!-- Correct exercise name -->
-                {% for detail in exercise.details %}
-                <td>{{ detail.reps }}</td> <!-- Repetitions -->
-                <td>{{ detail.weight }}</td> <!-- Weight -->
-                {% endfor %}
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+                <p class="article-content">{{ exercise.exercise_name}} :
+
+                    {% for detail in exercise.details%}
+                        {{detail.repetitions}} / {{ detail.weight }} &nbsp;
+                    {% endfor %}
+                    </p>
+            {% endfor  %}
+          </div>
+        </article>
     {% endfor %}
-</div>
-{% endblock %}
+{% endblock content %}
