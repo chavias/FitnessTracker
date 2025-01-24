@@ -270,6 +270,13 @@ def update_session(session_id):
 
 
 
+@app.route("/session/<int:session_id>/delete", methods=['POST'])
+def delete_session(session_id):
+    user_session = TrainingSession.query.get_or_404(session_id)  # Use a different name for the variable
+    db.session.delete(user_session)
+    db.session.commit()
+    flash('Your session has been deleted!', 'success')
+    return redirect(url_for('homepage'))
 
 
 

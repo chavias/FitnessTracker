@@ -4,6 +4,10 @@
     <div class="media-body">
         <div class="article-metadata">
             <!-- <a class="mr-2" href="#">{{ session.template.name }}</a> -->
+            <div>
+                <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{{ url_for('update_session', session_id=session.id) }}">Update</a>
+                <button type="button" class="btn btn-danger btn-sm m-1" data-toggle="modal" data-target="#deleteModal">Delete</button>
+            </div>
             <small class="text-muted">{{ session.date.strftime('%Y-%m-%d') }}</small>
         </div>
         <h2 class="article-title">{{ session.template.name }}</h2>
@@ -16,4 +20,24 @@
         {% endfor %}
     </div>
 </article>
+<!-- Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteModalLabel">Delete Session?</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <form action="{{ url_for('delete_session', session_id=session.id) }}" method="POST">
+            <input class="btn btn-danger" type="submit" action="{{ url_for('delete_session', session_id=session.id) }}" method="POST" value="Delete">
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock content %}
+  

@@ -8,7 +8,7 @@ class Template(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     exercises = db.relationship("TemplateExercise", backref="template", cascade="all, delete-orphan", lazy=True)
-    sessions = db.relationship('TrainingSession', backref='template', lazy=True)
+    sessions = db.relationship('TrainingSession', backref='template', cascade='all, delete-orphan', lazy=True)
 
 class TemplateExercise(db.Model):
     __tablename__ = "template_exercises"
@@ -22,7 +22,8 @@ class TrainingSession(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     template_id = db.Column(db.Integer, db.ForeignKey('templates.id'))
-    exercises = db.relationship('Exercise', backref='session', lazy=True)
+    exercises = db.relationship('Exercise', backref='session', cascade='all, delete-orphan', lazy=True)
+
 
 
 class Exercise(db.Model):

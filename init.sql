@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS training_sessions (
     id INT AUTO_INCREMENT PRIMARY KEY,
     date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     template_id INT,
-    FOREIGN KEY (template_id) REFERENCES templates(id) ON DELETE SET NULL
+    FOREIGN KEY (template_id) REFERENCES templates(id) ON DELETE CASCADE
 );
 
 -- Create exercises table
