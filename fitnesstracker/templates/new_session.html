@@ -14,7 +14,7 @@
         <div id="exercise-list">
             {% for exercise_form in form.exercises %}
             <div class="exercise-row">
-                <!-- <input type="text" name="exercise[]" value="{{ exercise_form.name.data }}"
+                <input type="text" name="exercise[]" value="{{ exercise_form.name.data }}"
                     placeholder="Exercise Name" oninput="loadLastSession(this, true)" required>
                 <div class="details-list">
                     {% for detail_form in exercise_form.details %}
@@ -22,7 +22,7 @@
                     {% endfor %}
                 </div>
                 <button type="button"
-                    onclick="addDetailRow(this.closest('.exercise-row').querySelector('.details-list'), '', '')">&#10010;</button> -->
+                    onclick="addDetailRow(this.closest('.exercise-row').querySelector('.details-list'), '', '')">&#10010;</button>
             </div>
             {{ exercise_form.csrf_token }}
             {% endfor %}
