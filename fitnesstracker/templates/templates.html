@@ -44,7 +44,6 @@
 </article>
 {% endfor %}
 
-
-<script src="static/templates.js"></script>
+<script src="{{ url_for('static', filename='templates.js') }}"></script>
 
 {% endblock %}
