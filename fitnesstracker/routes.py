@@ -226,13 +226,12 @@ def update_session(session_id):
         session.date = date
         session.template_id = template_id
 
-        # Clear existing exercises
-        session.exercises.clear()
+        Exercise.query.filter_by(session_id=session.id).delete()
 
-        # Add new exercises and associate them with the session
         for ex in exercise_details:
             exercise = Exercise(
                 exercise_name=ex["name"],
+                session_id=session.id,  # Explicitly set session_id
                 details=[
                     ExerciseDetails(
                         repetitions=det["repetitions"],
@@ -241,7 +240,8 @@ def update_session(session_id):
                     for det in ex["details"]
                 ]
             )
-            session.exercises.append(exercise)  # Associate with the session
+            session.exercises.append(exercise)
+
 
         db.session.commit()
         flash("Session updated successfully!", "success")

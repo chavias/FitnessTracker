@@ -33,7 +33,7 @@ class Exercise(db.Model):
     # sets = db.Column(db.Integer, nullable=False)
     # reps = db.Column(db.Integer, nullable=False)
     # weight = db.Column(db.Float, nullable=False)
-    details = db.relationship('ExerciseDetails', backref='exercise', lazy=True)
+    details = db.relationship('ExerciseDetails', backref='exercise', cascade='all, delete-orphan', lazy=True)
 
 
 class ExerciseDetails(db.Model):
