@@ -100,6 +100,8 @@ def delete_template(template_id):
 def new_session():
     form = SessionForm()
 
+    # print(f"Flask_form {form = }")
+
     if request.method == 'POST':
         
         # Not using flask forms because of its complicated indexing
@@ -261,7 +263,9 @@ def update_session(session_id):
                 for exercise in session.exercises
             ]
         }
-        return render_template('new_session.html', templates=Template.query.all(), form=session_data)
+        for exercise in session.exercises:
+            print(f"{exercise.exercise_name =}")
+        return render_template('update_session.html', templates=Template.query.all(), session=session_data)
 
 
 
