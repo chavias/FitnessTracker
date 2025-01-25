@@ -92,72 +92,47 @@ function loadLastSession(inputField, applyToDetails = false) {
 }
 
 
-function addDetailRow(detailsList, repetitions = '', weight = '', triggerAutocomplete = true) {
-    const detailRow = document.createElement('div');
-    detailRow.className = 'detail-row';
+function addExerciseRow() {
+    const exerciseList = document.getElementById("exercise-list");
+    const newExerciseIndex = exerciseList.children.length;
+
+    const exerciseRow = document.createElement("div");
+    exerciseRow.classList.add("exercise-row");
+
+    exerciseRow.innerHTML = `
+        <input type="text" name="exercises-${newExerciseIndex}-name" placeholder="Exercise Name" required>
+        <div class="details-list">
+            <div class="detail-row">
+                <input type="number" name="exercises-${newExerciseIndex}-details-0-repetitions" placeholder="Reps" required>
+                <input type="number" name="exercises-${newExerciseIndex}-details-0-weight" placeholder="Weight" step="0.5" required>
+            </div>
+        </div>
+        <button type="button" onclick="addDetailRow(this.closest('.exercise-row').querySelector('.details-list'), ${newExerciseIndex})">Add Detail</button>
+    `;
+
+    exerciseList.appendChild(exerciseRow);
+}
+
+function addDetailRow(detailsList, exerciseIndex) {
+    const newDetailIndex = detailsList.children.length;
+
+    const detailRow = document.createElement("div");
+    detailRow.classList.add("detail-row");
 
     detailRow.innerHTML = `
-        <input type="number" name="repetitions[]" style="width: 35%" placeholder="Reps" value="${repetitions}" required>
-        <input type="number" name="weight[]" style="width: 35%" placeholder="Weight" value="${weight}" step="0.5" required>
-        <button type="button" onclick="removeDetailRow(this)">&#10006;</button>`;
+        <input type="number" name="exercises-${exerciseIndex}-details-${newDetailIndex}-repetitions" placeholder="Reps" required>
+        <input type="number" name="exercises-${exerciseIndex}-details-${newDetailIndex}-weight" placeholder="Weight" step="0.5" required>
+        <button type="button" onclick="removeDetailRow(this)">&#10006;</button>
+    `;
 
     detailsList.appendChild(detailRow);
+}
 
-    // Prevent touch events on the detail row from triggering parent events
-    // detailRow.addEventListener('touchstart', (event) => event.stopPropagation());
-    // detailRow.addEventListener('touchmove', (event) => event.stopPropagation());
-    // detailRow.addEventListener('touchend', (event) => event.stopPropagation());
-
-    if (triggerAutocomplete) {
-        // Ensure only the last row is updated with data
-        const exerciseNameField = detailsList.closest('.exercise-row').querySelector('input[name="exercise[]"]');
-        if (exerciseNameField.value.trim()) {
-            fetch(`/get_last_session/${exerciseNameField.value.trim()}`)
-                .then(response => response.json())
-                .then(data => {
-                    const lastRow = detailsList.lastElementChild;
-                    const detail = data.details[detailsList.children.length - 1];
-                    if (detail) {
-                        lastRow.querySelector('input[name="repetitions[]"]').value = detail.repetitions;
-                        lastRow.querySelector('input[name="weight[]"]').value = detail.weight;
-                        console.log('Completed details');
-                    }
-                    console.log(detail);
-                })
-                .catch(error => console.error('Error autocompleting last detail:', error));
-        }
-    }
+function removeDetailRow(button) {
+    button.closest('.detail-row').remove();
 }
 
 
-function addExerciseRow(exercise = '', details = [], remove = false) {
-    const exerciseList = document.getElementById('exercise-list');
-    const newRow = document.createElement('div');
-    const rowId = `exercise-row-${Date.now()}`;
-
-    newRow.className = 'exercise-row';
-    newRow.id = rowId;
-    newRow.setAttribute('draggable', 'true');
-    newRow.setAttribute('ondragstart', 'drag(event)');
-    newRow.setAttribute('ondragover', 'allowDrop(event)');
-    newRow.setAttribute('ondrop', 'drop(event)');
-
-    newRow.innerHTML = `
-        <input type="text" name="exercise[]" value="${exercise}" placeholder="Exercise Name" oninput="loadLastSession(this, true)" required>
-        <div class="details-list">
-            ${details.map(detail => `<div class='detail-row'>
-                <input type="number" name="repetitions[]" style="width: 35%" value="${detail.repetitions}" placeholder="R" required>
-                <input type="number" name="weight[]" style="width: 35%" value="${detail.weight}" placeholder="W" step="0.5" required>
-                <button type="button" onclick="removeDetailRow(this)">&#10006;</button>
-            </div>`).join('')}
-        </div>
-        <button type="button" onclick="addDetailRow(this.closest('.exercise-row').querySelector('.details-list'), '', '')">&#10010</button>
-    `;
-    console.log(exerciseList);
-    exerciseList.appendChild(newRow);
-
-    enableSwipeToRemove();
-}
 
 
 function removeDetailRow(button) {

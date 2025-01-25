@@ -11,7 +11,7 @@
         <select name="template_id" id="template" onchange="loadTemplate(this.value)">
             <option value="">Select a Template</option>
             {% for template in templates %}
-            <option value="{{ template.id }}" {% if template.id == session.template_id %}selected{% endif %}>
+            <option value="{{ template.id }}" {% if template.id==session.template_id %}selected{% endif %}>
                 {{ template.name }}
             </option>
             {% endfor %}
@@ -19,35 +19,39 @@
         <br><br>
 
         <!-- Date Input -->
-        <label for="date">Date:</label>
+        <!-- <label for="date">Date:</label> -->
         <input type="date" name="date" id="date" value="{{ session.date }}" required>
         <br><br>
 
         <!-- Exercise List -->
-        <div id="exercise-list">
-            {% for exercise in session.exercises %}
-            <div class="exercise-row">
-                <!-- Exercise Name -->
-                <input type="text" name="exercise[]" value="{{ exercise.name }}" placeholder="Exercise Name" 
-                       oninput="loadLastSession(this, true)" required>
-                <div class="details-list">
-                    {% for detail in exercise.details %}
-                    <div class="detail-row">
-                        <input type="number" name="repetitions[]" value="{{ detail.repetitions }}" 
-                               placeholder="Repetitions" required>
-                        <input type="number" name="weight[]" value="{{ detail.weight }}" placeholder="Weight" required>
-                    </div>
-                    {% endfor %}
-                </div>
-                <!-- Add Detail Button -->
-                <button type="button" 
-                        onclick="addDetailRow(this.closest('.exercise-row').querySelector('.details-list'), '', '')">
-                    &#10010;
-                </button>
-                <br><br>
+<div id="exercise-list">
+    {% for exercise_idx, exercise in enumerate(session.exercises) %}
+    <div class="exercise-row" data-exercise-index="{{ exercise_idx }}">
+        <!-- Exercise Name -->
+        <label>Exercise Name:</label>
+        <input type="text" name="exercise[]" value="{{ exercise.name }}" placeholder="Exercise Name" required>
+
+        <div class="details-list">
+            {% for detail in exercise.details %}
+            <div class="detail-row">
+                <input type="number" name="repetitions_{{ exercise_idx }}[]" value="{{ detail.repetitions }}"
+                    placeholder="Reps" required>
+                <input type="number" name="weight_{{ exercise_idx }}[]" value="{{ detail.weight }}" placeholder="Weight"
+                    required>
+                <button type="button" onclick="removeDetailRow(this)">&#10006;</button>
             </div>
             {% endfor %}
         </div>
+
+        <!-- Add Detail Button -->
+        <button type="button"
+            onclick="addDetailRow(this.closest('.exercise-row').querySelector('.details-list'), {{ exercise_idx }})">
+            &#10010; Add Detail
+        </button>
+        <br><br>
+    </div>
+    {% endfor %}
+</div>
 
         <!-- Add Exercise Button -->
         <button type="button" onclick="addExerciseRow()" style="margin-bottom: 1cm;">Add Exercise</button>
@@ -59,5 +63,53 @@
 </div>
 
 <script src="{{ url_for('static', filename='new_session.js') }}"></script>
+
+
+<script>
+
+// Add a new detail row to the corresponding exercise
+function addDetailRow(container, exerciseIndex) {
+    // Create a new row for repetitions and weight
+    const newRow = document.createElement('div');
+    newRow.className = 'detail-row';
+
+    newRow.innerHTML = `
+        <input type="number" name="repetitions_${exerciseIndex}[]" placeholder="Reps" required>
+        <input type="number" name="weight_${exerciseIndex}[]" placeholder="Weight" required>
+        <button type="button" onclick="removeDetailRow(this)">&#10006;</button>
+    `;
+
+    container.appendChild(newRow);
+}
+
+// Remove a detail row
+function removeDetailRow(button) {
+    const row = button.closest('.detail-row');
+    row.remove();
+}
+
+// Add a new exercise row
+function addExerciseRow() {
+    const exerciseList = document.getElementById('exercise-list');
+    const exerciseIndex = exerciseList.children.length;
+
+    const newExercise = document.createElement('div');
+    newExercise.className = 'exercise-row';
+    newExercise.setAttribute('data-exercise-index', exerciseIndex);
+
+    newExercise.innerHTML = `
+        <label>Exercise Name:</label>
+        <input type="text" name="exercise[]" placeholder="Exercise Name" required>
+        <div class="details-list"></div>
+        <button type="button" onclick="addDetailRow(this.closest('.exercise-row').querySelector('.details-list'), ${exerciseIndex})">
+            &#10010; Add Detail
+        </button>
+        <br><br>
+    `;
+
+    exerciseList.appendChild(newExercise);
+}
+
+</script>
 
 {% endblock %}

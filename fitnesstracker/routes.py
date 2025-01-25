@@ -100,7 +100,7 @@ def delete_template(template_id):
 def new_session():
     form = SessionForm()
 
-    # print(f"Flask_form {form = }")
+    print(f"Flask_form {form.data = }")
 
     if request.method == 'POST':
         
@@ -208,25 +208,25 @@ def update_session(session_id):
 
         # Process exercise details
         exercise_details = []
-        start_index = 0
+        exercise_names = request.form.getlist('exercise[]')
 
-        for exercise in exercise_names:
-            num_sets = len(repetitions) // len(exercise_names)
-            exercise_reps = repetitions[start_index:start_index + num_sets]
-            exercise_weights = weights[start_index:start_index + num_sets]
-            start_index += num_sets
-
+        for exercise_idx, exercise_name in enumerate(exercise_names):
+            repetitions = request.form.getlist(f'repetitions_{exercise_idx}[]')
+            weights = request.form.getlist(f'weight_{exercise_idx}[]')
+            
             details = [
                 {"repetitions": rep, "weight": wt}
-                for rep, wt in zip(exercise_reps, exercise_weights)
+                for rep, wt in zip(repetitions, weights)
             ]
-            exercise_details.append({"name": exercise, "details": details})
+            exercise_details.append({"name": exercise_name, "details": details})
 
         # Update the session
         session.date = date
         session.template_id = template_id
 
+
         Exercise.query.filter_by(session_id=session.id).delete()
+        # db.session.delete(session)
 
         for ex in exercise_details:
             exercise = Exercise(
