@@ -134,7 +134,7 @@ function addExerciseRow(exerciseName = '', details = [], exerciseIndex = 0) {
     exerciseRow.classList.add("exercise-row");
 
     exerciseRow.innerHTML = `
-        <input type="text" name="exercises-${newExerciseIndex}-name" placeholder="Exercise Name" value="${exerciseName}" required>
+        <input type="text" name="exercises-${newExerciseIndex}-exercise_name" placeholder="Exercise Name" value="${exerciseName}" required>
         <div class="details-list">
             ${details.map((detail, detailIndex) => `
                 <div class="detail-row">
@@ -171,7 +171,7 @@ function addDetailRow(detailsList, exerciseIndex, triggerAutocomplete = true) {
 
     // Trigger autocomplete if needed
     if (triggerAutocomplete) {
-        const exerciseNameField = detailsList.closest('.exercise-row').querySelector('input[name="exercises-' + exerciseIndex + '-name"]');
+        const exerciseNameField = detailsList.closest('.exercise-row').querySelector('input[name="exercises-' + exerciseIndex + '-exercise_name"]');
     
         if (exerciseNameField && exerciseNameField.value.trim()) {
             fetch(`/get_last_session/${exerciseNameField.value.trim()}`)

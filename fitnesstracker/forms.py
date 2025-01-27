@@ -33,7 +33,7 @@ class ExerciseDetailForm(FlaskForm):
     weight = IntegerField("Weight", validators=[DataRequired()])
 
 class ExerciseForm(FlaskForm):
-    name = StringField("Exercise Name", validators=[DataRequired()])
+    exercise_name = StringField("Exercise Name", validators=[DataRequired()])
     details = FieldList(FormField(ExerciseDetailForm), min_entries=1)
 
 class SessionForm(FlaskForm):

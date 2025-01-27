@@ -127,10 +127,11 @@ def new_session():
         # Add exercises to the new session
         for exercise_form in form.exercises:
             new_exercise = Exercise(
-                exercise_name=exercise_form.data["name"],
+                exercise_name=exercise_form.data['exercise_name'],
                 session=new_session,  # Link this exercise to the session
             )
             db.session.add(new_exercise)
+            print(f"{exercise_form.data = }")
 
             # Add exercise details (repetitions, weight)
             for detail_form in exercise_form.details:
