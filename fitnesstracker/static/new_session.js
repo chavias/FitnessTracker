@@ -70,26 +70,58 @@ function loadLastSession(inputField, applyToDetails = false) {
         fetch(`/get_last_session/${exerciseName}`)
             .then(response => response.json())
             .then(data => {
-                const parent = inputField.closest('.exercise-row');
-                const detailsList = parent.querySelector('.details-list');
+                // Debug: Check what data looks like
+                console.log(data);
 
+                const parent = inputField.closest('.exercise-row');
+                if (!parent) {
+                    console.error('Could not find the parent exercise row');
+                    return;
+                }
+
+                const detailsList = parent.querySelector('.details-list');
+                if (!detailsList) {
+                    console.error('Could not find details list');
+                    return;
+                }
+
+                // If the API returned details and we need to apply them to the details list
                 if (applyToDetails && data.details) {
                     const existingRows = detailsList.children.length;
 
+                    // Iterate through the details and update or add new detail rows
                     data.details.forEach((detail, index) => {
+                        const repetitionsInputName = `exercises-${parent.dataset.exerciseIndex}-details-${index}-repetitions`;
+                        const weightInputName = `exercises-${parent.dataset.exerciseIndex}-details-${index}-weight`;
+
                         if (index < existingRows) {
+                            // Update existing detail rows
                             const detailRow = detailsList.children[index];
-                            detailRow.querySelector('input[name="repetitions[]"]').value = detail.repetitions;
-                            detailRow.querySelector('input[name="weight[]"]').value = detail.weight;
+                            const repetitionsInput = detailRow.querySelector(`input[name="${repetitionsInputName}"]`);
+                            const weightInput = detailRow.querySelector(`input[name="${weightInputName}"]`);
+                            
+                            if (repetitionsInput && weightInput) {
+                                repetitionsInput.value = detail.repetitions;
+                                weightInput.value = detail.weight;
+                            } else {
+                                console.error(`Inputs not found for ${repetitionsInputName} and ${weightInputName}`);
+                            }
                         } else {
-                            addDetailRow(detailsList, detail.repetitions, detail.weight, false);
+                            // Add new detail rows if there are more details than existing rows
+                            addDetailRow(detailsList, parent.dataset.exerciseIndex, detail.repetitions, detail.weight);
                         }
                     });
+
+                    // If there are more existing rows than the new session details, remove excess rows
+                    for (let i = data.details.length; i < existingRows; i++) {
+                        detailsList.children[i].remove();
+                    }
                 }
             })
             .catch(error => console.error('Error loading last session:', error));
     }
 }
+
 
 
 function getCsrfToken() {
