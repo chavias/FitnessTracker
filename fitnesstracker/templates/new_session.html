@@ -7,7 +7,7 @@
         <select name="template_id" id="template" onchange="loadTemplate(this.value)">
             <option value="">Select a Template</option>
             {% for template in templates %}
-            <option value="{{ template.id }}">{{ template.name }}</option>
+                <option value="{{ template.id }}">{{ template.name }}</option>
             {% endfor %}
         </select>
         <input type="date" name="date" id="date" required>

@@ -10,7 +10,7 @@ class RegistrationFrom(FlaskForm):
     confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Sign Up')
 
-class RegistrationFrom(FlaskForm):
+class LoginForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
     remember = BooleanField('Remember Me')
@@ -37,7 +37,7 @@ class ExerciseForm(FlaskForm):
     details = FieldList(FormField(ExerciseDetailForm), min_entries=1)
 
 class SessionForm(FlaskForm):
-    template_id = SelectField("Template", coerce=int, validators=[DataRequired()])
+    template_id = SelectField("Template", coerce=int)
     date = DateField("Date", validators=[DataRequired()])
     exercises = FieldList(FormField(ExerciseForm), min_entries=1)
     submit = SubmitField("Submit")

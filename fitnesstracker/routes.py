@@ -99,79 +99,42 @@ def delete_template(template_id):
 @app.route('/new_session', methods=['GET', 'POST'])
 def new_session():
     form = SessionForm()
+    form.template_id.choices = [(t.id, t.name) for t in Template.query.all()]
 
-    print(f"Flask_form {form.data = }")
 
-    if request.method == 'POST':
-        
-        # Not using flask forms because of its complicated indexing
-        template_id = request.form.get('template_id')
-        date = datetime.strptime(request.form.get('date'),'%Y-%m-%d').date()
-        exercise_names = request.form.getlist('exercise[]')
-        repetitions = request.form.getlist('repetitions[]')
-        weights = request.form.getlist('weight[]')
-
-        # Handling errors because flask forms is not used
-        errors = []
-        if not date:
-            errors.append("Date is required.")
-        if not exercise_names:
-            errors.append("At least one exercise is required.")
-        if len(repetitions) != len(weights):
-            errors.append("Mismatch repetitions and weights count.")
-
-        if errors:
-            print(f"Form errors: {errors}")
-            flash(" ".join(errors), "danger")
-            return render_template('new_session.html', form=form,
-                                   templates=Template.query.all())
-
-        # Determine the sets corresponding of to each exercise
-        exercise_details = []
-        start_index = 0
-
-        for exercise in exercise_names:
-            # Determine how many sets this exercise has
-            num_sets = len(repetitions) // len(exercise_names)
-
-            # Slice the repetitions and weights for this exercise
-            exercise_reps = repetitions[start_index:start_index + num_sets]
-            exercise_weights = weights[start_index:start_index + num_sets]
-            start_index += num_sets
-
-            # Add details for this exercise
-            details = [
-                {"repetitions": rep, "weight": wt}
-                for rep, wt in zip(exercise_reps, exercise_weights)
-            ]
-            exercise_details.append({"name": exercise, "details": details})
-
+    if form.validate_on_submit():
+        # Create the new session (TrainingSession)
         new_session = TrainingSession(
-            date=date,
-            template_id=template_id,
-            exercises=[
-                Exercise(
-                    exercise_name=ex["name"],
-                    details=[
-                        ExerciseDetails(
-                            repetitions=det["repetitions"],
-                            weight=det["weight"]
-                        )
-                        for det in ex["details"]
-                    ]
-                )
-                for ex in exercise_details
-            ]
+            template_id=form.template_id.data,
+            date=form.date.data
         )
+        
+        # Add exercises to the new session
+        for exercise_form in form.exercises:
+            new_exercise = Exercise(
+                exercise_name=exercise_form.data['name'],
+                session=new_session  # Link this exercise to the session
+            )
+            db.session.add(new_exercise)
+            
+            # Add exercise details (repetitions, weight)
+            for detail_form in exercise_form.details:
+                new_detail = ExerciseDetails(
+                    repetitions=detail_form.repetitions.data,
+                    weight=detail_form.weight.data,
+                    exercise=new_exercise  # Link this detail to the exercise
+                )
+                db.session.add(new_detail)
 
-        db.session.add(new_session)
+        # Commit changes to the database
         db.session.commit()
 
         flash("Session created successfully!", "success")
         return redirect(url_for("homepage"))
 
-    elif request.method == 'GET':
-        return render_template('new_session.html', form=form,  templates=Template.query.all())
+    
+    return render_template('new_session.html', form=form, templates=Template.query.all())
+
 
 
 @app.route('/session/<int:session_id>', methods=['GET', 'POST'])
