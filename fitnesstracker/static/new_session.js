@@ -138,15 +138,15 @@ function addExerciseRow(exerciseName = '', details = [], exerciseIndex = 0) {
         <div class="details-list">
             ${details.map((detail, detailIndex) => `
                 <div class="detail-row">
-                    <input type="number" name="exercises-${newExerciseIndex}-details-${detailIndex}-repetitions" placeholder="Reps" value="${detail.repetitions}" required>
-                    <input type="number" name="exercises-${newExerciseIndex}-details-${detailIndex}-weight" placeholder="Weight" value="${detail.weight}" step="0.5" required>
+                    <input type="number" name="exercises-${newExerciseIndex}-details-${detailIndex}-repetitions" placeholder="R" style="width : 35%" value="${detail.repetitions}" required>
+                    <input type="number" name="exercises-${newExerciseIndex}-details-${detailIndex}-weight" placeholder="W" style="width : 35%" value="${detail.weight}" step="0.5" required>
                     <button type="button" onclick="removeDetailRow(this)">&#10006;</button>
                     <input type="hidden" name="exercises-${newExerciseIndex}-csrf_token" value="${getCsrfToken()}">
                     <input type="hidden" name="exercises-${newExerciseIndex}-details-${detailIndex}-csrf_token" value="${getCsrfToken()}">
                 </div>
             `).join('')}
         </div>
-        <button type="button" onclick="addDetailRow(this.closest('.exercise-row').querySelector('.details-list'), ${newExerciseIndex}, true)">Add Detail</button>
+        <button type="button" onclick="addDetailRow(this.closest('.exercise-row').querySelector('.details-list'), ${newExerciseIndex}, true)"> &#x2795; </button>
     `;
 
     exerciseList.appendChild(exerciseRow);
@@ -160,11 +160,15 @@ function addDetailRow(detailsList, exerciseIndex, triggerAutocomplete = true) {
     detailRow.classList.add("detail-row");
 
     detailRow.innerHTML = `
-        <input type="number" name="exercises-${exerciseIndex}-details-${newDetailIndex}-repetitions" placeholder="Reps" required>
-        <input type="number" name="exercises-${exerciseIndex}-details-${newDetailIndex}-weight" placeholder="Weight" step="0.5" required>
-        <button type="button" onclick="removeDetailRow(this)">&#10006;</button>
-        <input type="hidden" name="exercises-${exerciseIndex}-csrf_token" value="${getCsrfToken()}">
-        <input type="hidden" name="exercises-${exerciseIndex}-details-${newDetailIndex}-csrf_token" value="${getCsrfToken()}">
+    <div class="details-list">
+        <div class="detail-row">
+            <input type="number" name="exercises-${exerciseIndex}-details-${newDetailIndex}-repetitions" style="width : 35%" placeholder="R" required>
+            <input type="number" name="exercises-${exerciseIndex}-details-${newDetailIndex}-weight" style="width : 35%" placeholder="W" step="0.5" required>
+            <button type="button" onclick="removeDetailRow(this)">&#10006;</button>
+            <input type="hidden" name="exercises-${exerciseIndex}-csrf_token" value="${getCsrfToken()}">
+            <input type="hidden" name="exercises-${exerciseIndex}-details-${newDetailIndex}-csrf_token" value="${getCsrfToken()}">
+        </div>
+     </div>
     `;
 
     detailsList.appendChild(detailRow);

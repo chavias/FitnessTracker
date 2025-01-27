@@ -166,46 +166,20 @@ def update_session(session_id):
     # Create the form and prepopulate it
     form = SessionForm(obj=session)
 
-    # Dynamically load choices for the SelectField (template options)
-    templates = Template.query.all()  # Get all templates from the database
-    form.template_id.choices = [(template.id, template.name) for template in templates]
+    
 
-    # Set the current template_id as the form field data
-    form.template_id.data = session.template_id  # Preselect the current template
-
-    # Populate exercise fields with data from the current session
-    for exercise in session.exercises:
-        # Initialize ExerciseForm and set name explicitly for each exercise
-        exercise_form = ExerciseForm(name=exercise.exercise_name)
-
-        # Debug: print exercise and its name
-        print(f"Exercise Name: {exercise.exercise_name}")
-
-        # Populate the details of the exercise
-        for detail in exercise.details:
-            detail_form = ExerciseDetailForm(
-                repetitions=detail.repetitions,
-                weight=detail.weight
-            )
-            # Debug: print exercise detail data
-            print(f"Detail: Reps = {detail.repetitions}, Weight = {detail.weight}")
-            exercise_form.details.append_entry(detail_form)  # Append the detail form to the exercise form
-
-        # Append the exercise form to the main form's exercises FieldList
-        form.exercises.append_entry(exercise_form)
-
-    # Debug: print the form data before rendering
+    # Debugging: Output the form data before rendering
     print(f"Form Data Before Rendering: {form.data}")
 
     if form.validate_on_submit():
-        # Debug: print the form data after submit
+        # Debugging: Output the form data after submit
         print(f"Form Data After Submit: {form.data}")
 
-        # Process the form data and update the session
+        # Update session with form data
         session.template_id = form.template_id.data
         session.date = form.date.data
 
-        # Clear existing exercises and details
+        # Clear existing exercises
         for exercise in session.exercises:
             db.session.delete(exercise)
         db.session.commit()
@@ -213,12 +187,12 @@ def update_session(session_id):
         # Add updated exercises
         for exercise_form in form.exercises:
             exercise = Exercise(
-                exercise_name=exercise_form.name.data,
+                exercise_name=exercise_form.exercise_name.data,
                 session=session  # Link this exercise to the session
             )
             db.session.add(exercise)
 
-            # Add exercise details
+            # Add details for the exercise
             for detail_form in exercise_form.details:
                 detail = ExerciseDetails(
                     repetitions=detail_form.repetitions.data,
@@ -231,7 +205,9 @@ def update_session(session_id):
         flash('Session updated successfully!', 'success')
         return redirect(url_for('view_session', session_id=session.id))
 
-    return render_template('update_session.html', form=form, legend="Update Session")
+    return render_template('new_session.html', form=form, legend="Update Session")
+
+
 
 
 @app.route("/session/<int:session_id>/delete", methods=["POST"])
