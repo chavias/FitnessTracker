@@ -171,7 +171,7 @@ def new_session():
         return redirect(url_for("homepage"))
 
     elif request.method == 'GET':
-        return render_template('new_session.html', form=form, templates=Template.query.all())
+        return render_template('new_session.html', form=form,  templates=Template.query.all())
 
 
 @app.route('/session/<int:session_id>', methods=['GET', 'POST'])

@@ -14,29 +14,7 @@
         <div id="exercise-list">
             {% set exercise_index = 0 %}
             {% for exercise_form in form.exercises %}
-            <div class="exercise-row">
-                {{ exercise_form.csrf_token }} <!-- Include CSRF token for each exercise -->
-                <input type="text" name="exercises-{{ exercise_index }}-name" value="{{ exercise_form.name.data }}"
-                    placeholder="Exercise Name" oninput="loadLastSession(this, true)" required>
-                <div class="details-list">
-                    {% set detail_index = 0 %}
-                    {% for detail_form in exercise_form.details %}
-                    <div class="detail-row">
-                        {{ detail_form.csrf_token }} <!-- Include CSRF token for each detail -->
-                        <input type="number"
-                            name="exercises-{{ exercise_index }}-details-{{ detail_index }}-repetitions"
-                            style="width: 35%" value="{{ detail_form.repetitions.data }}" placeholder="Reps" required>
-                        <input type="number" name="exercises-{{ exercise_index }}-details-{{ detail_index }}-weight"
-                            style="width: 35%" value="{{ detail_form.weight.data }}" placeholder="Weight" step="0.5"
-                            required>
-                        <button type="button" onclick="removeDetailRow(this)">&#10006;</button>
-                    </div>
-                    {% set detail_index = detail_index + 1 %}
-                    {% endfor %}
-                </div>
-                <button type="button"
-                    onclick="addDetailRow(this.closest('.exercise-row').querySelector('.details-list'), {{ exercise_index }})">&#10010;</button>
-            </div>
+
             {% set exercise_index = exercise_index + 1 %}
             {% endfor %}
         </div>
