@@ -5,32 +5,36 @@ function enableSwipeToRemove() {
 
     exerciseRows.forEach(row => {
         let startX = 0;
-        let endX = 0;
         let startY = 0;
-        let endY = 0;
+        let isDragging = false; // To differentiate between drag and swipe
 
         // Mark the row as initialized
         row.classList.add('swipe-enabled');
 
         row.addEventListener('touchstart', (event) => {
-            // Capture starting X and Y positions
             startX = event.touches[0].clientX;
             startY = event.touches[0].clientY;
+            isDragging = false; // Reset drag state
         });
 
         row.addEventListener('touchmove', (event) => {
-            // Capture ending X and Y positions during movement
-            endX = event.touches[0].clientX;
-            endY = event.touches[0].clientY;
+            const currentX = event.touches[0].clientX;
+            const currentY = event.touches[0].clientY;
+
+            // Determine if movement is primarily horizontal
+            if (Math.abs(currentX - startX) > Math.abs(currentY - startY)) {
+                event.preventDefault(); // Prevent vertical scrolling
+                isDragging = true; // Mark as dragging
+            }
         });
 
         row.addEventListener('touchend', () => {
-            // Calculate swipe distances
-            const deltaX = startX - endX;
-            const deltaY = Math.abs(startY - endY);
+            if (!isDragging) return; // Ignore if no swipe occurred
 
-            // Trigger swipe-left only if horizontal swipe is significant and vertical movement is minimal
-            if (deltaX > 50 && deltaY < 20) { // Adjust these thresholds as needed
+            const deltaX = startX - event.changedTouches[0].clientX;
+
+            // Trigger swipe-left if the horizontal swipe distance exceeds the threshold
+            if (deltaX > 50) {
                 row.classList.add('swipe-left'); // Optional: Add animation class
                 setTimeout(() => row.remove(), 300); // Remove row after animation
             }
@@ -38,22 +42,58 @@ function enableSwipeToRemove() {
     });
 }
 
-
-function validateForm() {
-    const exercises = document.querySelectorAll('.exercise-row');
-    if (exercises.length === 0) {
-        alert('Please add at least one exercise.');
-        return false;
-    }
-    for (const exercise of exercises) {
-        const name = exercise.querySelector('input[name="exercise[]"]').value.trim();
-        if (!name) {
-            alert('Exercise name cannot be empty.');
-            return false;
-        }
-    }
-    return true;
+function allowDrop(event) {
+    event.preventDefault();
 }
+
+function drag(event) {
+    draggedItem = event.target.closest('.exercise-row');
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData('text/plain', draggedItem.id);
+}
+
+function drop(event) {
+    event.preventDefault();
+    const targetItem = event.target.closest('.exercise-row');
+    if (targetItem && draggedItem && draggedItem !== targetItem) {
+        const parent = targetItem.parentNode;
+        parent.insertBefore(draggedItem, targetItem.nextSibling);
+    }
+}
+
+function enableDragAndDrop() {
+    const exerciseRows = document.querySelectorAll('.exercise-row:not(.drag-enabled)');
+
+    exerciseRows.forEach(row => {
+        // Mark the row as initialized for drag-and-drop
+        row.classList.add('drag-enabled');
+        row.setAttribute('draggable', 'true');
+
+        row.addEventListener('dragstart', drag);
+        row.addEventListener('dragover', allowDrop);
+        row.addEventListener('drop', drop);
+    });
+}
+
+// Call these functions to initialize functionality
+window.onload = function () {
+    const dateField = document.getElementById("date");
+    const today = new Date();
+    const formattedDate = today.toISOString().split('T')[0];
+    dateField.value = formattedDate;
+
+    // Initialize swipe-to-remove and drag-and-drop
+    enableSwipeToRemove();
+    enableDragAndDrop();
+};
+
+// Add listener to dynamically added rows
+const observer = new MutationObserver(() => {
+    enableSwipeToRemove();
+    enableDragAndDrop();
+});
+
+observer.observe(document.getElementById('exercise-list'), { childList: true });
 
 
 window.onload = function () {
