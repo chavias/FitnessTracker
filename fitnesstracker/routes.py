@@ -118,39 +118,50 @@ def new_session():
     form = SessionForm()
     form.template_id.choices = [(t.id, t.name) for t in Template.query.all()]
 
-    if form.validate_on_submit():
-        # Create the new session (TrainingSession)
-        new_session = TrainingSession(
-            template_id=form.template_id.data, date=form.date.data
-        )
+    if request.method == "POST":
+        # Repopulate the form with submitted data to avoid data loss
+        form = SessionForm(request.form)
+        form.template_id.choices = [(t.id, t.name) for t in Template.query.all()]
 
-        # Add exercises to the new session
-        for exercise_form in form.exercises:
-            new_exercise = Exercise(
-                exercise_name=exercise_form.data['exercise_name'],
-                session=new_session,  # Link this exercise to the session
-            )
-            db.session.add(new_exercise)
-            print(f"{exercise_form.data = }")
-
-            # Add exercise details (repetitions, weight)
-            for detail_form in exercise_form.details:
-                new_detail = ExerciseDetails(
-                    repetitions=detail_form.repetitions.data,
-                    weight=detail_form.weight.data,
-                    exercise=new_exercise,  # Link this detail to the exercise
+        if form.validate_on_submit():
+            try:
+                # Create a new session
+                new_session = TrainingSession(
+                    template_id=form.template_id.data, date=form.date.data
                 )
-                db.session.add(new_detail)
+                db.session.add(new_session)
 
-        # Commit changes to the database
-        db.session.commit()
+                # Add exercises
+                for exercise_form in form.exercises:
+                    new_exercise = Exercise(
+                        exercise_name=exercise_form.data['exercise_name'],
+                        session=new_session,
+                    )
+                    db.session.add(new_exercise)
 
-        flash("Session created successfully!", "success")
-        return redirect(url_for("homepage"))
+                    # Add exercise details
+                    for detail_form in exercise_form.details:
+                        new_detail = ExerciseDetails(
+                            repetitions=detail_form.repetitions.data,
+                            weight=detail_form.weight.data,
+                            exercise=new_exercise,  
+                        )
+                        db.session.add(new_detail)
 
-    return render_template(
-        "new_session.html", form=form, templates=Template.query.all()
-    )
+                # Commit changes to the database
+                db.session.commit()
+
+                flash("Session created successfully!", "success")
+                return redirect(url_for("homepage"))
+
+            except Exception as e:
+                db.session.rollback()
+                app.logger.error(f"Error creating session: {e}")
+                flash("An error occurred while creating the session. Please try again.", "danger")
+        else:
+            app.logger.warning(f"Form validation failed: {form.errors}")
+
+    return render_template("new_session.html", form=form, templates=Template.query.all())
 
 
 @app.route("/session/<int:session_id>", methods=["GET", "POST"])
@@ -162,20 +173,14 @@ def session(session_id):
 @app.route('/session/<int:session_id>/update', methods=['GET', 'POST'])
 def update_session(session_id):
     session = TrainingSession.query.get_or_404(session_id)
-
-    # Create the form and prepopulate it
     form = SessionForm(obj=session)
 
-    
-
-    # Debugging: Output the form data before rendering
     print(f"Form Data Before Rendering: {form.data}")
 
     if form.validate_on_submit():
         # Debugging: Output the form data after submit
         print(f"Form Data After Submit: {form.data}")
 
-        # Update session with form data
         session.template_id = form.template_id.data
         session.date = form.date.data
 
