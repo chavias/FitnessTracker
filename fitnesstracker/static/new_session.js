@@ -70,7 +70,6 @@ function loadLastSession(inputField, applyToDetails = false) {
         fetch(`/get_last_session/${exerciseName}`)
             .then(response => response.json())
             .then(data => {
-                // Debug: Check what data looks like
                 console.log(data);
 
                 const parent = inputField.closest('.exercise-row');
@@ -85,7 +84,6 @@ function loadLastSession(inputField, applyToDetails = false) {
                     return;
                 }
 
-                // If the API returned details and we need to apply them to the details list
                 if (applyToDetails && data.details) {
                     const existingRows = detailsList.children.length;
 
@@ -95,7 +93,6 @@ function loadLastSession(inputField, applyToDetails = false) {
                         const weightInputName = `exercises-${parent.dataset.exerciseIndex}-details-${index}-weight`;
 
                         if (index < existingRows) {
-                            // Update existing detail rows
                             const detailRow = detailsList.children[index];
                             const repetitionsInput = detailRow.querySelector(`input[name="${repetitionsInputName}"]`);
                             const weightInput = detailRow.querySelector(`input[name="${weightInputName}"]`);
@@ -107,7 +104,6 @@ function loadLastSession(inputField, applyToDetails = false) {
                                 console.error(`Inputs not found for ${repetitionsInputName} and ${weightInputName}`);
                             }
                         } else {
-                            // Add new detail rows if there are more details than existing rows
                             addDetailRow(detailsList, parent.dataset.exerciseIndex, detail.repetitions, detail.weight);
                         }
                     });
@@ -130,7 +126,6 @@ function getCsrfToken() {
 }
 
 
-
 function addExerciseRow(exerciseName = '', details = [], exerciseIndex = 0) {
     const exerciseList = document.getElementById("exercise-list");
     const newExerciseIndex = exerciseIndex || exerciseList.children.length;
@@ -138,7 +133,6 @@ function addExerciseRow(exerciseName = '', details = [], exerciseIndex = 0) {
     const exerciseRow = document.createElement("div");
     exerciseRow.classList.add("exercise-row");
 
-    // Create the exercise row HTML structure with exercise name and details
     exerciseRow.innerHTML = `
         <input type="text" name="exercises-${newExerciseIndex}-name" placeholder="Exercise Name" value="${exerciseName}" required>
         <div class="details-list">
@@ -152,15 +146,16 @@ function addExerciseRow(exerciseName = '', details = [], exerciseIndex = 0) {
                 </div>
             `).join('')}
         </div>
-        <button type="button" onclick="addDetailRow(this.closest('.exercise-row').querySelector('.details-list'), ${newExerciseIndex})">Add Detail</button>
+        <button type="button" onclick="addDetailRow(this.closest('.exercise-row').querySelector('.details-list'), ${newExerciseIndex}, true)">Add Detail</button>
     `;
 
     exerciseList.appendChild(exerciseRow);
 }
 
-function addDetailRow(detailsList, exerciseIndex) {
+
+function addDetailRow(detailsList, exerciseIndex, triggerAutocomplete = true) {
     const newDetailIndex = detailsList.children.length;
-    
+
     const detailRow = document.createElement("div");
     detailRow.classList.add("detail-row");
 
@@ -173,8 +168,27 @@ function addDetailRow(detailsList, exerciseIndex) {
     `;
 
     detailsList.appendChild(detailRow);
-}
 
+    // Trigger autocomplete if needed
+    if (triggerAutocomplete) {
+        const exerciseNameField = detailsList.closest('.exercise-row').querySelector('input[name="exercises-' + exerciseIndex + '-name"]');
+    
+        if (exerciseNameField && exerciseNameField.value.trim()) {
+            fetch(`/get_last_session/${exerciseNameField.value.trim()}`)
+                .then(response => response.json())
+                .then(data => {
+                    const lastRow = detailsList.lastElementChild;
+                    const lastDetail = data.details[detailsList.children.length - 1];
+
+                    if (lastDetail) {
+                        lastRow.querySelector(`input[name="exercises-${exerciseIndex}-details-${detailsList.children.length - 1}-repetitions"]`).value = lastDetail.repetitions;
+                        lastRow.querySelector(`input[name="exercises-${exerciseIndex}-details-${detailsList.children.length - 1}-weight"]`).value = lastDetail.weight;
+                    }
+                })
+                .catch(error => console.error('Error autocompleting last detail:', error));
+        }
+    }
+}
 
 
 function removeDetailRow(button) {
