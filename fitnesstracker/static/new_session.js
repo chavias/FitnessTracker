@@ -99,46 +99,50 @@ function getCsrfToken() {
 
 
 
-function addDetailRow(detailsList, exerciseIndex) {
-    const newDetailIndex = detailsList.children.length;
-
-    const detailRow = document.createElement("div");
-    detailRow.classList.add("detail-row");
-
-    detailRow.innerHTML = `
-            <input type="hidden" name="exercises-${exerciseIndex}-details-${newDetailIndex}-csrf_token" value="${getCsrfToken()}">
-            <input type="number" name="exercises-${exerciseIndex}-details-${newDetailIndex}-repetitions" placeholder="Reps" required>
-            <input type="number" name="exercises-${exerciseIndex}-details-${newDetailIndex}-weight" placeholder="Weight" step="0.5" required>
-            <button type="button" onclick="removeDetailRow(this)">&#10006;</button>
-    `;
-
-    detailsList.appendChild(detailRow);
-}
-
-
-function addExerciseRow() {
+function addExerciseRow(exerciseName = '', details = [], exerciseIndex = 0) {
     const exerciseList = document.getElementById("exercise-list");
-    const newExerciseIndex = exerciseList.children.length;
+    const newExerciseIndex = exerciseIndex || exerciseList.children.length;
 
     const exerciseRow = document.createElement("div");
     exerciseRow.classList.add("exercise-row");
 
+    // Create the exercise row HTML structure with exercise name and details
     exerciseRow.innerHTML = `
-        <input type="text" name="exercises-${newExerciseIndex}-name" placeholder="Exercise Name" required>
+        <input type="text" name="exercises-${newExerciseIndex}-name" placeholder="Exercise Name" value="${exerciseName}" required>
         <div class="details-list">
-            <div class="detail-row">
-            <input type="number" name="exercises-${newExerciseIndex}-details-0-repetitions" placeholder="Reps" required>
-            <input type="number" name="exercises-${newExerciseIndex}-details-0-weight" placeholder="Weight" step="0.5" required>
-            <button type="button" onclick="removeDetailRow(this)">&#10006;</button>
-            <input type="hidden" name="exercises-${newExerciseIndex}-csrf_token" value="${getCsrfToken()}">
-            <input type="hidden" name="exercises-${newExerciseIndex}-details-0-csrf_token" value="${getCsrfToken()}">
-        </div>
+            ${details.map((detail, detailIndex) => `
+                <div class="detail-row">
+                    <input type="number" name="exercises-${newExerciseIndex}-details-${detailIndex}-repetitions" placeholder="Reps" value="${detail.repetitions}" required>
+                    <input type="number" name="exercises-${newExerciseIndex}-details-${detailIndex}-weight" placeholder="Weight" value="${detail.weight}" step="0.5" required>
+                    <button type="button" onclick="removeDetailRow(this)">&#10006;</button>
+                    <input type="hidden" name="exercises-${newExerciseIndex}-csrf_token" value="${getCsrfToken()}">
+                    <input type="hidden" name="exercises-${newExerciseIndex}-details-${detailIndex}-csrf_token" value="${getCsrfToken()}">
+                </div>
+            `).join('')}
         </div>
         <button type="button" onclick="addDetailRow(this.closest('.exercise-row').querySelector('.details-list'), ${newExerciseIndex})">Add Detail</button>
     `;
 
     exerciseList.appendChild(exerciseRow);
 }
+
+function addDetailRow(detailsList, exerciseIndex) {
+    const newDetailIndex = detailsList.children.length;
+    
+    const detailRow = document.createElement("div");
+    detailRow.classList.add("detail-row");
+
+    detailRow.innerHTML = `
+        <input type="number" name="exercises-${exerciseIndex}-details-${newDetailIndex}-repetitions" placeholder="Reps" required>
+        <input type="number" name="exercises-${exerciseIndex}-details-${newDetailIndex}-weight" placeholder="Weight" step="0.5" required>
+        <button type="button" onclick="removeDetailRow(this)">&#10006;</button>
+        <input type="hidden" name="exercises-${exerciseIndex}-csrf_token" value="${getCsrfToken()}">
+        <input type="hidden" name="exercises-${exerciseIndex}-details-${newDetailIndex}-csrf_token" value="${getCsrfToken()}">
+    `;
+
+    detailsList.appendChild(detailRow);
+}
+
 
 
 function removeDetailRow(button) {
@@ -158,15 +162,15 @@ function removeExerciseRow(button) {
 
 function loadTemplate(templateId) {
     const exerciseList = document.getElementById('exercise-list');
-    exerciseList.innerHTML = '';
+    exerciseList.innerHTML = ''; // Clear the existing list
 
     if (templateId) {
         fetch(`/get_template/${templateId}`)
             .then(response => response.json())
             .then(data => {
                 if (data.exercises) {
-                    data.exercises.forEach(exercise => {
-                        addExerciseRow(exercise.exercise, exercise.details);
+                    data.exercises.forEach((exercise, index) => {
+                        addExerciseRow(exercise.exercise, exercise.details, index);
                     });
                 }
             })

@@ -12,11 +12,7 @@
         </select>
         <input type="date" name="date" id="date" required>
         <div id="exercise-list">
-            {% set exercise_index = 0 %}
-            {% for exercise_form in form.exercises %}
-
-            {% set exercise_index = exercise_index + 1 %}
-            {% endfor %}
+            <!-- Adding items dynamically here -->
         </div>
         <button type="button" onclick="addExerciseRow()">Add Exercise</button>
         <button type="submit" class="btn btn-primary">Submit</button>
