@@ -3,10 +3,8 @@
 <article class="media content-section">
   <div class="media-body">
     <div class="article-metadata d-flex justify-content-between align-items-center">
-      <div class="d-flex justify-content-between align-items-center">
       <h2 class="mb-0 article-title">{{ session.template.name }}</h2>
-      <div class="text-muted ml-2"> {{ session.date.strftime('%Y-%m-%d') }}</div>
-      </div>
+      <!-- <div class="text-muted ml-2"> {{ session.date.strftime('%Y-%m-%d') }}</div> -->
       <div>
         <a class="btn btn-secondary btn-sm  mt-1 mb-1"
           href="{{ url_for('update_session', session_id=session.id) }}">Update</a>
