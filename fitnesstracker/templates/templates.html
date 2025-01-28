@@ -32,11 +32,11 @@
 <article class="media content-section">
     <div class="media-body">
         <div class="article-metadata">
-            <h2><a class="article-title" href="{{ url_for('template', template_id=template.id) }}">{{ template.name }}</a></h2>
+            <h2 class="mb-0"><a class="article-title" href="{{ url_for('template', template_id=template.id) }}">{{ template.name }}</a></h2>
         </div>
         <ul class="exercise-list">
             {% for exercise in template.exercises %}
-            <li class="exercise-item">{{ exercise.exercise }}</li>
+            <li class="exercise-item" style="font-size: smaller;">{{ exercise.exercise }}</li>
             {% endfor %}
         </ul>
     </div>
