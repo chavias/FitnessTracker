@@ -14,7 +14,7 @@
         <div id="exercise-list">
             {% set exercise_index = 0 %}
             {% for exercise_form in form.exercises %}
-
+                
             {% set exercise_index = exercise_index + 1 %}
             {% endfor %}
         </div>
@@ -22,7 +22,6 @@
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 </div>
-
 
 <script src="{{ url_for('static', filename='new_session.js') }}"></script>
 {% endblock %}

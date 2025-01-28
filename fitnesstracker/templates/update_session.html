@@ -1,40 +1,46 @@
-{% extends "layout.html" %}
+{% extends 'layout.html' %}
 
 {% block content %}
-<form method="POST">
-  {{ form.hidden_tag() }}
-
-    <!-- Template Selection -->
-    <label for="template_id">Template:</label>
-    {{ form.template_id() }}
-
-    <!-- Date Field -->
-    <label for="date">{{ form.date.label }}</label>
-    {{ form.date() }}
-
-    <!-- Render Exercise Fields -->
-    <div id="exercise-list">
-        {% for exercise_form in form.exercises %}
+<div class="content-section">
+    <form method="POST">
+        {{ form.hidden_tag() }}  <!-- This will include the CSRF token automatically -->
+        
+        <input type="hidden" name="template_id" id="template_id" value="{{ form.template_id.data }}" required>
+        
+        <input type="date" name="date" id="date" value="{{ form.date.data }}" required>
+        
+        <div id="exercise-list">
+            {% for exercise_form in form.exercises %}
+            {% set exercise_loop = loop %} <!-- store the outer loop in a variable -->
             <div class="exercise-row">
-                <!-- Exercise Name Field -->
-                <label for="exercise_name_{{ loop.index }}">{{ exercise_form.name.label }}</label>
-                {{ exercise_form.name(id="exercise_name_" ~ loop.index) }} 
-
-                <!-- Render Exercise Details (Repetitions, Weight) -->
+                <input type="text" name="exercises-{{ exercise_loop.index0 }}-exercise_name" 
+                       placeholder="Exercise Name" value="{{ exercise_form.exercise_name.data }}" required>
+                <input type="hidden" name="exercises-{{ exercise_loop.index0 }}-csrf_token" 
+                       value="{{ form.csrf_token._value() }}" required>
                 <div class="details-list">
-                    {% for detail_form in exercise_form.details %}
-                        <div class="detail-row">
-                            <label for="repetitions_{{ loop.index }}">{{ detail_form.repetitions.label }}</label>
-                            {{ detail_form.repetitions(id="repetitions_" ~ loop.index) }}
-                            <label for="weight_{{ loop.index }}">{{ detail_form.weight.label }}</label>
-                            {{ detail_form.weight(id="weight_" ~ loop.index) }}
-                        </div>
+                    {% for detail in exercise_form.details %}
+                    <div class="detail-row">
+                        <input type="hidden" name="exercises-{{ exercise_loop.index0 }}-details-{{ loop.index0 }}-csrf_token" 
+                            value="{{ form.csrf_token._value() }}" required>
+                        <input type="number" name="exercises-{{ exercise_loop.index0 }}-details-{{ loop.index0 }}-repetitions"
+                               placeholder="R" style="width: 35%" value="{{ detail.repetitions.data }}" required>
+                        <input type="number" name="exercises-{{ exercise_loop.index0 }}-details-{{ loop.index0 }}-weight"
+                               placeholder="W" style="width: 35%" value="{{ detail.weight.data }}" step="0.5" required>
+                        <button type="button" onclick="removeDetailRow(this)">&#10006;</button>
+                    </div>
                     {% endfor %}
                 </div>
+                <button type="button" onclick="addDetailRow(this.closest('.exercise-row').querySelector('.details-list'), {{ exercise_loop.index0 }}, true)">
+                    &#x2795; 
+                </button>
             </div>
-        {% endfor %}
-    </div>
+            {% endfor %}
+        </div>
 
-    <button type="submit" class="btn btn-primary">Update Session</button>
-</form>
+        <button type="button" onclick="addExerciseRow()">Add Exercise</button>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+
+<script src="{{ url_for('static', filename='new_session.js') }}"></script>
 {% endblock %}
