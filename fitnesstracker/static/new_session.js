@@ -58,6 +58,8 @@ function drop(event) {
     if (targetItem && draggedItem && draggedItem !== targetItem) {
         const parent = targetItem.parentNode;
         parent.insertBefore(draggedItem, targetItem.nextSibling);
+
+        updateExerciseIndexes();
     }
 }
 
@@ -74,6 +76,35 @@ function enableDragAndDrop() {
         row.addEventListener('drop', drop);
     });
 }
+
+
+function updateExerciseIndexes() {
+    const exerciseRows = document.querySelectorAll('.exercise-row');
+    exerciseRows.forEach((row, rowIndex) => {
+        const exerciseNameInput = row.querySelector('input[name^="exercises-"]');
+        if (exerciseNameInput) {
+            exerciseNameInput.setAttribute('name', `exercises-${rowIndex}-exercise_name`);
+        }
+            const detailRows = detailsList.querySelectorAll('.detail-row');
+            detailRows.forEach((detailRow, detailIndex) => {
+                // Update the name attributes of repetitions, weight, and csrf_token fields
+                const repetitionsInput = detailRow.querySelector(`input[name^="exercises-${rowIndex}-details-${detailIndex}-repetitions"]`);
+                const weightInput = detailRow.querySelector(`input[name^="exercises-${rowIndex}-details-${detailIndex}-weight"]`);
+                const csrfTokenInput = detailRow.querySelector(`input[name^="exercises-${rowIndex}-details-${detailIndex}-csrf_token"]`);
+
+                if (repetitionsInput) {
+                    repetitionsInput.setAttribute('name', `exercises-${rowIndex}-details-${detailIndex}-repetitions`);
+                }
+                if (weightInput) {
+                    weightInput.setAttribute('name', `exercises-${rowIndex}-details-${detailIndex}-weight`);
+                }
+                if (csrfTokenInput) {
+                    csrfTokenInput.setAttribute('name', `exercises-${rowIndex}-details-${detailIndex}-csrf_token`);
+                }
+            });
+    });
+}
+
 
 // Call these functions to initialize functionality
 window.onload = function () {
@@ -286,5 +317,7 @@ function drop(event) {
     if (targetItem && draggedItem !== targetItem) {
         const parent = draggedItem.parentNode;
         parent.insertBefore(draggedItem, targetItem.nextSibling);
+
+        updateExerciseIndexes();
     }
 }

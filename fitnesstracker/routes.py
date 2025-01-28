@@ -170,7 +170,7 @@ def update_session(session_id):
     templates = [(t.id, t.name) for t in Template.query.all()]
     form.template_id.choices = [(t.id, t.name) for t in Template.query.all()]
 
-    print(f"Form Data Before Rendering: {form.data}")
+    # print(f"Form Data Before Rendering: {form.data}")
 
     
     if form.validate_on_submit():
@@ -183,14 +183,13 @@ def update_session(session_id):
                 template_id=form.template_id.data, date=form.date.data
             )
             db.session.add(new_session)
-            # Add exercises
+
             for exercise_form in form.exercises:
                 new_exercise = Exercise(
                     exercise_name=exercise_form.data["exercise_name"],
                     session=new_session,
                 )
                 db.session.add(new_exercise)
-                # Add exercise details
                 for detail_form in exercise_form.details:
                     new_detail = ExerciseDetails(
                         repetitions=detail_form.repetitions.data,
@@ -198,7 +197,6 @@ def update_session(session_id):
                         exercise=new_exercise,
                     )
                     db.session.add(new_detail)
-            # Commit changes to the database
             db.session.commit()
             flash("Session updated successfully!", "success")
             return redirect(url_for("homepage"))
