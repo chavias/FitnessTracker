@@ -23,7 +23,6 @@
             </div>
             {% endfor %}
         </div>
-
         <button type="button" value="true" onclick="addExerciseRow()">Add Exercise</button><br><br>
         <button type="submit" name="submit" value="true">Create Template</button>
     </form>
@@ -33,13 +32,13 @@
 <article class="media content-section">
     <div class="media-body">
         <div class="article-metadata">
-            <a class="article-title" href="{{ url_for('template', template_id=template.id) }}">{{ template.name }}</a>
+            <h2><a class="article-title" href="{{ url_for('template', template_id=template.id) }}">{{ template.name }}</a></h2>
         </div>
-        <p class="article-content">
-            {% for exercise in template_data[template.id] %}
-            <li>{{ exercise }}</li>
+        <ul class="exercise-list">
+            {% for exercise in template.exercises %}
+            <li class="exercise-item">{{ exercise.exercise }}</li>
             {% endfor %}
-        </p>
+        </ul>
     </div>
 </article>
 {% endfor %}

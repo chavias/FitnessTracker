@@ -13,8 +13,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h2 {
-  font-size: 24px;
-  margin-bottom: 20px;
+  font-size: 20px;
+  /* margin-bottom: 20px; */
   color: #333;
 }
 
@@ -34,16 +34,47 @@ h2 {
 .site-header .navbar-nav .nav-link.active {
   font-weight: 500;
 }
-
+ 
 /* Content Section */
 .content-section, .template-section {
   background-color: #ffffff;
-  padding: 20px;
+  padding: 10px 15px;
   border-radius: 8px;
+  border: 1px solid #dddddd;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px auto;
-  margin: 20px auto;
+  margin-bottom: 10px;
 }
+
+.article-title {
+  color: #444444;
+}
+
+a.article-title:hover {
+  color: #428bca;
+  text-decoration: none;
+}
+
+.article-content {
+  white-space: pre-line;
+}
+
+.article-img {
+  height: 65px;
+  width: 65px;
+  margin-right: 16px;
+}
+
+.article-metadata {
+  padding-bottom: 1px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid #e3e3e3
+}
+
+.article-metadata a:hover {
+  color: #333;
+  text-decoration: none;
+}
+
 
 .template-list {
   list-style-type: none;
@@ -222,10 +253,20 @@ form button[type="button"]:hover {
   font-style: italic;
 }
 
-
 /* Animation for swiping left */
 .exercise-row.swipe-left {
   transition: transform 0.3s ease-out, opacity 0.3s ease-out;
   transform: translateX(-100%); /* Move out of view */
   opacity: 0; /* Fade out */
+}
+
+.exercise-list {
+  list-style-type: none;
+  padding: 5px 0px;
+}
+
+.exercise-item {
+  /* background-color: #f0f0f0; */
+  padding: 0px;
+  margin: 5px 0px;
 }

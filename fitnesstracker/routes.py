@@ -8,8 +8,8 @@ from fitnesstracker.models import (
 from fitnesstracker.forms import (
     TemplateForm,
     SessionForm,
-    ExerciseForm,
-    ExerciseDetailForm,
+    # ExerciseForm,
+    # ExerciseDetailForm,
 )
 from flask import render_template, request, redirect, jsonify, flash, url_for
 from fitnesstracker import app, db
