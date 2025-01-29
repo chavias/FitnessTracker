@@ -113,23 +113,23 @@ def delete_template(template_id):
     return redirect(url_for("homepage"))
 
 
-@app.route("/new_session", methods=["GET", "POST"])
-def new_session():
+@app.route("/create_session", methods=["GET", "POST"])
+def create_session():
     form = SessionForm()
     form.template_id.choices = [(t.id, t.name) for t in Template.query.all()]
 
     if form.validate_on_submit():
         try:
             # Create a new session
-            new_session = TrainingSession(
+            create_session = TrainingSession(
                 template_id=form.template_id.data, date=form.date.data
             )
-            db.session.add(new_session)
+            db.session.add(create_session)
             # Add exercises
             for exercise_form in form.exercises:
                 new_exercise = Exercise(
                     exercise_name=exercise_form.data["exercise_name"],
-                    session=new_session,
+                    session=create_session,
                 )
                 db.session.add(new_exercise)
                 # Add exercise details
@@ -153,7 +153,7 @@ def new_session():
             )
 
     return render_template(
-        "new_session.html", form=form, templates=Template.query.all()
+        "create_session.html", form=form, templates=Template.query.all()
     )
 
 
@@ -179,15 +179,15 @@ def update_session(session_id):
             db.session.delete(session)
             
             # Create a new session
-            new_session = TrainingSession(
+            create_session = TrainingSession(
                 template_id=form.template_id.data, date=form.date.data
             )
-            db.session.add(new_session)
+            db.session.add(create_session)
 
             for exercise_form in form.exercises:
                 new_exercise = Exercise(
                     exercise_name=exercise_form.data["exercise_name"],
-                    session=new_session,
+                    session=create_session,
                 )
                 db.session.add(new_exercise)
                 for detail_form in exercise_form.details:
