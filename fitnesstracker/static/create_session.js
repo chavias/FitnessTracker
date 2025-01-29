@@ -80,30 +80,38 @@ function enableDragAndDrop() {
 
 function updateExerciseIndexes() {
     const exerciseRows = document.querySelectorAll('.exercise-row');
+
     exerciseRows.forEach((row, rowIndex) => {
         const exerciseNameInput = row.querySelector('input[name^="exercises-"]');
         if (exerciseNameInput) {
             exerciseNameInput.setAttribute('name', `exercises-${rowIndex}-exercise_name`);
         }
-            const detailRows = detailsList.querySelectorAll('.detail-row');
-            detailRows.forEach((detailRow, detailIndex) => {
-                // Update the name attributes of repetitions, weight, and csrf_token fields
-                const repetitionsInput = detailRow.querySelector(`input[name^="exercises-${rowIndex}-details-${detailIndex}-repetitions"]`);
-                const weightInput = detailRow.querySelector(`input[name^="exercises-${rowIndex}-details-${detailIndex}-weight"]`);
-                const csrfTokenInput = detailRow.querySelector(`input[name^="exercises-${rowIndex}-details-${detailIndex}-csrf_token"]`);
 
-                if (repetitionsInput) {
-                    repetitionsInput.setAttribute('name', `exercises-${rowIndex}-details-${detailIndex}-repetitions`);
-                }
-                if (weightInput) {
-                    weightInput.setAttribute('name', `exercises-${rowIndex}-details-${detailIndex}-weight`);
-                }
-                if (csrfTokenInput) {
-                    csrfTokenInput.setAttribute('name', `exercises-${rowIndex}-details-${detailIndex}-csrf_token`);
-                }
-            });
+        const detailsList = row.querySelector('.details-list'); // Fix: get detailsList within loop
+        if (!detailsList) {
+            console.log("no detailList");
+            return;
+        }
+
+        const detailRows = detailsList.querySelectorAll('.detail-row'); // Fix: get detailRows within loop
+        detailRows.forEach((detailRow, detailIndex) => {
+            const repetitionsInput = detailRow.querySelector(`input[name^="exercises-"][name$="-details-${detailIndex-1}-repetitions"]`);
+            const weightInput = detailRow.querySelector(`input[name^="exercises-"][name$="-details-${detailIndex-1}-weight"]`);
+            const csrfTokenInput = detailRow.querySelector(`input[name^="exercises-"][name$="-details-${detailIndex-1}-csrf_token"]`);
+
+            if (repetitionsInput) {
+                repetitionsInput.setAttribute('name', `exercises-${rowIndex}-details-${detailIndex-1}-repetitions`);
+            }
+            if (weightInput) {
+                weightInput.setAttribute('name', `exercises-${rowIndex}-details-${detailIndex-1}-weight`);
+            }
+            if (csrfTokenInput) {
+                csrfTokenInput.setAttribute('name', `exercises-${rowIndex}-details-${detailIndex-1}-csrf_token`);
+            }
+        });
     });
 }
+
 
 
 // Call these functions to initialize functionality
