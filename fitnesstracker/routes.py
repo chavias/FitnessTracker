@@ -23,8 +23,8 @@ def homepage():
     return render_template("index.html", sessions=sessions)
 
 
-@app.route("/templates", methods=["GET", "POST"])
-def templates():
+@app.route("/create_template", methods=["GET", "POST"])
+def create_template():
     form = TemplateForm()
 
     if form.validate_on_submit():
@@ -53,7 +53,7 @@ def templates():
                 print(f"Exercise: {exercise.exercise}")
 
             # Redirect to the same page to avoid duplicate form submissions
-            return redirect("/templates")
+            return redirect("/create_template")
 
     # Fetch all templates with their associated exercises
     templates = Template.query.all()
@@ -62,7 +62,7 @@ def templates():
     template_data = {t.id: [e.exercise for e in t.exercises] for t in templates}
 
     return render_template(
-        "templates.html", form=form, templates=templates, template_data=template_data
+        "create_template.html", form=form, templates=templates, template_data=template_data
     )
 
 
@@ -101,7 +101,7 @@ def update_template(template_id):
         for exercise in template.exercises[1:]:
             form.exercises.append_entry({"exercise_name": exercise.exercise})
 
-    return render_template("templates.html", form=form, legend="Update template")
+    return render_template("create_template.html", form=form, legend="Update template")
 
 
 @app.route("/template/<int:template_id>/delete", methods=["POST"])
