@@ -118,23 +118,6 @@ window.onload = function () {
     enableDragAndDrop();
 };
 
-// Add listener to dynamically added rows
-const observer = new MutationObserver(() => {
-    enableSwipeToRemove();
-    enableDragAndDrop();
-});
-
-observer.observe(document.getElementById('exercise-list'), { childList: true });
-
-
-window.onload = function () {
-    const dateField = document.getElementById("date");
-    const today = new Date();
-    const formattedDate = today.toISOString().split('T')[0];
-    dateField.value = formattedDate;
-};
-
-
 function loadLastSession(inputField, applyToDetails = false) {
     const exerciseName = inputField.value.trim();
     if (exerciseName) {
@@ -299,25 +282,18 @@ function loadTemplate(templateId) {
     }
 }
 
+// Add listener to dynamically added rows
+const observer = new MutationObserver(() => {
+    enableSwipeToRemove();
+    enableDragAndDrop();
+});
 
-function allowDrop(event) {
-    event.preventDefault();
-}
-
-
-function drag(event) {
-    draggedItem = event.target;
-    event.dataTransfer.setData("text", draggedItem.id);
-}
+observer.observe(document.getElementById('exercise-list'), { childList: true });
 
 
-function drop(event) {
-    event.preventDefault();
-    const targetItem = event.target.closest('.exercise-row');
-    if (targetItem && draggedItem !== targetItem) {
-        const parent = draggedItem.parentNode;
-        parent.insertBefore(draggedItem, targetItem.nextSibling);
-
-        updateExerciseIndexes();
-    }
-}
+window.onload = function () {
+    const dateField = document.getElementById("date");
+    const today = new Date();
+    const formattedDate = today.toISOString().split('T')[0];
+    dateField.value = formattedDate;
+};

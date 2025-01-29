@@ -1,5 +1,3 @@
-#version: '3.4'
-
 services:
   flask:
     image: fitness_debug
