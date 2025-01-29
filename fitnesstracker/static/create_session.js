@@ -85,6 +85,7 @@ function updateExerciseIndexes() {
         const exerciseNameInput = row.querySelector('input[name^="exercises-"]');
         if (exerciseNameInput) {
             const csrfTokenInput = row.querySelector('input[name^="csrf_token-"]');
+            exerciseNameInput.setAttribute('name', `exercises-${rowIndex}-exercise_name`);
             if (csrfTokenInput) {
                 csrfTokenInput.setAttribute('name', `exercises-${rowIndex}-csrf_token`);
                 csrfTokenInput.value = getCsrfToken(); // Ensure you get the CSRF token here
