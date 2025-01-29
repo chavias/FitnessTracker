@@ -80,37 +80,53 @@ function enableDragAndDrop() {
 
 function updateExerciseIndexes() {
     const exerciseRows = document.querySelectorAll('.exercise-row');
-
     exerciseRows.forEach((row, rowIndex) => {
+        // Update exercise name
         const exerciseNameInput = row.querySelector('input[name^="exercises-"]');
         if (exerciseNameInput) {
-            exerciseNameInput.setAttribute('name', `exercises-${rowIndex}-exercise_name`);
+            const csrfTokenInput = row.querySelector('input[name^="csrf_token-"]');
+            if (csrfTokenInput) {
+                csrfTokenInput.setAttribute('name', `exercises-${rowIndex}-csrf_token`);
+                csrfTokenInput.value = getCsrfToken(); // Ensure you get the CSRF token here
+            } else {
+                // If there's no csrf_token input, you might need to create one dynamically
+                const newCsrfTokenInput = document.createElement('input');
+                newCsrfTokenInput.setAttribute('type', 'hidden');
+                newCsrfTokenInput.setAttribute('name', `exercises-${rowIndex}-csrf_token`);
+                newCsrfTokenInput.value = getCsrfToken();  // Assign the CSRF token value
+                row.appendChild(newCsrfTokenInput);  // Add the new CSRF token input to the row
+            }
         }
 
-        const detailsList = row.querySelector('.details-list'); // Fix: get detailsList within loop
-        if (!detailsList) {
-            console.log("no detailList");
-            return;
-        }
-
-        const detailRows = detailsList.querySelectorAll('.detail-row'); // Fix: get detailRows within loop
+        // Update details
+        const detailRows = row.querySelectorAll('.detail-row');
         detailRows.forEach((detailRow, detailIndex) => {
-            const repetitionsInput = detailRow.querySelector(`input[name^="exercises-"][name$="-details-${detailIndex-1}-repetitions"]`);
-            const weightInput = detailRow.querySelector(`input[name^="exercises-"][name$="-details-${detailIndex-1}-weight"]`);
-            const csrfTokenInput = detailRow.querySelector(`input[name^="exercises-"][name$="-details-${detailIndex-1}-csrf_token"]`);
+            // Update repetitions, weight, and csrf_token fields
+            const repetitionsInput = detailRow.querySelector('input[name^="exercises-"][name*="-repetitions"]');
+            const weightInput = detailRow.querySelector('input[name^="exercises-"][name*="-weight"]');
+            const csrfTokenInput = detailRow.querySelector('input[name^="exercises-"][name*="-csrf_token"]');
 
             if (repetitionsInput) {
-                repetitionsInput.setAttribute('name', `exercises-${rowIndex}-details-${detailIndex-1}-repetitions`);
+                repetitionsInput.setAttribute('name', `exercises-${rowIndex}-details-${detailIndex}-repetitions`);
             }
             if (weightInput) {
-                weightInput.setAttribute('name', `exercises-${rowIndex}-details-${detailIndex-1}-weight`);
+                weightInput.setAttribute('name', `exercises-${rowIndex}-details-${detailIndex}-weight`);
             }
-            if (csrfTokenInput) {
-                csrfTokenInput.setAttribute('name', `exercises-${rowIndex}-details-${detailIndex-1}-csrf_token`);
+            if (!csrfTokenInput) {
+                // Create a hidden csrf token input if it's missing
+                const csrfToken = document.createElement('input');
+                csrfToken.type = 'hidden';
+                csrfToken.name = `exercises-${rowIndex}-details-${detailIndex}-csrf_token`;
+                csrfToken.value = getCsrfToken(); // You can define `getCsrfToken` or use a global CSRF token
+                detailRow.appendChild(csrfToken);
+            } else {
+                // Update existing CSRF token input field
+                csrfTokenInput.setAttribute('name', `exercises-${rowIndex}-details-${detailIndex}-csrf_token`);
             }
         });
     });
 }
+
 
 
 
@@ -195,47 +211,97 @@ function addExerciseRow(exerciseName = '', details = [], exerciseIndex = 0) {
     const exerciseRow = document.createElement("div");
     exerciseRow.classList.add("exercise-row");
 
-    exerciseRow.innerHTML = `
-        <input type="text" name="exercises-${newExerciseIndex}-exercise_name" placeholder="Exercise Name" value="${exerciseName}" required>
-        <div class="details-list">
-            ${details.map((detail, detailIndex) => `
-                <div class="detail-row">
-                    <input type="number" name="exercises-${newExerciseIndex}-details-${detailIndex}-repetitions" placeholder="R" style="width : 35%" value="${detail.repetitions}" required>
-                    <input type="number" name="exercises-${newExerciseIndex}-details-${detailIndex}-weight" placeholder="W" style="width : 35%" value="${detail.weight}" step="0.5" required>
-                    <button type="button" onclick="removeDetailRow(this)">&#10006;</button>
-                    <input type="hidden" name="exercises-${newExerciseIndex}-csrf_token" value="${getCsrfToken()}">
-                    <input type="hidden" name="exercises-${newExerciseIndex}-details-${detailIndex}-csrf_token" value="${getCsrfToken()}">
-                </div>
-            `).join('')}
-        </div>
-        <button type="button" onclick="addDetailRow(this.closest('.exercise-row').querySelector('.details-list'), ${newExerciseIndex}, true)"> &#x2795; </button>
-    `;
+    const exerciseNameInput = createInputField(`exercises-${newExerciseIndex}-exercise_name`, "Exercise Name", exerciseName);
+
+    const detailsList = document.createElement('div');
+    detailsList.classList.add("details-list");
+    details.forEach((detail, detailIndex) => {
+        const detailRow = createDetailRow(detail, newExerciseIndex, detailIndex);
+        detailsList.appendChild(detailRow);
+    });
+
+    const addDetailButton = createAddDetailButton(detailsList, newExerciseIndex);
+
+    exerciseRow.appendChild(exerciseNameInput);
+    exerciseRow.appendChild(detailsList);
+    exerciseRow.appendChild(addDetailButton);
 
     exerciseList.appendChild(exerciseRow);
 }
 
+function createInputField(name, placeholder, value = '', required = true) {
+    const input = document.createElement("input");
+    input.type = "text";
+    input.name = name;
+    input.placeholder = placeholder;
+    input.value = value;
+    input.required = required;
+    return input;
+}
+
+function createDetailRow(detail, exerciseIndex, detailIndex) {
+    const detailRow = document.createElement("div");
+    detailRow.classList.add("detail-row");
+
+    const repetitionsInput = createInputField(
+        `exercises-${exerciseIndex}-details-${detailIndex}-repetitions`,
+        "R",
+        detail.repetitions,
+        true
+    );
+    repetitionsInput.type = "number";
+    repetitionsInput.style.width = "35%";
+
+    const weightInput = createInputField(
+        `exercises-${exerciseIndex}-details-${detailIndex}-weight`,
+        "W",
+        detail.weight,
+        true
+    );
+    weightInput.type = "number";
+    weightInput.style.width = "35%";
+    weightInput.step = 0.5;
+
+    const removeButton = document.createElement("button");
+    removeButton.type = "button";
+    removeButton.innerHTML = "&#10006;";
+    removeButton.onclick = () => removeDetailRow(removeButton);
+
+    const csrfTokenInputs = [
+        createHiddenInput(`exercises-${exerciseIndex}-csrf_token`),
+        createHiddenInput(`exercises-${exerciseIndex}-details-${detailIndex}-csrf_token`)
+    ];
+
+    detailRow.appendChild(repetitionsInput);
+    detailRow.appendChild(weightInput);
+    detailRow.appendChild(removeButton);
+    csrfTokenInputs.forEach(input => detailRow.appendChild(input));
+
+    return detailRow;
+}
+
+function createHiddenInput(name) {
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = name;
+    input.value = getCsrfToken();
+    return input;
+}
+
+function createAddDetailButton(detailsList, exerciseIndex) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.innerHTML = "&#x2795;";
+    button.onclick = () => addDetailRow(detailsList, exerciseIndex, true);
+    return button;
+}
 
 function addDetailRow(detailsList, exerciseIndex, triggerAutocomplete = true) {
     const newDetailIndex = detailsList.children.length;
 
-    const detailRow = document.createElement("div");
-    detailRow.classList.add("detail-row");
-
-    detailRow.innerHTML = `
-    <div class="details-list">
-        <div class="detail-row">
-            <input type="number" name="exercises-${exerciseIndex}-details-${newDetailIndex}-repetitions" style="width : 35%" placeholder="R" required>
-            <input type="number" name="exercises-${exerciseIndex}-details-${newDetailIndex}-weight" style="width : 35%" placeholder="W" step="0.5" required>
-            <button type="button" onclick="removeDetailRow(this)">&#10006;</button>
-            <input type="hidden" name="exercises-${exerciseIndex}-csrf_token" value="${getCsrfToken()}">
-            <input type="hidden" name="exercises-${exerciseIndex}-details-${newDetailIndex}-csrf_token" value="${getCsrfToken()}">
-        </div>
-     </div>
-    `;
-
+    const detailRow = createDetailRow({ repetitions: '', weight: '' }, exerciseIndex, newDetailIndex);
     detailsList.appendChild(detailRow);
 
-    // Trigger autocomplete if needed
     if (triggerAutocomplete) {
         const exerciseNameField = detailsList.closest('.exercise-row').querySelector('input[name="exercises-' + exerciseIndex + '-exercise_name"]');
     
@@ -254,6 +320,11 @@ function addDetailRow(detailsList, exerciseIndex, triggerAutocomplete = true) {
                 .catch(error => console.error('Error autocompleting last detail:', error));
         }
     }
+}
+
+function removeDetailRow(button) {
+    const detailRow = button.closest('.detail-row');
+    detailRow.remove();
 }
 
 

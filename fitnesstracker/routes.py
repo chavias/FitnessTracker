@@ -151,6 +151,9 @@ def create_session():
                 "An error occurred while creating the session. Please try again.",
                 "danger",
             )
+    else:
+        print(f"{form.errors = }")
+        print(f"{form.data = }")
 
     return render_template(
         "create_session.html", form=form, templates=Template.query.all()
