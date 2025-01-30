@@ -1,8 +1,9 @@
 -- Grant privileges and create database
-GRANT ALL PRIVILEGES ON flaskdb.* TO 'flask_user'@'%' IDENTIFIED BY 'flask_password';
+GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_USER}';
 
-CREATE DATABASE IF NOT EXISTS flaskdb;
-USE flaskdb;
+
+CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABASE};
+USE ${MYSQL_DATABASE};
 
 -- Create templates table
 CREATE TABLE IF NOT EXISTS templates (
