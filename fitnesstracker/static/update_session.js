@@ -109,6 +109,13 @@ function enableSwipeToRemove() {
     });
 }
 
+function getCsrfToken() {
+    const csrfInput = document.querySelector('input[name="csrf_token"]');
+    return csrfInput ? csrfInput.value : null;
+}
+
+
+
 // Add a new exercise row
 function addExerciseRow() {
     const exerciseList = document.getElementById('exercise-list');
@@ -119,7 +126,7 @@ function addExerciseRow() {
     newRow.innerHTML = `
         <input type="text" name="exercises-${exerciseList.children.length}-exercise_name" 
                placeholder="Exercise Name" required>
-        <input type="hidden" name="exercises-${exerciseList.children.length}-csrf_token" value="">
+        <input type="hidden" name="exercises-${exerciseList.children.length}-csrf_token" value="${getCsrfToken()}">
         <div class="details-list"></div>
         <button type="button" onclick="addDetailRow(this.closest('.exercise-row').querySelector('.details-list'), ${exerciseList.children.length}, true)">
             &#x2795;
@@ -139,7 +146,7 @@ function addDetailRow(detailsList, exerciseIndex) {
     newDetailRow.classList.add('detail-row');
 
     newDetailRow.innerHTML = `
-        <input type="hidden" name="exercises-${exerciseIndex}-details-${detailsList.children.length}-csrf_token" value="">
+        <input type="hidden" name="exercises-${exerciseIndex}-details-${detailsList.children.length}-csrf_token" value="${getCsrfToken()}">
         <input type="number" name="exercises-${exerciseIndex}-details-${detailsList.children.length}-repetitions" 
                placeholder="R" style="width: 35%" required>
         <input type="number" name="exercises-${exerciseIndex}-details-${detailsList.children.length}-weight" 
