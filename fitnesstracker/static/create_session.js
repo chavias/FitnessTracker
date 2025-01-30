@@ -284,3 +284,19 @@ function loadTemplate(templateId) {
             .catch(error => console.error('Error fetching template:', error));
     }
 }
+
+
+// ensures that forms don’t break after long periods of inactivity.
+function refreshCsrfToken() {
+    fetch('/refresh_csrf')
+    .then(response => response.json())
+    .then(data => {
+        let csrfInput = document.querySelector("input[name='csrf_token']");
+        if (csrfInput) {
+            csrfInput.value = data.csrf_token;
+        }
+    });
+}
+
+// Refresh CSRF token every 10 minutes
+setInterval(refreshCsrfToken, 10 * 60 * 1000);
