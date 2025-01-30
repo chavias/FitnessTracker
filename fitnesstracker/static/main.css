@@ -270,3 +270,10 @@ form button[type="button"]:hover {
   padding: 0px;
   margin: 5px 0px;
 }
+
+
+.submit-button {
+  background-color:  #295c88; /* Change to any color you prefer */
+  color: white; /* Text color */
+  border-color:  #295c88; /* Border color (optional) */
+}

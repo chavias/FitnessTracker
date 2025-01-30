@@ -6,10 +6,10 @@
         {{ form.hidden_tag() }}
 
         <!-- Template Name -->
-        <div class="form-group">
+        <!-- <div class="form-group"> -->
             <input type="text" name="template_name" value="{{ form.template_name.data or '' }}"
                 placeholder="{{ form.template_name.label.text }}" size="40" required>
-        </div>
+        <!-- </div> -->
 
         <!-- Exercises List -->
         <div id="exercise-list">
@@ -23,8 +23,8 @@
             </div>
             {% endfor %}
         </div>
-        <button type="button" value="true" onclick="addExerciseRow()">Add Exercise</button><br><br>
-        <button type="submit" name="submit" value="true">Create Template</button>
+        <button type="button" value="true" onclick="addExerciseRow()">Add Exercise</button>
+        <button type="submit" class="btn btn-primary submit-button">Create Template</button>
     </form>
 </div>
 
