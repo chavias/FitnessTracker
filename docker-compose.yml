@@ -1,6 +1,6 @@
 services:
   flask:
-    #container_name: fitnesstracker
+    container_name: fitnesstracker
     image: chavias/fitnesstracker:latest
     restart: unless-stopped
     build:
