@@ -13,15 +13,17 @@ def progression():
     return render_template('statistics/progression.html')
 
 
+
 @statistics_bp.route('/api/progression', methods=['GET'])
 def progression_api():
     """Fetch workout progression data and return JSON for Plotly"""
     exercise_name = request.args.get('exercise', '')
+    window_size = int(request.args.get('window', 3))  # Get MA window from request, default=3
 
     if not exercise_name:
         return jsonify({"error": "No exercise provided"}), 400
 
-    # Efficient query to fetch relevant exercise details with session dates
+    # Fetch relevant exercise details
     exercises = (
         db.session.query(
             ExerciseDetails.weight,
@@ -35,15 +37,22 @@ def progression_api():
         .all()
     )
 
-    # If no data, return a 404 error
     if not exercises:
         return jsonify({"error": "No data found"}), 404
 
-    # Convert results into a Pandas DataFrame
+    # Convert to Pandas DataFrame
     df = pd.DataFrame(exercises, columns=["Weight", "Repetitions", "Date"])
-    df["Date"] = df["Date"].astype(str)  # Convert datetime to string for JSON serialization
+    df["Date"] = df["Date"].astype(str)  # Convert datetime to string
+    df["Volume"] = df["Weight"] * df["Repetitions"]  # Compute training volume
+
+    # Compute Moving Averages (Rolling Mean)
+    df["Weight_MA"] = df["Weight"].rolling(window=window_size, min_periods=1).mean()
+    df["Repetitions_MA"] = df["Repetitions"].rolling(window=window_size, min_periods=1).mean()
 
     return jsonify(df.to_dict(orient="records"))
+
+
+
 
 
 @statistics_bp.route('/api/exercises', methods=['GET'])
