@@ -19,7 +19,7 @@ app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=4)
 
 @app.before_request
 def make_session_permanent():
-    session.permanent = True  # Ensures session does not expire too soon
+    session.permanent = True
 
 
 db = SQLAlchemy(app)

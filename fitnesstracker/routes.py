@@ -12,6 +12,7 @@ from fitnesstracker.forms import (
     # ExerciseDetailForm,
 )
 from flask import render_template, request, redirect, jsonify, flash, url_for
+from flask_wtf.csrf import generate_csrf
 from fitnesstracker import app, db
 from datetime import datetime
 
@@ -306,3 +307,8 @@ def get_last_session(exerciseName):
         # No previous session found for the exercise
         response = {"details": []}
     return jsonify(response)
+
+
+@app.route('/refresh_csrf', methods=['GET'])
+def refresh_csrf():
+    return jsonify({'csrf_token': generate_csrf()})
