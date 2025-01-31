@@ -1,32 +1,34 @@
 from flask import Flask, session
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
-import os
-from datetime import timedelta
+from fitnesstracker.config import DevelopmentConfig, ProductionConfig, TestingConfig
 
 load_dotenv()
 
-app = Flask(__name__)
+db = SQLAlchemy()
 
-app.config['SECRET_KEY'] ='34110d22dfd1e0ac02ddca391a1db27f'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///fitness.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+def create_app(enviroment='development'):
 
-# app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
-# app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
-# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = os.getenv('SQLALCHEMY_TRACK_MODIFICATIONS')
-# app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=4)
+    app = Flask(__name__)
+    
+    if enviroment == 'production':
+        app.config.from_object(ProductionConfig)
+    elif enviroment == 'testing':
+        app.config.from_object(TestingConfig)
+    else:  # Default to development
+        app.config.from_object(DevelopmentConfig)
 
-@app.before_request
-def make_session_permanent():
-    session.permanent = True
+    db.init_app(app)
 
-db = SQLAlchemy(app)
+    @app.before_request
+    def make_session_permanent():
+        session.permanent = True
 
-from fitnesstracker.workout_templates.routes import workout_templates
-from fitnesstracker.workout_sessions.routes import workout_sessions
-from fitnesstracker.main.routes import main
+    from fitnesstracker.workout_templates.routes import workout_templates
+    from fitnesstracker.workout_sessions.routes import workout_sessions
+    from fitnesstracker.main.routes import main
+    app.register_blueprint(workout_sessions)
+    app.register_blueprint(workout_templates)
+    app.register_blueprint(main)
 
-app.register_blueprint(workout_sessions)
-app.register_blueprint(workout_templates)
-app.register_blueprint(main)
+    return app

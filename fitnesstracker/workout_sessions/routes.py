@@ -9,7 +9,7 @@ workout_sessions = Blueprint('workout_sessions',
                              __name__,
                              static_folder='static',
                              static_url_path='/workout_sessions/static', 
-                             )
+                             template_folder='../templates')
 
 
 @workout_sessions.route("/create_session", methods=["GET", "POST"])

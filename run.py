@@ -1,15 +1,12 @@
-from fitnesstracker import app, db
+from fitnesstracker import create_app, db
 from flask_migrate import Migrate
 
+app = create_app(enviroment='development')
 
 if __name__ == "__main__":
 
     with app.app_context():
         db.create_all()
-        # from sqlalchemy import inspect
-        # inspector = inspect(db.engine)
-        # tables = inspector.get_table_names()
-        # print(f"{tables}")
 
     migrate = Migrate(app, db)
 
