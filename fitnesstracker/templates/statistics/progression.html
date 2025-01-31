@@ -1,0 +1,72 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<h2>Exercise Progression</h2>
+
+<label for="exercise">Select Exercise:</label>
+<select id="exercise"></select>
+
+<button onclick="updateChart()">Load Progression</button>
+
+<div id="plot"></div>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        fetch('/statistics/api/exercises')
+            .then(response => response.json())
+            .then(exercises => {
+                let dropdown = document.getElementById("exercise");
+                exercises.forEach(exercise => {
+                    let option = document.createElement("option");
+                    option.value = exercise;
+                    option.textContent = exercise;
+                    dropdown.appendChild(option);
+                });
+            })
+            .catch(error => console.error("Error loading exercises:", error));
+    });
+
+    function updateChart() {
+        let exercise = document.getElementById("exercise").value;
+        fetch(`/statistics/api/progression?exercise=${exercise}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById("plot").innerHTML = `<p>${data.error}</p>`;
+                    return;
+                }
+
+                let dates = data.map(d => d.Date);
+                let weights = data.map(d => d.Weight);
+                let reps = data.map(d => d.Repetitions);
+
+                let weightTrace = {
+                    x: dates,
+                    y: weights,
+                    type: 'scatter',
+                    mode: 'lines+markers',
+                    name: 'Weight (kg)'
+                };
+
+                let repsTrace = {
+                    x: dates,
+                    y: reps,
+                    type: 'bar',
+                    name: 'Repetitions'
+                };
+
+                let layout = {
+                    title: `Progression for ${exercise}`,
+                    xaxis: { title: "Date" },
+                    yaxis: { title: "Weight (kg) / Reps" }
+                };
+
+                Plotly.newPlot('plot', [weightTrace, repsTrace], layout);
+            })
+            .catch(error => console.error("Error fetching data:", error));
+    }
+</script>
+
+{% endblock %}
