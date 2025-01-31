@@ -1,6 +1,7 @@
 .venv/
 .env/
 fitness.db
+package*.json
 
 ###############################################  Python 
 # Byte-compiled / optimized / DLL files
