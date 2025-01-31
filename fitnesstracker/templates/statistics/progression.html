@@ -1,125 +1,30 @@
 {% extends "layout.html" %}
 
+{% block header %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='statistics.css') }}">
+{% endblock %}
+
 {% block content %}
+
 
 <div class="content-section">
 
 <div>
-<label for="exercise">Select Exercise:</label>
-<select id="exercise"></select>
-<label for="window">Moving average Window:</label>
-<input type="number" id="window" value="3" min="1" style="width: 50px;">
-<button onclick="updateChart()">Load Progression</button>
+<select id="exercise", class="select-exercise"></select>
+<button class='button submit-button' onclick="updateChart()">Load Progression</button>
+<div>
+    <label for="window"> Moving average Window:</label>
+    <input type="number" id="window" value="3" min="1" style="width: 50px;">
 </div>
-
+</div>
     <div id="plot_progression"></div>  <!-- First plot: Weight & Reps -->
-
     <div id="plot_volume"></div>       <!-- Second plot: Volume -->
 </div>
 
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            fetch('/statistics/api/exercises')
-                .then(response => response.json())
-                .then(exercises => {
-                    let dropdown = document.getElementById("exercise");
-                    exercises.forEach(exercise => {
-                        let option = document.createElement("option");
-                        option.value = exercise;
-                        option.textContent = exercise;
-                        dropdown.appendChild(option);
-                    });
-                })
-                .catch(error => console.error("Error loading exercises:", error));
-        });
 
-        function updateChart() {
-            let exercise = document.getElementById("exercise").value;
-            let windowSize = document.getElementById("window").value;
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
-            fetch(`/statistics/api/progression?exercise=${exercise}&window=${windowSize}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        document.getElementById("plot_progression").innerHTML = `<p>${data.error}</p>`;
-                        document.getElementById("plot_volume").innerHTML = "";
-                        return;
-                    }
-
-                    let dates = data.map(d => d.Date);
-                    let weights = data.map(d => d.Weight);
-                    let reps = data.map(d => d.Repetitions);
-                    let volumes = data.map(d => d.Volume);
-                    let weightsMA = data.map(d => d.Weight_MA);
-                    let repsMA = data.map(d => d.Repetitions_MA);
-
-                    // First plot: Weight & Repetitions
-                    let weightTrace = {
-                        x: dates,
-                        y: weights,
-                        type: 'scatter',
-                        mode: 'lines+markers',
-                        name: 'Weight (kg)',
-                        line: { color: 'blue' }
-                    };
-
-                    let weightMATrace = {
-                        x: dates,
-                        y: weightsMA,
-                        type: 'scatter',
-                        mode: 'lines',
-                        name: `Weight MA (Window=${windowSize})`,
-                        line: { color: 'blue', dash: 'dash' }
-                    };
-
-                    let repsTrace = {
-                        x: dates,
-                        y: reps,
-                        type: 'scatter',
-                        mode: 'lines+markers',
-                        name: 'Repetitions',
-                        line: { color: 'red' }
-                    };
-
-                    let repsMATrace = {
-                        x: dates,
-                        y: repsMA,
-                        type: 'scatter',
-                        mode: 'lines',
-                        name: `Reps MA (Window=${windowSize})`,
-                        line: { color: 'red', dash: 'dash' }
-                    };
-
-                    let layout1 = {
-                        title: `Progression for ${exercise}`,
-                        xaxis: { title: "Date" },
-                        yaxis: { title: "Weight (kg) / Reps" }
-                    };
-
-                    Plotly.newPlot('plot_progression', [weightTrace, weightMATrace, repsTrace, repsMATrace], layout1);
-
-                    // Second plot: Volume
-                    let volumeTrace = {
-                        x: dates,
-                        y: volumes,
-                        type: 'bar',
-                        name: 'Volume (Weight × Reps)',
-                        marker: { color: 'rgba(50,171,96,0.6)' }
-                    };
-
-                    let layout2 = {
-                        title: `Training Volume for ${exercise}`,
-                        xaxis: { title: "Date" },
-                        yaxis: { title: "Volume (Weight × Reps)" }
-                    };
-
-                    Plotly.newPlot('plot_volume', [volumeTrace], layout2);
-                })
-                .catch(error => console.error("Error fetching data:", error));
-        }
-    </script>
-
+<script src="{{ url_for(request.blueprint+'.static', filename='progression.js') }}"></script>
 
 
 {% endblock %}
