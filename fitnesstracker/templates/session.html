@@ -7,7 +7,7 @@
       <!-- <div class="text-muted ml-2"> {{ session.date.strftime('%Y-%m-%d') }}</div> -->
       <div>
         <a class="btn btn-secondary btn-sm  mt-1 mb-1"
-          href="{{ url_for('update_session', session_id=session.id) }}">Update</a>
+          href="{{ url_for('workout_sessions.update_session', session_id=session.id) }}">Update</a>
         <button type="button" class="btn btn-danger btn-sm m-1" data-toggle="modal"
           data-target="#deleteModal">Delete</button>
       </div>
@@ -36,8 +36,8 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <form action="{{ url_for('delete_session', session_id=session.id) }}" method="POST">
-          <input class="btn btn-danger" type="submit" action="{{ url_for('delete_session', session_id=session.id) }}"
+        <form action="{{ url_for('workout_sessions.delete_session', session_id=session.id) }}" method="POST">
+          <input class="btn btn-danger" type="submit" action="{{ url_for('workout_sessions.delete_session', session_id=session.id) }}"
             method="POST" value="Delete">
         </form>
       </div>
