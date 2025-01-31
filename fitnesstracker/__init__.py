@@ -27,10 +27,10 @@ def create_app(enviroment='development'):
     from fitnesstracker.workout_templates.routes import workout_templates
     from fitnesstracker.workout_sessions.routes import workout_sessions
     from fitnesstracker.main.routes import main
-    from fitnesstracker.workout_statistics.routes import statistics_bp
+    from fitnesstracker.workout_statistics.routes import workout_statistics
     app.register_blueprint(workout_sessions)
     app.register_blueprint(workout_templates)
-    app.register_blueprint(statistics_bp)
+    app.register_blueprint(workout_statistics)
     app.register_blueprint(main)
 
     return app

@@ -5,16 +5,21 @@ import json
 from fitnesstracker import db
 from fitnesstracker.models import Exercise, ExerciseDetails, TrainingSession
 
-statistics_bp = Blueprint('statistics', __name__, url_prefix='/statistics')
 
-@statistics_bp.route('/progression', methods=['GET'])
+workout_statistics = Blueprint('workout_statistics',
+                               __name__,
+                               url_prefix='/statistics',
+                               template_folder='../template',
+                               static_folder='static')
+
+
+@workout_statistics.route('/progression', methods=['GET'])
 def progression():
     """Render the progression page"""
     return render_template('statistics/progression.html')
 
 
-
-@statistics_bp.route('/api/progression', methods=['GET'])
+@workout_statistics.route('/api/progression', methods=['GET'])
 def progression_api():
     """Fetch workout progression data and return JSON for Plotly"""
     exercise_name = request.args.get('exercise', '')
@@ -23,7 +28,6 @@ def progression_api():
     if not exercise_name:
         return jsonify({"error": "No exercise provided"}), 400
 
-    # Fetch relevant exercise details
     exercises = (
         db.session.query(
             ExerciseDetails.weight,
@@ -40,25 +44,19 @@ def progression_api():
     if not exercises:
         return jsonify({"error": "No data found"}), 404
 
-    # Convert to Pandas DataFrame
     df = pd.DataFrame(exercises, columns=["Weight", "Repetitions", "Date"])
-    df["Date"] = df["Date"].astype(str)  # Convert datetime to string
-    df["Volume"] = df["Weight"] * df["Repetitions"]  # Compute training volume
+    df["Date"] = df["Date"].astype(str)
+    df["Volume"] = df["Weight"] * df["Repetitions"]
 
-    # Compute Moving Averages (Rolling Mean)
     df["Weight_MA"] = df["Weight"].rolling(window=window_size, min_periods=1).mean()
     df["Repetitions_MA"] = df["Repetitions"].rolling(window=window_size, min_periods=1).mean()
 
     return jsonify(df.to_dict(orient="records"))
 
 
-
-
-
-@statistics_bp.route('/api/exercises', methods=['GET'])
+@workout_statistics.route('/api/exercises', methods=['GET'])
 def get_exercises():
     """Fetch all distinct exercise names from the database"""
     exercise_names = db.session.query(Exercise.exercise_name).distinct().all()
 
-    # Flatten list and return JSON response
     return jsonify([name[0] for name in exercise_names])
