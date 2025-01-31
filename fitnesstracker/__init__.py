@@ -15,7 +15,7 @@ def create_app(enviroment='development'):
         app.config.from_object(ProductionConfig)
     elif enviroment == 'testing':
         app.config.from_object(TestingConfig)
-    else:  # Default to development
+    else:
         app.config.from_object(DevelopmentConfig)
 
     db.init_app(app)

@@ -1,12 +1,12 @@
 let draggedItem = null;
 
 function enableSwipeToRemove() {
-    const exerciseRows = document.querySelectorAll('.exercise-row:not(.swipe-enabled)'); // Only rows not initialized
+    const exerciseRows = document.querySelectorAll('.exercise-row:not(.swipe-enabled)');
 
     exerciseRows.forEach(row => {
         let startX = 0;
         let startY = 0;
-        let isDragging = false; // To differentiate between drag and swipe
+        let isDragging = false;
 
         // Mark the row as initialized
         row.classList.add('swipe-enabled');
@@ -35,23 +35,25 @@ function enableSwipeToRemove() {
 
             // Trigger swipe-left if the horizontal swipe distance exceeds the threshold
             if (deltaX > 50) {
-                row.classList.add('swipe-left'); // Optional: Add animation class
+                row.classList.add('swipe-left');
                 setTimeout(() => row.remove(), 300); // Remove row after animation
             }
         });
     });
 }
 
-// Drag-and-Drop handlers
+
 function allowDrop(event) {
     event.preventDefault();
 }
+
 
 function drag(event) {
     draggedItem = event.target.closest('.exercise-row');
     event.dataTransfer.effectAllowed = 'move';
     event.dataTransfer.setData('text/plain', draggedItem.id);
 }
+
 
 function drop(event) {
     event.preventDefault();
@@ -64,7 +66,7 @@ function drop(event) {
     }
 }
 
-// Enable drag-and-drop functionality
+
 function enableDragAndDrop() {
     const exerciseRows = document.querySelectorAll('.exercise-row:not(.drag-enabled)');
 
@@ -85,20 +87,17 @@ function getCsrfToken() {
 }
 
 
-// Update the name attributes for exercise and detail rows
 function updateExerciseIndexes() {
     const exerciseRows = document.querySelectorAll('.exercise-row');
+
     exerciseRows.forEach((row, rowIndex) => {
-        // Update exercise name
         const exerciseNameInput = row.querySelector('input[name^="exercises-"]');
         if (exerciseNameInput) {
             exerciseNameInput.setAttribute('name', `exercises-${rowIndex}-exercise_name`);
         }
 
-        // Update details
         const detailRows = row.querySelectorAll('.detail-row');
         detailRows.forEach((detailRow, detailIndex) => {
-            // Update repetitions, weight, and csrf_token fields
             const repetitionsInput = detailRow.querySelector('input[name^="exercises-"][name*="-repetitions"]');
             const weightInput = detailRow.querySelector('input[name^="exercises-"][name*="-weight"]');
             const csrfTokenInput = detailRow.querySelector('input[name^="exercises-"][name*="-csrf_token"]');
@@ -117,13 +116,11 @@ function updateExerciseIndexes() {
 }
 
 
-// Add a new exercise row
 function addExerciseRow(exerciseName='') {
     const exerciseList = document.getElementById('exercise-list');
     const newRow = document.createElement('div');
     newRow.classList.add('exercise-row');
 
-    // Add HTML structure for the new exercise row
     newRow.innerHTML = `
         <input type="text" name="exercises-${exerciseList.children.length}-exercise_name" value="${exerciseName}"
                placeholder="Exercise Name" required>
@@ -136,12 +133,11 @@ function addExerciseRow(exerciseName='') {
 
     exerciseList.appendChild(newRow);
 
-    // Re-initialize functionality for drag-and-drop and swipe-to-remove
     enableDragAndDrop();
     enableSwipeToRemove();
 }
 
-// Add a new detail row
+
 function addDetailRow(detailsList, exerciseIndex, triggerAutocomplete = true) {
     const newDetailRow = document.createElement('div');
     newDetailRow.classList.add('detail-row');
@@ -176,32 +172,27 @@ function addDetailRow(detailsList, exerciseIndex, triggerAutocomplete = true) {
         }
     }
 
-
-    // Re-index the details for the current exercise row
     updateExerciseIndexes();
 }
 
-// Remove a detail row
+
 function removeDetailRow(button) {
     const detailRow = button.closest('.detail-row');
     detailRow.remove();
 
-    // Re-index the details for the current exercise row
     updateExerciseIndexes();
 }
 
-// Initialize the page
+
 window.onload = function () {
     const dateField = document.getElementById("date");
     const today = new Date();
     dateField.value = today.toISOString().split('T')[0];
 
-    // Initialize drag-and-drop and swipe-to-remove
     enableDragAndDrop();
     enableSwipeToRemove();
 };
 
-// Observer for dynamically added rows
 const observer = new MutationObserver(() => {
     enableDragAndDrop();
     enableSwipeToRemove();
@@ -209,10 +200,9 @@ const observer = new MutationObserver(() => {
 
 observer.observe(document.getElementById('exercise-list'), { childList: true });
 
-
-// Get information from last session
 function loadLastSession(inputField, applyToDetails = false) {
     const exerciseName = inputField.value.trim();
+
     if (exerciseName) {
         fetch(`/get_last_session/${exerciseName}`)
             .then(response => response.json())
@@ -266,10 +256,9 @@ function loadLastSession(inputField, applyToDetails = false) {
 }
 
 
-// load template
 function loadTemplate(templateId) {
     const exerciseList = document.getElementById('exercise-list');
-    exerciseList.innerHTML = ''; // Clear the existing list
+    exerciseList.innerHTML = '';
 
     if (templateId) {
         fetch(`/get_template/${templateId}`)
@@ -286,7 +275,6 @@ function loadTemplate(templateId) {
 }
 
 
-// ensures that forms don’t break after long periods of inactivity.
 function refreshCsrfToken() {
     fetch('/refresh_csrf')
     .then(response => response.json())
