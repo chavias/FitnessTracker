@@ -1,30 +1,25 @@
 {% extends "layout.html" %}
 
 {% block header %}
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='statistics.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='statistics.css') }}">
 {% endblock %}
 
 {% block content %}
 
+<!-- <div class="content-section"> -->
+    <div class="article-metadata d-flex justify-content-between align-items-center">
+        <select id="exercise" class="select-exercise"></select>
+        <div>
+            <label for="window"> MA Window:</label>
+            <input type="number" id="window" value="3" min="1" style="width: 50px;">
+        </div>
+    </div>
 
-<div class="content-section">
-
-<div>
-<select id="exercise", class="select-exercise"></select>
-<button class='button submit-button' onclick="updateChart()">Load Progression</button>
-<div>
-    <label for="window"> Moving average Window:</label>
-    <input type="number" id="window" value="3" min="1" style="width: 50px;">
-</div>
-</div>
-    <div id="plot_progression"></div>  <!-- First plot: Weight & Reps -->
-    <div id="plot_volume"></div>       <!-- Second plot: Volume -->
-</div>
-
+    <div id="plot_progression" class="chart-container"></div> <!-- First plot: Weight & Reps -->
+    <div id="plot_volume" class="chart-container"></div> <!-- Second plot: Volume -->
+<!-- </div> -->
 
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-
 <script src="{{ url_for(request.blueprint+'.static', filename='progression.js') }}"></script>
-
 
 {% endblock %}
