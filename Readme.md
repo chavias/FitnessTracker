@@ -1,13 +1,29 @@
 # Fitness Tracker App
 
-A simple Flask app for tracking your workouts. This app remembers the weights and repetitions of the last time you performed exercises and features an autocomplete to make tracking even easier. It is containerized using Docker and can be quickly deployed with the included docker-compose.yml file.
+This application is designed to help you track your workouts efficiently.
+You can create workout templates, log your exercises, and monitor your progress over time. The app remembers the
+weights and repetitions from your last session and features an autocomplete function to make logging exercises quicker and easier.
+Additionally, it provides graphical representations of your workout progress. The app connects to a database to store your workout data securely,
+ensuring that your progress is saved and accessible across sessions.
+Deploy it easily using the included docker-compose.yml file.
 
 ## Features
- - Exercise Tracking: Keeps track of the weights and repetitions for each exercise.
- - Autocomplete: Autocompletes exercise names for easy selection.
- - Persistency: Remembers the weights and repetitions of your last session.
- - Docker Support: Simple deployment using Docker Compose.
- - Development & Production Modes: Switch easily between development and production modes.
+
+- Exercise Tracking: Log and track weights and repetitions for each exercise.
+- Autocomplete: Quickly select exercises with the autocomplete feature.
+- Persistency: The app remembers your last session's weights and repetitions.
+- Database Integration: Connects to a database to securely store and retrieve your workout data.
+- Docker Support: Easy deployment using Docker Compose.
+- Progress Visualization: View your workout progress through intuitive graphics
+- Development & Production Modes: Seamlessly switch between development and production environments.
+  
+
+## Docker Images
+
+Pre-built Docker images are available:
+
+- Docker Hub: chavias/fitnesstracker
+    
 
 ## Getting Started
 <!-- To get started with the app, follow these steps: -->
@@ -44,10 +60,11 @@ A simple Flask app for tracking your workouts. This app remembers the weights an
 
     ```bash
     docker-compose up --build
-    This will build the image (if necessary) and start the app. You can now access the app at http://localhost:5000.
     ```
+    This will build the image (if necessary) and start the app. You can now access the app at http://localhost:5000.
+    You can also connect it to a SQLlight database using the docker-compose.debug.yml
 
-5. Switching Between Debug and Production Mode
+5. Switching Between SQLlite and Mariadb mode
     
     The app can be run in either debug or production mode. To switch modes, open the run.py file and set the DEBUG variable to True for development or False for production.
 
