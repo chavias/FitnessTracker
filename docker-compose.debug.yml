@@ -1,6 +1,6 @@
 services:
   flask:
-    image: fitness_debug
+    image: fitness_SQLlight
     build:
       context: .
       dockerfile: ./Dockerfile
