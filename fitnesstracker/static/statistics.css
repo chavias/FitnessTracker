@@ -1,0 +1,46 @@
+.select-exercise .button-exercise {
+    width: 100%;
+    gap: 2px;
+    padding: 5px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+canvas {
+    width: 100% !important;
+    height: auto !important;
+  }
+  
+.chart-container {
+    width: 90%; /* Increased width */
+    max-width: 1200px; /* Limit max width for large screens */
+    height: 500px; /* Default height */
+    margin: 0 auto; /* Center the charts */
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .chart-container {
+        width: 100%; /* Full width for mobile */
+        height: 350px; /* Reduce height for better visibility */
+        padding: 0 10px;
+    }
+}
+
+
+.js-plotly-plot .plotly .modebar {
+    transform: scale(0.8); /* Reduce button size */
+    top: 40px !important;  /* Position it lower */
+    right: 0px !important; /* Align to the right */
+}
+
+@media (max-width: 768px) {
+    .js-plotly-plot .plotly .modebar {
+        transform: scale(0.7); /* Make even smaller for mobile */
+        top: 5px !important;
+        right: 5px !important;
+    }
+}

@@ -91,88 +91,77 @@ function updateExerciseIndexes() {
     const exerciseRows = document.querySelectorAll('.exercise-row');
 
     exerciseRows.forEach((row, rowIndex) => {
-        const exerciseNameInput = row.querySelector('input[name^="exercises-"]');
-        if (exerciseNameInput) {
-            exerciseNameInput.setAttribute('name', `exercises-${rowIndex}-exercise_name`);
-        }
+        // Update exercise name input
+        const nameInput = row.querySelector('input[type="text"]');
+        if (nameInput) nameInput.name = `exercises-${rowIndex}-exercise_name`;
 
-        const detailRows = row.querySelectorAll('.detail-row');
-        detailRows.forEach((detailRow, detailIndex) => {
-            const repetitionsInput = detailRow.querySelector('input[name^="exercises-"][name*="-repetitions"]');
-            const weightInput = detailRow.querySelector('input[name^="exercises-"][name*="-weight"]');
-            const csrfTokenInput = detailRow.querySelector('input[name^="exercises-"][name*="-csrf_token"]');
+        // Update exercise CSRF token
+        const csrfInput = row.querySelector('input[type="hidden"]');
+        if (csrfInput) csrfInput.name = `exercises-${rowIndex}-csrf_token`;
 
-            if (repetitionsInput) {
-                repetitionsInput.setAttribute('name', `exercises-${rowIndex}-details-${detailIndex}-repetitions`);
-            }
-            if (weightInput) {
-                weightInput.setAttribute('name', `exercises-${rowIndex}-details-${detailIndex}-weight`);
-            }
-            if (csrfTokenInput) {
-                csrfTokenInput.setAttribute('name', `exercises-${rowIndex}-details-${detailIndex}-csrf_token`);
-            }
+        // Update detail rows
+        const details = row.querySelectorAll('.detail-row');
+        details.forEach((detail, detailIndex) => {
+            const inputs = detail.querySelectorAll('input');
+            if (inputs[0]) inputs[0].name = `exercises-${rowIndex}-details-${detailIndex}-repetitions`;
+            if (inputs[1]) inputs[1].name = `exercises-${rowIndex}-details-${detailIndex}-weight`;
+            if (inputs[2]) inputs[2].name = `exercises-${rowIndex}-details-${detailIndex}-csrf_token`; 
         });
     });
 }
 
-
-function addExerciseRow(exerciseName='') {
+function addExerciseRow(exerciseName = '') {
     const exerciseList = document.getElementById('exercise-list');
     const newRow = document.createElement('div');
     newRow.classList.add('exercise-row');
 
+    // Create inputs with initial name attributes
     newRow.innerHTML = `
-        <input type="text" name="exercises-${exerciseList.children.length}-exercise_name" value="${exerciseName}"
-               placeholder="Exercise Name" required>
-        <input type="hidden" name="exercises-${exerciseList.children.length}-csrf_token" value="${getCsrfToken()}">
+        <input type="text" placeholder="Exercise Name" value="${exerciseName}" required>
+        <input type="hidden" value="${getCsrfToken()}">
         <div class="details-list"></div>
-        <button type="button" onclick="addDetailRow(this.closest('.exercise-row').querySelector('.details-list'), ${exerciseList.children.length}, true)">
-            &#x2795;
-        </button>
+        <button type="button" onclick="addDetailRow(this)">&#x2795;</button>
     `;
 
     exerciseList.appendChild(newRow);
-
+    updateExerciseIndexes(); // Update names immediately
     enableDragAndDrop();
     enableSwipeToRemove();
 }
 
 
-function addDetailRow(detailsList, exerciseIndex, triggerAutocomplete = true) {
-    const newDetailRow = document.createElement('div');
-    newDetailRow.classList.add('detail-row');
-
-    newDetailRow.innerHTML = `
-        <input type="hidden" name="exercises-${exerciseIndex}-details-${detailsList.children.length}-csrf_token" value="${getCsrfToken()}">
-        <input type="number" name="exercises-${exerciseIndex}-details-${detailsList.children.length}-repetitions" 
-               placeholder="R" style="width: 35%" required>
-        <input type="number" name="exercises-${exerciseIndex}-details-${detailsList.children.length}-weight" 
-               placeholder="W" style="width: 35%" step="0.5" required>
-        <button type="button" onclick="removeDetailRow(this)">&#10006;</button>
+function addDetailRow(button, triggerAutocomplete = true) {
+    const exerciseRow = button.closest('.exercise-row');
+    const detailsList = exerciseRow.querySelector('.details-list');
+    
+    // Create new detail row
+    const newRow = document.createElement('div');
+    newRow.className = 'detail-row';
+    newRow.innerHTML = `
+    <input type="number" placeholder="R" style="width: 35%" required>
+    <input type="number" placeholder="W" step="0.5" style="width: 35%" required>
+    <input type="hidden" value="${getCsrfToken()}">
+        <button type="button" onclick="removeDetailRow(this)">✕</button>
     `;
 
-    detailsList.appendChild(newDetailRow);
+    detailsList.appendChild(newRow);
+    updateExerciseIndexes();
 
+    // Autocomplete handling
     if (triggerAutocomplete) {
-        const exerciseNameField = detailsList.closest('.exercise-row').querySelector('input[name="exercises-' + exerciseIndex + '-exercise_name"]');
-    
-        if (exerciseNameField && exerciseNameField.value.trim()) {
-            fetch(`/get_last_session/${exerciseNameField.value.trim()}`)
+        const exerciseName = exerciseRow.querySelector('input[type="text"]').value;
+        if (exerciseName) {
+            const detailIndex = detailsList.children.length - 1;
+            fetch(`/get_last_session/${exerciseName}`)
                 .then(response => response.json())
                 .then(data => {
-                    const lastRow = detailsList.lastElementChild;
-                    const lastDetail = data.details[detailsList.children.length - 1];
-
-                    if (lastDetail) {
-                        lastRow.querySelector(`input[name="exercises-${exerciseIndex}-details-${detailsList.children.length - 1}-repetitions"]`).value = lastDetail.repetitions;
-                        lastRow.querySelector(`input[name="exercises-${exerciseIndex}-details-${detailsList.children.length - 1}-weight"]`).value = lastDetail.weight;
+                    if (data.details[detailIndex]) {
+                        newRow.querySelector('input:nth-of-type(1)').value = data.details[detailIndex].repetitions;
+                        newRow.querySelector('input:nth-of-type(2)').value = data.details[detailIndex].weight;
                     }
-                })
-                .catch(error => console.error('Error autocompleting last detail:', error));
+                });
         }
     }
-
-    updateExerciseIndexes();
 }
 
 
@@ -200,59 +189,28 @@ const observer = new MutationObserver(() => {
 
 observer.observe(document.getElementById('exercise-list'), { childList: true });
 
-function loadLastSession(inputField, applyToDetails = false) {
-    const exerciseName = inputField.value.trim();
 
-    if (exerciseName) {
-        fetch(`/get_last_session/${exerciseName}`)
-            .then(response => response.json())
-            .then(data => {
-                console.log(data);
+function loadLastSession(inputField) {
+    const exerciseRow = inputField.closest('.exercise-row');
+    const exerciseList = document.getElementById('exercise-list');
+    const rowIndex = Array.from(exerciseList.children).indexOf(exerciseRow);
+    
+    fetch(`/get_last_session/${inputField.value.trim()}`)
+        .then(response => response.json())
+        .then(data => {
+            const detailsList = exerciseRow.querySelector('.details-list');
+            detailsList.innerHTML = ''; // Clear existing details
 
-                const parent = inputField.closest('.exercise-row');
-                if (!parent) {
-                    console.error('Could not find the parent exercise row');
-                    return;
-                }
-
-                const detailsList = parent.querySelector('.details-list');
-                if (!detailsList) {
-                    console.error('Could not find details list');
-                    return;
-                }
-
-                if (applyToDetails && data.details) {
-                    const existingRows = detailsList.children.length;
-
-                    // Iterate through the details and update or add new detail rows
-                    data.details.forEach((detail, index) => {
-                        const repetitionsInputName = `exercises-${parent.dataset.exerciseIndex}-details-${index}-repetitions`;
-                        const weightInputName = `exercises-${parent.dataset.exerciseIndex}-details-${index}-weight`;
-
-                        if (index < existingRows) {
-                            const detailRow = detailsList.children[index];
-                            const repetitionsInput = detailRow.querySelector(`input[name="${repetitionsInputName}"]`);
-                            const weightInput = detailRow.querySelector(`input[name="${weightInputName}"]`);
-                            
-                            if (repetitionsInput && weightInput) {
-                                repetitionsInput.value = detail.repetitions;
-                                weightInput.value = detail.weight;
-                            } else {
-                                console.error(`Inputs not found for ${repetitionsInputName} and ${weightInputName}`);
-                            }
-                        } else {
-                            addDetailRow(detailsList, parent.dataset.exerciseIndex, detail.repetitions, detail.weight);
-                        }
-                    });
-
-                    // If there are more existing rows than the new session details, remove excess rows
-                    for (let i = data.details.length; i < existingRows; i++) {
-                        detailsList.children[i].remove();
-                    }
-                }
-            })
-            .catch(error => console.error('Error loading last session:', error));
-    }
+            data.details.forEach((detail, i) => {
+                const button = exerciseRow.querySelector('button');
+                addDetailRow(button, false); // Add without autocomplete trigger
+                
+                const newRow = detailsList.lastElementChild;
+                newRow.querySelector('input:nth-of-type(1)').value = detail.repetitions;
+                newRow.querySelector('input:nth-of-type(2)').value = detail.weight;
+            });
+            updateExerciseIndexes();
+        });
 }
 
 
@@ -273,7 +231,6 @@ function loadTemplate(templateId) {
             .catch(error => console.error('Error fetching template:', error));
     }
 }
-
 
 function refreshCsrfToken() {
     fetch('/refresh_csrf')
