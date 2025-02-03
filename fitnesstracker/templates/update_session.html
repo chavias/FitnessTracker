@@ -7,7 +7,8 @@
 
         <input type="hidden" name="template_id" id="template_id" value="{{ form.template_id.data }}" required>
 
-        <input type="date" name="date" id="date" value="{{ form.date.data }}" required>
+        <input type="date" name="date" id="date" value="{{ form.date.data.strftime('%Y-%m-%d') }}" required>
+    
 
         <div id="exercise-list">
             {% for exercise_form in form.exercises %}

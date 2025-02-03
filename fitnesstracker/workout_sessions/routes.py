@@ -73,6 +73,7 @@ def update_session(session_id):
     templates = [(t.id, t.name) for t in Template.query.all()]
     form.template_id.choices = [(t.id, t.name) for t in Template.query.all()]
     
+    print(f"{form.date.data = }")
     if form.validate_on_submit():
         try:
             # deleted old session 
