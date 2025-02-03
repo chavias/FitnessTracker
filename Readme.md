@@ -13,10 +13,7 @@ Deploy it easily using the included docker-compose.yml file.
 - Autocomplete: Quickly select exercises with the autocomplete feature.
 - Persistency: The app remembers your last session's weights and repetitions.
 - Database Integration: Connects to a database to securely store and retrieve your workout data.
-- Docker Support: Easy deployment using Docker Compose.
-- Progress Visualization: View your workout progress through intuitive graphics
-- Development & Production Modes: Seamlessly switch between development and production environments.
-  
+- Progress Visualization: View your workout progress through intuitive graphics  
 
 ## Docker Images
 

@@ -20,15 +20,15 @@
                 <div class="details-list">
                     {% for detail in exercise_form.details %}
                     <div class="detail-row">
+                        <input type="number"
+                        name="exercises-{{ exercise_loop.index0 }}-details-{{ loop.index0 }}-repetitions"
+                        placeholder="R" style="width: 35%" value="{{ detail.repetitions.data }}" required>
+                        <input type="number"
+                        name="exercises-{{ exercise_loop.index0 }}-details-{{ loop.index0 }}-weight" placeholder="W"
+                        style="width: 35%" value="{{ detail.weight.data }}" step="0.5" required>
                         <input type="hidden"
                             name="exercises-{{ exercise_loop.index0 }}-details-{{ loop.index0 }}-csrf_token"
                             value="{{ form.csrf_token._value() }}" required>
-                        <input type="number"
-                            name="exercises-{{ exercise_loop.index0 }}-details-{{ loop.index0 }}-repetitions"
-                            placeholder="R" style="width: 35%" value="{{ detail.repetitions.data }}" required>
-                        <input type="number"
-                            name="exercises-{{ exercise_loop.index0 }}-details-{{ loop.index0 }}-weight" placeholder="W"
-                            style="width: 35%" value="{{ detail.weight.data }}" step="0.5" required>
                         <button type="button" onclick="removeDetailRow(this)">&#10006;</button>
                     </div>
                     {% endfor %}
