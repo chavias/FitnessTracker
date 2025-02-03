@@ -175,12 +175,17 @@ function removeDetailRow(button) {
 
 window.onload = function () {
     const dateField = document.getElementById("date");
-    const today = new Date();
-    dateField.value = today.toISOString().split('T')[0];
+
+    // Only set today's date if the field is empty
+    if (!dateField.value) {
+        const today = new Date();
+        dateField.value = today.toISOString().split('T')[0];
+    }
 
     enableDragAndDrop();
     enableSwipeToRemove();
 };
+
 
 const observer = new MutationObserver(() => {
     enableDragAndDrop();
