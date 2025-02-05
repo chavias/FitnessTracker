@@ -120,7 +120,7 @@ function addExerciseRow(exerciseName = '') {
         <input type="text" placeholder="Exercise Name" value="${exerciseName}" required>
         <input type="hidden" value="${getCsrfToken()}">
         <div class="details-list"></div>
-        <button type="button" onclick="addDetailRow(this)">&#x2795;</button>
+        <button type="button" onclick="addDetailRow(this)"  style="color: black;" >&#xFF0B;</button>
     `;
 
     exerciseList.appendChild(newRow);
@@ -141,7 +141,7 @@ function addDetailRow(button, triggerAutocomplete = true) {
     <input type="number" placeholder="R" style="width: 35%" required>
     <input type="number" placeholder="W" step="0.5" style="width: 35%" required>
     <input type="hidden" value="${getCsrfToken()}">
-        <button type="button" onclick="removeDetailRow(this)">✕</button>
+        <button type="button" onclick="removeDetailRow(this)" style="color: black;">✕</button>
     `;
 
     detailsList.appendChild(newRow);

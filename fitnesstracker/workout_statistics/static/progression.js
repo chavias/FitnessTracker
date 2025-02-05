@@ -18,7 +18,6 @@ document.addEventListener("DOMContentLoaded", function () {
         .catch(error => console.error("Error loading exercises:", error));
 });
 
-
 function updateChart() {
     let exercise = document.getElementById("exercise").value;
     let windowSize = document.getElementById("window").value;
@@ -32,6 +31,7 @@ function updateChart() {
                 return;
             }
 
+            // Extract raw data for progression plot
             let dates = data.map(d => d.Date);
             let weights = data.map(d => d.Weight);
             let reps = data.map(d => d.Repetitions);
@@ -54,7 +54,7 @@ function updateChart() {
                 y: weightsMA,
                 type: 'scatter',
                 mode: 'lines',
-                name: `Weight MA (Window=${windowSize})`,
+                name: `Weight MA`,
                 line: { color: 'blue', dash: 'dash' }
             };
 
@@ -72,63 +72,61 @@ function updateChart() {
                 y: repsMA,
                 type: 'scatter',
                 mode: 'lines',
-                name: `Reps MA (Window=${windowSize})`,
+                name: `Reps MA`,
                 line: { color: 'red', dash: 'dash' }
             };
 
             let layout1 = {
-                title: {
-                    text: `Progression for ${exercise}`,
-                    font: { size: 14 }
-                },
-                xaxis: { 
-                    title: { text: "Date", font: { size: 12 } },
-                    tickfont: { size: 10 }
-                },
-                yaxis: { 
-                    title: { text: "Weight (kg) / Reps", font: { size: 12 } },
-                    tickfont: { size: 10 }
-                },
+                title: { text: `Progression for ${exercise}`, font: { size: 14 } },
+                xaxis: { title: { text: "Date", font: { size: 12 } }, tickfont: { size: 10 } },
+                yaxis: { title: { text: "Weight (kg) / Reps", font: { size: 12 } }, tickfont: { size: 10 } },
                 legend: { font: { size: 10 }, orientation: "h", x: 0.5, xanchor: "center", y: -0.3 },
-                margin: { l: 50, r: 30, t: 60, b: 50 }, // Increased top margin to 60px
-                autosize: true,
-                // modebar: { orientation: 'v' } // Move modebar to the side
+                margin: { l: 50, r: 30, t: 60, b: 50 },
+                autosize: true
             };
 
-            Plotly.newPlot('plot_progression', [weightTrace, weightMATrace, repsTrace, repsMATrace], layout1,
-                                         { displayModeBar: false });
+            Plotly.newPlot('plot_progression',
+                           [weightTrace, weightMATrace, repsTrace, repsMATrace],
+                           layout1,
+                           { displayModeBar: false });
 
-            // Second plot: Volume
+            // --- Updated Volume Plot: Group by Date ---
+
+            // Group volume data by date (summing volume for each date)
+            let volumeByDate = {};
+            data.forEach(d => {
+                let date = d.Date;
+                // Ensure numeric volume (if not already a number)
+                let vol = Number(d.Volume) || 0;
+                volumeByDate[date] = (volumeByDate[date] || 0) + vol;
+            });
+
+            // Prepare grouped arrays
+            let groupedDates = Object.keys(volumeByDate);
+            let groupedVolumes = groupedDates.map(date => volumeByDate[date]);
+
             let volumeTrace = {
-                x: dates,
-                y: volumes,
+                x: groupedDates,
+                y: groupedVolumes,
                 type: 'bar',
                 name: 'Volume (Weight × Reps)',
                 marker: { color: 'rgba(50,171,96,0.6)' }
             };
 
             let layout2 = {
-                title: {
-                    text: `Training Volume for ${exercise}`,
-                    font: { size: 14 }
-                },
-                xaxis: { 
-                    title: { text: "Date", font: { size: 12 } },
-                    tickfont: { size: 10 }
-                },
-                yaxis: { 
-                    title: { text: "Volume (Weight × Reps)", font: { size: 12 } },
-                    tickfont: { size: 10 }
-                },
-                margin: { l: 50, r: 30, t: 60, b: 50 }, // Increased top margin to 60px
-                autosize: true,
-                // modebar: { orientation: 'v' } // Move modebar to the side
+                title: { text: `Training Volume for ${exercise}`, font: { size: 14 } },
+                xaxis: { title: { text: "Date", font: { size: 12 } }, tickfont: { size: 10 } },
+                yaxis: { title: { text: "Volume (Weight × Reps)", font: { size: 12 } }, tickfont: { size: 10 } },
+                margin: { l: 50, r: 30, t: 60, b: 50 },
+                autosize: true
             };
 
             Plotly.newPlot('plot_volume', [volumeTrace], layout2, { displayModeBar: false });
         })
         .catch(error => console.error("Error fetching data:", error));
 }
+
+
 
 // Ensure chart updates dynamically
 document.getElementById("exercise").addEventListener("change", updateChart);
@@ -139,3 +137,4 @@ window.addEventListener('resize', function () {
     Plotly.Plots.resize(document.getElementById('plot_progression'));
     Plotly.Plots.resize(document.getElementById('plot_volume'));
 });
+

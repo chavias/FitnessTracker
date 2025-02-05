@@ -2,24 +2,24 @@
 
 {% block header %}
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='statistics.css') }}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cal-heatmap@3.6.2/cal-heatmap.css">
 {% endblock %}
 
 {% block content %}
-
-<!-- <div class="content-section"> -->
-    <div class="article-metadata d-flex justify-content-between align-items-center">
-        <select id="exercise" class="select-exercise"></select>
-        <div>
-            <label for="window"> MA Window:</label>
-            <input type="number" id="window" value="3" min="1" style="width: 50px;">
-        </div>
+<div class="article-metadata d-flex justify-content-between align-items-center">
+    <select id="exercise" class="select-exercise"></select>
+    <div>
+        <label for="window"> MA Window:</label>
+        <input type="number" id="window" value="3" min="1" style="width: 50px;">
     </div>
+</div>
 
-    <div id="plot_progression" class="chart-container"></div> <!-- First plot: Weight & Reps -->
-    <div id="plot_volume" class="chart-container"></div> <!-- Second plot: Volume -->
-<!-- </div> -->
+<div id="plot_progression" class="chart-container"></div> <!-- Progression plot -->
+<div id="plot_volume" class="chart-container"></div>       <!-- Volume plot -->
+<div id="plot_calendar" class="chart-container"></div>
 
+<!-- <script src="https://cdn.jsdelivr.net/npm/cal-heatmap@3.6.2/cal-heatmap.min.js"></script> -->
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 <script src="{{ url_for(request.blueprint+'.static', filename='progression.js') }}"></script>
-
 {% endblock %}
+
