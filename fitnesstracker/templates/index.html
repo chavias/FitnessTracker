@@ -1,5 +1,34 @@
 {% extends "layout.html" %}
+
+{% block header %}
+<script src="https://d3js.org/d3.v6.min.js"></script>
+<script src="https://unpkg.com/cal-heatmap@4.2.4/dist/cal-heatmap.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/cal-heatmap/dist/cal-heatmap.css">
+<link href="https://fonts.googleapis.com/css2?family=Arimo&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+<script src="https://unpkg.com/@popperjs/core@2"></script>
+<script src="https://unpkg.com/cal-heatmap/dist/plugins/Tooltip.min.js"></script>
+<script src="https://unpkg.com/cal-heatmap/dist/plugins/CalendarLabel.min.js"></script>
+<script src="https://unpkg.com/cal-heatmap/dist/plugins/Legend.min.js"></script>
+<style>
+    #cal-heatmap {
+        width: 100%;
+        /* height: 140px; */
+        margin: auto;
+        display: flex;
+        justify-content: center;
+        /* background-color: white; */
+    }
+</style>
+{% endblock %}
+
 {% block content %}
+<article class="media content-section">
+  <div class="media-body">
+  <div id="cal-heatmap" ></div>
+</div>
+</article>
 {% for session in sessions %}
 <article class="media content-section">
   <div class="media-body">
@@ -35,4 +64,5 @@
 {% endif %}
 {% endfor %}
 
+<script src="{{ url_for(request.blueprint+'.static', filename='index.js') }}"></script>
 {% endblock content %}

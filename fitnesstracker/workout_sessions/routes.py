@@ -18,7 +18,7 @@ def create_session():
     form.template_id.choices = [(t.id, t.name) for t in Template.query.all()]
 
     if form.validate_on_submit():
-        try:
+        # try:
             create_session = TrainingSession(
                 template_id=form.template_id.data, date=form.date.data
             )
@@ -43,17 +43,17 @@ def create_session():
             flash("Session created successfully!", "success")
             return redirect(url_for("main.homepage"))
         
-        except Exception as e:
-            db.session.rollback()
-            # workout_sessions.logger.error(f"Error creating session: {e}")
-            print(f"Error creating session: {e}")
-            flash(
-                "An error occurred while creating the session. Please try again.",
-                "danger",
-            )
-    else:
-        print(f"{form.errors = }")
-        print(f"{form.data = }")
+    #     except Exception as e:
+    #         db.session.rollback()
+    #         # workout_sessions.logger.error(f"Error creating session: {e}")
+    #         print(f"Error creating session: {e}")
+    #         flash(
+    #             "An error occurred while creating the session. Please try again.",
+    #             "danger",
+    #         )
+    # else:
+    #     print(f"{form.errors = }")
+    #     print(f"{form.data = }")
 
     return render_template(
         "create_session.html", form=form, templates=Template.query.all()

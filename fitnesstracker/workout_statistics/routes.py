@@ -3,7 +3,7 @@ import plotly.express as px
 import pandas as pd
 import json
 from fitnesstracker import db
-from fitnesstracker.models import Exercise, ExerciseDetails, TrainingSession
+from fitnesstracker.models import Exercise, ExerciseDetails, TrainingSession, Template
 
 
 workout_statistics = Blueprint('workout_statistics',
@@ -17,6 +17,13 @@ workout_statistics = Blueprint('workout_statistics',
 def progression():
     """Render the progression page"""
     return render_template('statistics/progression.html')
+
+
+# @workout_statistics.route('/heatmap', methods=['GET'])
+# def heatmap():
+#     """Render the heatmap page"""
+#     return render_template('statistics/heatmap_test.html')
+
 
 
 @workout_statistics.route('/api/progression', methods=['GET'])
@@ -60,3 +67,4 @@ def get_exercises():
     exercise_names = db.session.query(Exercise.exercise_name).distinct().all()
 
     return jsonify([name[0] for name in exercise_names])
+

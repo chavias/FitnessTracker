@@ -34,7 +34,7 @@
                     </div>
                     {% endfor %}
                 </div>
-                <button type="button"
+                <button type="button",
                     onclick="addDetailRow(this.closest('.exercise-row').querySelector('.details-list'), {{ exercise_loop.index0 }}, true)">
                     &#x2795;
                 </button>
@@ -47,6 +47,7 @@
     </form>
 </div>
 
+<!-- <script src="{{ url_for('workout_sessions.static', filename='create_session.js') }}"></script> -->
 <script src="{{ url_for(request.blueprint+'.static', filename='create_session.js') }}"></script>
 
 {% endblock %}
