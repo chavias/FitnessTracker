@@ -39,9 +39,9 @@
       </h2>
       <div class="text-muted">{{ session.date.strftime('%Y-%m-%d') }}</div>
     </div>
-    <ul class="exercise-list">
+    <ul class="exercise-list" style="padding: 0cm;">
       {% for exercise in session.exercises %}
-      <li class="exercise-item" style="font-size: smaller;">{{ exercise.exercise_name}}:
+      <li class="exercise-item"  style="font-size: smaller;">{{ exercise.exercise_name}}:
         {% for detail in exercise.details%}
         {{detail.repetitions}}/{{ detail.weight | int }}
         {% endfor %}
