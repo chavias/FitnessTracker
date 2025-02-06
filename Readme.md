@@ -63,38 +63,18 @@ Pre-built Docker images are available:
 
 5. Switching Between SQLlite and Mariadb mode
     
-    The app can be run in either debug or production mode. To switch modes, open the run.py file and set the DEBUG variable to True for development or False for production.
+    The app can be run in either debug (SQLlight) or production (mariadb) mode. To switch modes, open the run.py file and set the enviroment variable to debug or production.
 
     Example:
 
     ```python
-    DEBUG = True  # Change to False for production
+        app = create_app(enviroment='production')
     ```
 
 6. Access the App
 
 Once the app is running, you can access it at http://localhost:5000 and start tracking your workouts.
 
-Docker Commands
-Here are some useful Docker commands for managing the app:
-
-Build the Docker image:
-
-```bash
-docker-compose build
-```
-
-Start the app:
-
-```bash
-docker-compose up
-```
-
-Stop the app:
-
-```bash
-docker-compose down
-```
 
 ## License
 This project is licensed under the MIT License - see the LICENSE file for details.
