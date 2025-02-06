@@ -5,11 +5,13 @@ from fitnesstracker.workout_sessions.forms import SessionForm
 from flask_wtf.csrf import generate_csrf
 
 
-workout_sessions = Blueprint('workout_sessions',
-                             __name__,
-                             static_folder='static',
-                             static_url_path='/workout_sessions/static', 
-                             template_folder='../templates')
+workout_sessions = Blueprint(
+    "workout_sessions",
+    __name__,
+    static_folder="static",
+    static_url_path="/workout_sessions/static",
+    template_folder="../templates",
+)
 
 
 @workout_sessions.route("/create_session", methods=["GET", "POST"])
@@ -19,30 +21,30 @@ def create_session():
 
     if form.validate_on_submit():
         # try:
-            create_session = TrainingSession(
-                template_id=form.template_id.data, date=form.date.data
+        create_session = TrainingSession(
+            template_id=form.template_id.data, date=form.date.data
+        )
+        db.session.add(create_session)
+
+        for exercise_form in form.exercises:
+            new_exercise = Exercise(
+                exercise_name=exercise_form.data["exercise_name"],
+                session=create_session,
             )
-            db.session.add(create_session)
-            
-            for exercise_form in form.exercises:
-                new_exercise = Exercise(
-                    exercise_name=exercise_form.data["exercise_name"],
-                    session=create_session,
+            db.session.add(new_exercise)
+
+            for detail_form in exercise_form.details:
+                new_detail = ExerciseDetails(
+                    repetitions=detail_form.repetitions.data,
+                    weight=detail_form.weight.data,
+                    exercise=new_exercise,
                 )
-                db.session.add(new_exercise)
-             
-                for detail_form in exercise_form.details:
-                    new_detail = ExerciseDetails(
-                        repetitions=detail_form.repetitions.data,
-                        weight=detail_form.weight.data,
-                        exercise=new_exercise,
-                    )
-                    db.session.add(new_detail)
-            
-            db.session.commit()
-            flash("Session created successfully!", "success")
-            return redirect(url_for("main.homepage"))
-        
+                db.session.add(new_detail)
+
+        db.session.commit()
+        flash("Session created successfully!", "success")
+        return redirect(url_for("main.homepage"))
+
     #     except Exception as e:
     #         db.session.rollback()
     #         # workout_sessions.logger.error(f"Error creating session: {e}")
@@ -72,13 +74,13 @@ def update_session(session_id):
     form = SessionForm(obj=session)
     templates = [(t.id, t.name) for t in Template.query.all()]
     form.template_id.choices = [(t.id, t.name) for t in Template.query.all()]
-    
+
     print(f"{form.date.data = }")
     if form.validate_on_submit():
         try:
-            # deleted old session 
+            # deleted old session
             db.session.delete(session)
-            
+
             # Create a new session
             create_session = TrainingSession(
                 template_id=form.template_id.data, date=form.date.data
@@ -119,9 +121,7 @@ def update_session(session_id):
 
 @workout_sessions.route("/session/<int:session_id>/delete", methods=["POST"])
 def delete_session(session_id):
-    user_session = TrainingSession.query.get_or_404(
-        session_id
-    ) 
+    user_session = TrainingSession.query.get_or_404(session_id)
     db.session.delete(user_session)
     db.session.commit()
     flash("Your session has been deleted!", "success")
@@ -145,8 +145,3 @@ def get_last_session(exerciseName):
     else:
         response = {"details": []}
     return jsonify(response)
-
-
-@workout_sessions.route('/refresh_csrf', methods=['GET'])
-def refresh_csrf():
-    return jsonify({'csrf_token': generate_csrf()})

@@ -38,10 +38,10 @@ async function updateCalendarHeatmap() {
                 {
                     text: function (date, value, dayjsDate) {
                         return (
-                            (value ? templateMap.get(value) : 'No Training') + ' on ' + dayjsDate.format('LL')
+                            `<a href="{{ url_for('workout_sessions.create_session') }}" target="_blank">${value ? templateMap.get(value) : 'No Training'}</a> on ${dayjsDate.format('LL')}`
                         );
                     },
-                },
+                }
             ],
             // [
             //     Legend,
