@@ -164,7 +164,7 @@ button .material-symbols-outlined {
 }
 
 #exercise-list button:hover {
-  background-color: #212038;
+  background-color: #295c88;
 }
 
 
@@ -198,7 +198,7 @@ button .material-symbols-outlined {
 /*  new  */
 
 .exercise-list {
-  /* padding: 5px 0px; */
+  margin-bottom: 5px;
   list-style-type: none;
   display: flex;
   flex-direction: column;
@@ -221,18 +221,24 @@ button .material-symbols-outlined {
   justify-content: center;
   flex-direction: column;
   vertical-align: middle; /* Ensures everything stays aligned */
-  gap: 3px;
+  gap: 0px;
 }
 
 .detail-row {
   display: flex;
   align-items: start;
   justify-content: center;
-  gap: 3px;
-  margin-bottom: -8px;
+  gap: 0px;
 }
 
 .exercise-list > .details-list > .detail-row:first-child {
   display: flex;
   flex: 1;
+}
+
+
+#exercise-list .exercise-row .details-list .detail-row {
+  display: flex;
+  gap: 2px; /* Default gap between different elements */
+  margin-bottom: -5px;
 }
