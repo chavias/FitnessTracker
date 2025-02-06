@@ -55,7 +55,11 @@ function addExerciseRow() {
 
     newRow.innerHTML = `
             <input type="text" name="exercises-${newIndex}-exercise_name" placeholder="Exercise Name" required>
-            <button type="button" onclick="removeExerciseRow(this)">&#10006;</button>
+            <button type="button" onclick="removeExerciseRow(this)" style="color: black;">
+            <span class="material-symbols-outlined">
+            delete
+            </span> 
+            </button>
         `;
     exerciseList.appendChild(newRow);
 }
