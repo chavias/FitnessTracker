@@ -30,13 +30,17 @@
                         <input type="hidden"
                             name="exercises-{{ exercise_loop.index0 }}-details-{{ loop.index0 }}-csrf_token"
                             value="{{ form.csrf_token._value() }}" required>
-                        <button type="button" onclick="removeDetailRow(this)">&#10006;</button>
+                        <button type="button" style="color: black;" onclick="removeDetailRow(this)">
+                            <span class="material-symbols-outlined">delete</span>
+                        </button>
                     </div>
                     {% endfor %}
                 </div>
-                <button type="button",
+                <button type="button" style="color: black;",
                     onclick="addDetailRow(this.closest('.exercise-row').querySelector('.details-list'), {{ exercise_loop.index0 }}, true)">
-                    &#x2795;
+                    <span class="material-symbols-outlined">
+                        add
+                        </span> 
                 </button>
             </div>
             {% endfor %}
