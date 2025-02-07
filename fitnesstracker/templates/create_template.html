@@ -42,7 +42,7 @@
         <div class="article-metadata">
             <h2 class="mb-0"><a class="article-title" href="{{ url_for('workout_templates.template', template_id=template.id) }}">{{ template.name }}</a></h2>
         </div>
-        <ul class="exercise-list">
+        <ul class="exercise-list" style="padding: 0px">
             {% for exercise in template.exercises %}
             <li class="exercise-item" style="font-size: smaller;">{{ exercise.exercise }}</li>
             {% endfor %}

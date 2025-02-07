@@ -20,7 +20,6 @@ Deploy it easily using the included docker-compose.yml file.
 Pre-built Docker images are available:
 
 - Docker Hub: chavias/fitnesstracker
-    
 
 ## Getting Started
 <!-- To get started with the app, follow these steps: -->
@@ -32,7 +31,7 @@ Pre-built Docker images are available:
     cd workout-tracker
     ```
 
-1. Create a .env file
+2. Create a .env file
 
     Copy the example .env.example file to create your own .env file with the necessary configuration.
 
@@ -58,11 +57,12 @@ Pre-built Docker images are available:
     ```bash
     docker-compose up --build
     ```
+
     This will build the image (if necessary) and start the app. You can now access the app at http://localhost:5000.
     You can also connect it to a SQLlight database using the docker-compose.debug.yml
 
 5. Switching Between SQLlite and Mariadb mode
-    
+
     The app can be run in either debug (SQLlight) or production (mariadb) mode. To switch modes, open the run.py file and set the enviroment variable to debug or production.
 
     Example:
@@ -74,7 +74,6 @@ Pre-built Docker images are available:
 6. Access the App
 
 Once the app is running, you can access it at http://localhost:5000 and start tracking your workouts.
-
 
 ## License
 This project is licensed under the MIT License - see the LICENSE file for details.

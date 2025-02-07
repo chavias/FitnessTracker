@@ -113,6 +113,8 @@ def update_session(session_id):
             )
     else:
         print(f"Form validation failed: {form.errors}")
+        print(f"Form data: {form.data}")
+        
 
     return render_template(
         "update_session.html", form=form, templates=templates, legend="Update Session"
