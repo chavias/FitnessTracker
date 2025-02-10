@@ -5,15 +5,7 @@ You can create workout templates, log your exercises, and monitor your progress 
 weights and repetitions from your last session and features an autocomplete function to make logging exercises quicker and easier.
 Additionally, it provides graphical representations of your workout progress. The app connects to a database to store your workout data securely,
 ensuring that your progress is saved and accessible across sessions.
-Deploy it easily using the included docker-compose.yml file.
-
-## Features
-
-- Exercise Tracking: Log and track weights and repetitions for each exercise.
-- Autocomplete: Quickly select exercises with the autocomplete feature.
-- Persistency: The app remembers your last session's weights and repetitions.
-- Database Integration: Connects to a database to securely store and retrieve your workout data.
-- Progress Visualization: View your workout progress through intuitive graphics  
+Deploy it easily with SQLlight or Mariadb using the included docker-compose.yml file.
 
 ## Docker Images
 
@@ -58,8 +50,7 @@ Pre-built Docker images are available:
     docker-compose up --build
     ```
 
-    This will build the image (if necessary) and start the app. You can now access the app at http://localhost:5000.
-    You can also connect it to a SQLlight database using the docker-compose.debug.yml
+    This will build the image (if necessary) and start the app.
 
 5. Switching Between SQLlite and Mariadb mode
 
@@ -68,12 +59,12 @@ Pre-built Docker images are available:
     Example:
 
     ```python
-        app = create_app(enviroment='production')
+        app = create_app(enviroment='production') # use 'debug' for SQLlight
     ```
 
 6. Access the App
 
-Once the app is running, you can access it at http://localhost:5000 and start tracking your workouts.
+    Once the app is running, you can access it at http://localhost:5000 and start tracking your workouts.
 
 ## License
 This project is licensed under the MIT License - see the LICENSE file for details.
