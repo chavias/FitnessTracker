@@ -1,7 +1,7 @@
 from fitnesstracker import create_app, db
 from flask_migrate import Migrate
 
-app = create_app(enviroment='production')
+app = create_app(enviroment='debug')
 
 if __name__ == "__main__":
 

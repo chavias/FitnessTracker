@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, render_template, request
 from fitnesstracker import db
 from fitnesstracker.models import Template, TrainingSession
 import pandas as pd
+from datetime import datetime
 
 main = Blueprint('main',
                  __name__,
@@ -23,7 +24,7 @@ def homepage():
 def get_training_sessions():
     """Fetch all training sessions with date and template name"""
     sessions = (
-        db.session.query(TrainingSession.date, Template.name, Template.id)
+        db.session.query(TrainingSession.date, TrainingSession.id, Template.name, Template.id)
         .join(Template, Template.id == TrainingSession.template_id)
         .order_by(TrainingSession.date)
         .all()
@@ -32,7 +33,8 @@ def get_training_sessions():
     if not sessions:
         return jsonify({"error": "No training data found"}), 404
     
-    df = pd.DataFrame(sessions, columns=["Date", "Template", "Id"])
-    df["Date"] = df["Date"].astype(str)  # Ensure date is string format for JSON
+    df = pd.DataFrame(sessions, columns=["Date","SessionId" ,"Template", "Id"])
+    # df["Date"] = df["Date"].astype(str)  # Ensure date is string format for JSON
+    df["Date"] = df["Date"].apply(lambda x: x.isoformat() if isinstance(x, datetime) else str(x))
 
     return jsonify(df.to_dict(orient="records"))
