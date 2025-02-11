@@ -1,3 +1,5 @@
+// const SCRIPT_ROOT = {{ request.script_root|tojson }};
+
 async function updateCalendarHeatmap() {
 
     const response = await fetch(`/api/training_sessions`);
@@ -8,20 +10,28 @@ async function updateCalendarHeatmap() {
         templateMap.set(item.Id, item.Template);
     });
 
+    // Extract dates from rawData
+    const startDate = rawData.length
+        ? new Date(Math.max(...rawData.map(d => new Date(d.Date).getTime())))
+        : new Date();
+    console.log(startDate)
+
+    const calenderRange = 4;
+    startDate.setMonth(startDate.getMonth() - calenderRange + 1);
 
     const cal = new CalHeatmap();
     cal.paint({
         itemSelector: "#cal-heatmap",
         domain: { type: "month", label: { position: "top" } },
         subDomain: { type: "day", radius: 2 },
-        date: { start: new Date("2025-01-01") }, // Adjusted to a realistic start date
-        range: 4, // Show 12 months for a full year
+        date: { start:  startDate}, // Adjusted to a realistic start date
+        range: calenderRange, // Show 12 months for a full year
         scale: {
             color: {
                 type: "threshold", // Better for discrete values
                 domain: [1, 2, 3, 4, 5, 6], // List the numbers you want to assign colors to
                 range: ['#FF6347', '#4682B4', '#32CD32', '#FFD700', '#8A2BE2', '#FF4500'], // Assign random colors for each number
-                // scheme: "Blues"
+                // scheme: "Blues"CD
             }
         },
         data: {
@@ -34,14 +44,16 @@ async function updateCalendarHeatmap() {
     },
         [
             [
-                Tooltip,
-                {
+                Tooltip, {
                     text: function (date, value, dayjsDate) {
+                        // You can now use SCRIPT_ROOT in your URL generation
+                        // const sessionId = item.SessionId;
+                        const url = `${SCRIPT_ROOT}/session/${sessionMap.get(date)}`;
                         return (
-                            `<a href="{{ url_for('workout_sessions.create_session') }}" target="_blank">${value ? templateMap.get(value) : 'No Training'}</a> on ${dayjsDate.format('LL')}`
+                            `<a href="${url}" target="_blank">${value ? templateMap.get(value) : 'No Training'}</a> on ${dayjsDate.format('LL')}`
                         );
                     },
-                }
+                },
             ],
             // [
             //     Legend,

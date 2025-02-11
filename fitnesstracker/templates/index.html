@@ -63,6 +63,6 @@
   ...
 {% endif %}
 {% endfor %}
-
+<script>const SCRIPT_ROOT = {{ request.script_root|tojson }}</script>
 <script src="{{ url_for(request.blueprint+'.static', filename='index.js') }}"></script>
 {% endblock content %}
