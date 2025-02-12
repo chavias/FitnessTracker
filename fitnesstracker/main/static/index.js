@@ -48,7 +48,7 @@ async function updateCalendarHeatmap() {
                     text: function (date, value, dayjsDate) {
                         // You can now use SCRIPT_ROOT in your URL generation
                         // const sessionId = item.SessionId;
-                        const url = `${SCRIPT_ROOT}/session/${sessionMap.get(date)}`;
+                        const url = `${SCRIPT_ROOT}}`;
                         return (
                             `<a href="${url}" target="_blank">${value ? templateMap.get(value) : 'No Training'}</a> on ${dayjsDate.format('LL')}`
                         );
