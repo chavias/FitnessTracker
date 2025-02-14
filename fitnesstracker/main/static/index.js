@@ -14,16 +14,26 @@ async function updateCalendarHeatmap() {
     const startDate = rawData.length
         ? new Date(Math.max(...rawData.map(d => new Date(d.Date).getTime())))
         : new Date();
-    console.log(startDate)
+    startDate.setUTCHours(0, 0, 0, 0);
+
 
     const calenderRange = 4;
-    startDate.setMonth(startDate.getMonth() - calenderRange + 1);
+    startDate.setUTCMonth(startDate.getUTCMonth() + 1 - calenderRange);
+
+    const updatedData = rawData.map(item => {
+        const newDate = new Date(item.Date); 
+        newDate.setDate(newDate.getDate() + 1); 
+        return {
+            ...item,
+            Date: newDate
+        };
+    });
 
     const cal = new CalHeatmap();
     cal.paint({
         itemSelector: "#cal-heatmap",
         domain: { type: "month", label: { position: "top" } },
-        subDomain: { type: "day", radius: 2 },
+        subDomain: { type: "day", radius: 1 },
         date: { start:  startDate}, // Adjusted to a realistic start date
         range: calenderRange, // Show 12 months for a full year
         scale: {
@@ -35,7 +45,7 @@ async function updateCalendarHeatmap() {
             }
         },
         data: {
-            source: rawData,
+            source: updatedData,
             type: "json",
             x: "Date",
             y: "Id",
