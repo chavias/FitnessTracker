@@ -1,4 +1,4 @@
-# Fitness Tracker App
+# Fitness Tracker
 
 This application is designed to help you track your workouts efficiently.
 You can create workout templates, log your exercises, and monitor your progress over time. The app remembers the
