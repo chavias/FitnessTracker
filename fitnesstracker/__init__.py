@@ -43,13 +43,16 @@ def create_app(enviroment='development'):
     def make_session_permanent():
         session.permanent = True
 
+    from fitnesstracker.main.routes import main
+    from fitnesstracker.users.routes import users
     from fitnesstracker.workout_templates.routes import workout_templates
     from fitnesstracker.workout_sessions.routes import workout_sessions
-    from fitnesstracker.main.routes import main
     from fitnesstracker.workout_statistics.routes import workout_statistics
-    app.register_blueprint(workout_sessions)
-    app.register_blueprint(workout_templates)
-    app.register_blueprint(workout_statistics)
+    
     app.register_blueprint(main)
+    app.register_blueprint(users)
+    app.register_blueprint(workout_templates)
+    app.register_blueprint(workout_sessions)
+    app.register_blueprint(workout_statistics)
 
     return app
