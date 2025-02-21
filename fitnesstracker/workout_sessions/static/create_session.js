@@ -244,3 +244,26 @@ function loadTemplate(templateId) {
             .catch(error => console.error('Error fetching template:', error));
     }
 }
+
+
+function validateForm(event) {
+    const templateSelect = document.getElementById('template');
+    const warningDiv = document.getElementById('template-warning');
+    
+    if (!templateSelect.value) {
+        event.preventDefault(); // Prevent form submission
+        warningDiv.style.display = 'block';
+        
+        // Scroll to warning
+        warningDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        
+        // Hide warning after 5 seconds
+        setTimeout(() => {
+            warningDiv.style.display = 'none';
+        }, 5000);
+        
+        return false;
+    }
+    
+    return true;
+}
