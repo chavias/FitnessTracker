@@ -2,10 +2,12 @@ from flask import Flask, session
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
 from fitnesstracker.config import DevelopmentConfig, ProductionConfig, TestingConfig
+from flask_migrate import Migrate
 
 load_dotenv()
 
 db = SQLAlchemy()
+migrate = Migrate()
 
 def create_app(enviroment='development'):
 
@@ -18,7 +20,9 @@ def create_app(enviroment='development'):
     else:
         app.config.from_object(DevelopmentConfig)
 
+    # Initialize extensions
     db.init_app(app)
+    migrate.init_app(app, db)
 
     @app.before_request
     def make_session_permanent():
