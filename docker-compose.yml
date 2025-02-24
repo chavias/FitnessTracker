@@ -3,6 +3,7 @@ services:
     container_name: fitnesstracker
     image: chavias/fitnesstracker:latest
     restart: unless-stopped
+    env_file: .env
     build:
       context: .
       dockerfile: ./Dockerfile
@@ -13,26 +14,35 @@ services:
       # - EMAIL_PASS=${EMAIL_PASS}
       # - TLS=${TLS}
       # - SSL=${SSL}
-      # - SECRET_KEY=${SECRET_KEY}
+      - SECRET_KEY=${SECRET_KEY}
       - SQLALCHEMY_DATABASE_URI=${SQLALCHEMY_DATABASE_URI}
       # - PERMANENT_SESSION_LIFETIME=${PERMANENT_SESSION_LIFETIME}
       # - WTF_CSRF_TIME_LIMIT=28800
       # - MAIL_SERVER=${MAIL_SERVER}
+    depends_on:
+      mariadb:
+        condition: service_healthy
   
   mariadb:
     image: mariadb:latest
     container_name: mariadb_fitness
     restart: unless-stopped
+    env_file: .env
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_DATABASE=${MYSQL_DATABASE}
       - MYSQL_USER=${MYSQL_USER}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
     volumes:
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      # - ./init.sql:/docker-entrypoint-initdb.d/init.sql
       - mariadb_data:/var/lib/mysql
     ports:
       - "3306:3306"
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
   mariadb_data:
