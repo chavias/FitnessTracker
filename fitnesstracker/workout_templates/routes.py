@@ -61,32 +61,42 @@ def template(template_id):
 
 
 @workout_templates.route("/template/<int:template_id>/update", methods=["GET", "POST"])
+@workout_templates.route("/template/<int:template_id>/update", methods=["GET", "POST"])
 def update_template(template_id):
     template = Template.query.get_or_404(template_id)
+
     form = TemplateForm()
-
+    
     if form.validate_on_submit():
-        template.exercises = [] 
-        # Create new Exercise instances based on form data
+        template.name = form.template_name.data
+        
+        # Clear existing exercises to avoid duplicates
+        template.exercises = []
+        
+        # Add exercises from the form
         for exercise_form in form.exercises:
-            exercise = TemplateExercise(exercise=exercise_form.exercise_name.data)
+            exercise = TemplateExercise(
+                exercise=exercise_form.exercise_name.data,
+                template_id=template.id
+            )
             template.exercises.append(exercise)
-
+            
         db.session.commit()
         flash("Your template has been updated!", "success")
         return redirect(url_for("workout_templates.template", template_id=template.id))
-
+    
     elif request.method == "GET":
-        # Pre-fill the form with existing exercise data
         form.template_name.data = template.name
-        if template.exercises:
-            form.exercises[0].exercise_name.data = template.exercises[
-                0
-            ].exercise
-        for exercise in template.exercises[1:]:
+        
+        # Clear any default entries
+        while len(form.exercises) > 0:
+            form.exercises.pop_entry()
+            
+        # Add existing exercises
+        for exercise in template.exercises:
             form.exercises.append_entry({"exercise_name": exercise.exercise})
-
-    return render_template("create_template.html", form=form, legend="Update template")
+    
+    return render_template("create_template.html", form=form, legend="Update Template")
 
 
 @workout_templates.route("/template/<int:template_id>/delete", methods=["POST"])
