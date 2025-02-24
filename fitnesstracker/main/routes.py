@@ -1,5 +1,6 @@
-from flask import Blueprint, jsonify, render_template, request
+from flask import Blueprint, jsonify, render_template, request, redirect, url_for
 from fitnesstracker import db
+from flask_login import login_required, current_user
 from fitnesstracker.models import Template, TrainingSession
 import pandas as pd
 from datetime import datetime
@@ -12,15 +13,18 @@ main = Blueprint('main',
                  static_url_path='/main/static', )
 
 
+@login_required
 @main.route("/home", methods=['GET'])
 @main.route("/index", methods=['GET'])
 @main.route("/", methods=['GET'])
 def homepage():
+    if not current_user.is_authenticated:
+        return redirect(url_for('users.login'))
     page = request.args.get('page', 1, type=int)
     sessions = TrainingSession.query.order_by(TrainingSession.date.desc()).paginate(page=page, per_page=5)
     return render_template("index.html", sessions=sessions)
 
-
+@login_required
 @main.route('/api/training_sessions', methods=['GET'])
 def get_training_sessions():
     """Fetch all training sessions with date and template name"""
