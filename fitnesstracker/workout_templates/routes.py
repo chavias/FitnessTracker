@@ -12,8 +12,8 @@ workout_templates = Blueprint('workout_templates',
                               template_folder='../templates')
 
 
-@login_required
 @workout_templates.route("/create_template", methods=["GET", "POST"])
+@login_required
 def create_template():
     form = TemplateForm()
 
@@ -58,12 +58,14 @@ def create_template():
 
 
 @workout_templates.route("/template/<int:template_id>")
+@login_required
 def template(template_id):
     template = Template.query.get_or_404(template_id)
     return render_template("template.html", template=template)
 
 
 @workout_templates.route("/template/<int:template_id>/update", methods=["GET", "POST"])
+@login_required
 def update_template(template_id):
     template = Template.query.get_or_404(template_id)
     form = TemplateForm()
@@ -93,6 +95,7 @@ def update_template(template_id):
 
 
 @workout_templates.route("/template/<int:template_id>/delete", methods=["POST"])
+@login_required
 def delete_template(template_id):
     template = Template.query.get_or_404(template_id)
     db.session.delete(template)
@@ -102,6 +105,7 @@ def delete_template(template_id):
 
 
 @workout_templates.route("/get_template/<int:template_id>", methods=["GET"])
+@login_required
 def get_template(template_id):
     # Fetch the template with the provided ID
     template = Template.query.get_or_404(template_id)

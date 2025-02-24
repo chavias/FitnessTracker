@@ -13,7 +13,6 @@ main = Blueprint('main',
                  static_url_path='/main/static', )
 
 
-@login_required
 @main.route("/home", methods=['GET'])
 @main.route("/index", methods=['GET'])
 @main.route("/", methods=['GET'])
@@ -24,8 +23,8 @@ def homepage():
     sessions = TrainingSession.query.order_by(TrainingSession.date.desc()).paginate(page=page, per_page=5)
     return render_template("index.html", sessions=sessions)
 
-@login_required
 @main.route('/api/training_sessions', methods=['GET'])
+@login_required
 def get_training_sessions():
     """Fetch all training sessions with date and template name"""
     sessions = (

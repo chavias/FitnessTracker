@@ -1,4 +1,5 @@
 from flask import render_template, redirect, jsonify, flash, url_for, Blueprint
+from flask_login import current_user, login_required
 from fitnesstracker import db
 from fitnesstracker.models import Exercise, ExerciseDetails, Template, TrainingSession
 from fitnesstracker.workout_sessions.forms import SessionForm
@@ -13,15 +14,15 @@ workout_sessions = Blueprint(
     template_folder="../templates",
 )
 
-
 @workout_sessions.route("/create_session", methods=["GET", "POST"])
+@login_required
 def create_session():
     form = SessionForm()
     form.template_id.choices = [(t.id, t.name) for t in Template.query.all()]
 
     if form.validate_on_submit():
         create_session = TrainingSession(
-            template_id=form.template_id.data, date=form.date.data
+            template_id=form.template_id.data, date=form.date.data, user_id=current_user.id
         )
         db.session.add(create_session)
 
@@ -54,12 +55,14 @@ def create_session():
 
 
 @workout_sessions.route("/session/<int:session_id>", methods=["GET", "POST"])
+@login_required
 def session(session_id):
     session = TrainingSession.query.get_or_404(session_id)
     return render_template("session.html", session=session)
 
 
 @workout_sessions.route("/session/<int:session_id>/update", methods=["GET", "POST"])
+@login_required
 def update_session(session_id):
     session = TrainingSession.query.get_or_404(session_id)
     form = SessionForm(obj=session)
@@ -74,7 +77,7 @@ def update_session(session_id):
 
             # Create a new session
             create_session = TrainingSession(
-                template_id=form.template_id.data, date=form.date.data
+                template_id=form.template_id.data, date=form.date.data, user_id=current_user.id
             )
             db.session.add(create_session)
 
@@ -113,6 +116,7 @@ def update_session(session_id):
 
 
 @workout_sessions.route("/session/<int:session_id>/delete", methods=["POST"])
+@login_required
 def delete_session(session_id):
     user_session = TrainingSession.query.get_or_404(session_id)
     db.session.delete(user_session)
@@ -122,6 +126,7 @@ def delete_session(session_id):
 
 
 @workout_sessions.route("/get_last_session/<exerciseName>", methods=["GET"])
+@login_required
 def get_last_session(exerciseName):
     last_session = (
         Exercise.query.filter_by(exercise_name=exerciseName)
