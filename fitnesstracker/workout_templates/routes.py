@@ -1,4 +1,5 @@
 from flask import Blueprint, flash, jsonify, redirect, render_template, request, url_for
+from flask_login import current_user, login_required
 from fitnesstracker import db
 from fitnesstracker.models import Exercise, ExerciseDetails, Template, TemplateExercise, TrainingSession
 from fitnesstracker.workout_templates.forms import TemplateForm
@@ -11,6 +12,7 @@ workout_templates = Blueprint('workout_templates',
                               template_folder='../templates')
 
 
+@login_required
 @workout_templates.route("/create_template", methods=["GET", "POST"])
 def create_template():
     form = TemplateForm()
@@ -22,7 +24,8 @@ def create_template():
             exercises = [exercise.exercise_name.data for exercise in form.exercises]
 
             # Create a new Template object
-            new_template = Template(name=template_name)
+            print(f"{current_user.id = }")
+            new_template = Template(name=template_name, user_id=current_user.id)
 
             # Add exercises to the template
             new_template.exercises = [
