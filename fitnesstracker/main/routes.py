@@ -4,6 +4,7 @@ from fitnesstracker.models import Template, TrainingSession
 import pandas as pd
 from datetime import datetime
 
+
 main = Blueprint('main',
                  __name__,
                  template_folder='../template',
