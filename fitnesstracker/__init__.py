@@ -30,6 +30,9 @@ def create_app(enviroment='development'):
         app.config.from_object(TestingConfig)
     else:
         app.config.from_object(DevelopmentConfig)
+    
+    # with app.app_context():
+    #     db.create_all()
 
     # Initialize extensions
     db.init_app(app)

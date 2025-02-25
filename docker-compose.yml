@@ -9,16 +9,16 @@ services:
     ports:
       - "5000:5000"
     environment:
-      # - EMAIL_USER=${EMAIL_USER}
-      # - EMAIL_PASS=${EMAIL_PASS}
-      # - TLS=${TLS}
-      # - SSL=${SSL}
-      # - SECRET_KEY=${SECRET_KEY}
+      - EMAIL_USER=${EMAIL_USER}
+      - EMAIL_PASS=${EMAIL_PASS}
+      - TLS=${TLS}
+      - SSL=${SSL}
+      - SECRET_KEY=${SECRET_KEY}
       - SQLALCHEMY_DATABASE_URI=${SQLALCHEMY_DATABASE_URI}
-      # - PERMANENT_SESSION_LIFETIME=${PERMANENT_SESSION_LIFETIME}
-      # - WTF_CSRF_TIME_LIMIT=28800
-      # - MAIL_SERVER=${MAIL_SERVER}
-  
+      - MAIL_SERVER=${MAIL_SERVER}
+    depends_on:
+      - mariadb
+
   mariadb:
     image: mariadb:latest
     container_name: mariadb_fitness
@@ -29,7 +29,6 @@ services:
       - MYSQL_USER=${MYSQL_USER}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
     volumes:
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
       - mariadb_data:/var/lib/mysql
     ports:
       - "3306:3306"
