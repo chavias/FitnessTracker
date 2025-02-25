@@ -121,7 +121,7 @@ def update_session(session_id):
 @login_required
 def delete_session(session_id):
     user_session = TrainingSession.query.get_or_404(session_id)
-        # Make sure the template belongs to the current user
+    # Make sure the template belongs to the current user
     if user_session.user_id != current_user.id:
         abort(403)
     db.session.delete(user_session)
@@ -133,11 +133,17 @@ def delete_session(session_id):
 @workout_sessions.route("/get_last_session/<exerciseName>", methods=["GET"])
 @login_required
 def get_last_session(exerciseName):
+    # Query for exercises that belong to the current user's training sessions
     last_session = (
-        Exercise.query.filter_by(exercise_name=exerciseName)
+        Exercise.query.join(TrainingSession)
+        .filter(
+            Exercise.exercise_name == exerciseName,
+            TrainingSession.user_id == current_user.id
+        )
         .order_by(Exercise.id.desc())
         .first()
     )
+    
     if last_session:
         response = {
             "details": [
@@ -147,4 +153,5 @@ def get_last_session(exerciseName):
         }
     else:
         response = {"details": []}
+    
     return jsonify(response)
