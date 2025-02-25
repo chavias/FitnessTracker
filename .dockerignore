@@ -1,5 +1,12 @@
 !.migrations
 
+
+# migrations/versions/da3a7ddf960c_add_user_support.py
+instance/
+Readme.md
+.env.example
+images/
+
 # git
 **/.git
 **/.gitignore
