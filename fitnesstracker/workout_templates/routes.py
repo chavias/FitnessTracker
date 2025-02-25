@@ -54,12 +54,6 @@ def template(template_id):
     return render_template("template.html", template=template)
 
 @workout_templates.route("/template/<int:template_id>/update", methods=["GET", "POST"])
-<<<<<<< HEAD
-@workout_templates.route("/template/<int:template_id>/update", methods=["GET", "POST"])
-def update_template(template_id):
-    template = Template.query.get_or_404(template_id)
-
-=======
 @login_required
 def update_template(template_id):
     template = Template.query.get_or_404(template_id)
@@ -68,7 +62,6 @@ def update_template(template_id):
     if template.user_id != current_user.id:
         abort(403)
         
->>>>>>> login
     form = TemplateForm()
     
     if form.validate_on_submit():
@@ -101,10 +94,6 @@ def update_template(template_id):
             form.exercises.append_entry({"exercise_name": exercise.exercise})
     
     return render_template("create_template.html", form=form, legend="Update Template")
-<<<<<<< HEAD
-=======
-
->>>>>>> login
 
 
 @workout_templates.route("/template/<int:template_id>/delete", methods=["POST"])
