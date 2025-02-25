@@ -19,9 +19,11 @@ class ExerciseDetailForm(FlaskForm):
     repetitions = IntegerField("Repetitions", validators=[InputRequired()])
     weight = FloatField("Weight", validators=[InputRequired()])
 
+
 class ExerciseForm(FlaskForm):
     exercise_name = StringField("Exercise Name", validators=[DataRequired()])
     details = FieldList(FormField(ExerciseDetailForm), min_entries=0)
+
 
 class SessionForm(FlaskForm):
     template_id = SelectField("Template", coerce=int)
