@@ -1,4 +1,4 @@
-from flask import render_template, redirect, jsonify, flash, url_for, Blueprint
+from flask import render_template, redirect, jsonify, flash, url_for, Blueprint, abort
 from flask_login import current_user, login_required
 from fitnesstracker import db
 from fitnesstracker.models import Exercise, ExerciseDetails, Template, TrainingSession
@@ -65,6 +65,8 @@ def session(session_id):
 @login_required
 def update_session(session_id):
     session = TrainingSession.query.get_or_404(session_id)
+    if session.user_id != current_user.id:
+        abort(403)
     form = SessionForm(obj=session)
     templates = [(t.id, t.name) for t in Template.query.all()]
     form.template_id.choices = [(t.id, t.name) for t in Template.query.all()]
@@ -119,6 +121,9 @@ def update_session(session_id):
 @login_required
 def delete_session(session_id):
     user_session = TrainingSession.query.get_or_404(session_id)
+        # Make sure the template belongs to the current user
+    if user_session.user_id != current_user.id:
+        abort(403)
     db.session.delete(user_session)
     db.session.commit()
     flash("Your session has been deleted!", "success")
