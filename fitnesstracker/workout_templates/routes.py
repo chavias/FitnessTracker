@@ -1,4 +1,5 @@
-from flask import Blueprint, flash, jsonify, redirect, render_template, request, url_for
+from flask import Blueprint, flash, jsonify, redirect, render_template, request, url_for, abort
+from flask_login import current_user, login_required
 from fitnesstracker import db
 from fitnesstracker.models import Exercise, ExerciseDetails, Template, TemplateExercise, TrainingSession
 from fitnesstracker.workout_templates.forms import TemplateForm
@@ -12,41 +13,33 @@ workout_templates = Blueprint('workout_templates',
 
 
 @workout_templates.route("/create_template", methods=["GET", "POST"])
+@login_required
 def create_template():
     form = TemplateForm()
 
     if form.validate_on_submit():
-        if form.submit.data:  # Create Template logic
-            # Fetch form data
+        if form.submit.data: 
+
             template_name = form.template_name.data
             exercises = [exercise.exercise_name.data for exercise in form.exercises]
+            new_template = Template(name=template_name, user_id=current_user.id)
 
-            # Create a new Template object
-            new_template = Template(name=template_name)
-
-            # Add exercises to the template
             new_template.exercises = [
                 TemplateExercise(exercise=exercise) for exercise in exercises
             ]
 
-            # Save the template and associated exercises
             db.session.add(new_template)
             db.session.commit()
 
             flash("Template added successfully!", "success")
 
-            # Debugging: Print saved template and exercises
             print(f"New Template Added: {new_template.id} - {new_template.name}")
             for exercise in new_template.exercises:
                 print(f"Exercise: {exercise.exercise}")
 
-            # Redirect to the same page to avoid duplicate form submissions
             return redirect("/create_template")
 
-    # Fetch all templates with their associated exercises
     templates = Template.query.all()
-
-    # Create a dictionary for rendering template data
     template_data = {t.id: [e.exercise for e in t.exercises] for t in templates}
 
     return render_template(
@@ -55,16 +48,20 @@ def create_template():
 
 
 @workout_templates.route("/template/<int:template_id>")
+@login_required
 def template(template_id):
     template = Template.query.get_or_404(template_id)
     return render_template("template.html", template=template)
 
-
 @workout_templates.route("/template/<int:template_id>/update", methods=["GET", "POST"])
-@workout_templates.route("/template/<int:template_id>/update", methods=["GET", "POST"])
+@login_required
 def update_template(template_id):
     template = Template.query.get_or_404(template_id)
-
+    
+    # Make sure the template belongs to the current user
+    if template.user_id != current_user.id:
+        abort(403)
+        
     form = TemplateForm()
     
     if form.validate_on_submit():
@@ -100,6 +97,7 @@ def update_template(template_id):
 
 
 @workout_templates.route("/template/<int:template_id>/delete", methods=["POST"])
+@login_required
 def delete_template(template_id):
     template = Template.query.get_or_404(template_id)
     db.session.delete(template)
@@ -109,6 +107,7 @@ def delete_template(template_id):
 
 
 @workout_templates.route("/get_template/<int:template_id>", methods=["GET"])
+@login_required
 def get_template(template_id):
     # Fetch the template with the provided ID
     template = Template.query.get_or_404(template_id)

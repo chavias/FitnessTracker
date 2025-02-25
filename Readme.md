@@ -7,7 +7,7 @@ Additionally, it provides graphical representations of your workout progress. Th
 ensuring that your progress is saved and accessible across sessions.
 Deploy it easily with SQLlight or Mariadb using the included docker-compose.yml file.
 
-<img src="./app_graphic.png" alt="isolated"/>
+<img src="./images/app_graphic.png" alt="isolated"/>
 
 
 ## Docker Images

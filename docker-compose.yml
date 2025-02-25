@@ -1,28 +1,25 @@
 services:
   flask:
     container_name: fitnesstracker
-    image: chavias/fitnesstracker:latest
+    image: chavias/fitnesstracker:multi
     restart: unless-stopped
-    env_file: .env
-    build:
-      context: .
-      dockerfile: ./Dockerfile
+    # build:
+    #   context: .
+    #   dockerfile: ./Dockerfile
     ports:
       - "5000:5000"
     environment:
-      # - EMAIL_USER=${EMAIL_USER}
-      # - EMAIL_PASS=${EMAIL_PASS}
-      # - TLS=${TLS}
-      # - SSL=${SSL}
+      - EMAIL_USER=${EMAIL_USER}
+      - EMAIL_PASS=${EMAIL_PASS}
+      - TLS=${TLS}
+      - SSL=${SSL}
       - SECRET_KEY=${SECRET_KEY}
       - SQLALCHEMY_DATABASE_URI=${SQLALCHEMY_DATABASE_URI}
-      # - PERMANENT_SESSION_LIFETIME=${PERMANENT_SESSION_LIFETIME}
-      # - WTF_CSRF_TIME_LIMIT=28800
-      # - MAIL_SERVER=${MAIL_SERVER}
+      - MAIL_SERVER=${MAIL_SERVER}
     depends_on:
-      mariadb:
-        condition: service_healthy
-  
+      - mariadb
+      - redis
+
   mariadb:
     image: mariadb:latest
     container_name: mariadb_fitness
@@ -34,15 +31,16 @@ services:
       - MYSQL_USER=${MYSQL_USER}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
     volumes:
-      # - ./init.sql:/docker-entrypoint-initdb.d/init.sql
       - mariadb_data:/var/lib/mysql
-    ports:
-      - "3306:3306"
-    healthcheck:
-      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+    # ports:
+    #   - "3306:3306"
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:alpine
+    container_name: redis_fitness
+    restart: unless-stopped
 
 volumes:
   mariadb_data:
