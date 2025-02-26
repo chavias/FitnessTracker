@@ -20,4 +20,4 @@ license-files = ["LICEN[CS]E*"]
 
 [project.urls]
 Homepage = "https://github.com/chavias/FitnessTracker"
-Issues = "https://github.com/pypa/sampleproject/issues"
+Issues = "https://github.com/chavias/FitnessTracker/issues"
