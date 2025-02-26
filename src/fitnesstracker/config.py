@@ -29,6 +29,8 @@ class ProductionConfig(Config):
 
 class TestingConfig(Config):
     # SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI', 'sqlite:///fitness.db')
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///fitness.db'
+    # SQLALCHEMY_DATABASE_URI = 'sqlite:///testing.db'
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
     PERMANENT_SESSION_LIFETIME = timedelta(hours=12)
+    WTF_CSRF_ENABLED = False
     TESTING = True

@@ -31,9 +31,6 @@ def create_app(environment='development'):
     else:
         app.config.from_object(DevelopmentConfig)
     
-    # with app.app_context():
-    #     db.create_all()
-
     # Initialize extensions
     db.init_app(app)
     migrate.init_app(app, db)
@@ -41,6 +38,9 @@ def create_app(environment='development'):
     login_manager.init_app(app)
     mail.init_app(app)
 
+    with app.app_context():
+        db.create_all()
+    
 
     @app.before_request
     def make_session_permanent():

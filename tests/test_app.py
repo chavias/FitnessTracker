@@ -1,13 +1,13 @@
 import pytest
 from datetime import datetime, timedelta
-from src.fitnesstracker import create_app, db
+from src.fitnesstracker import create_app, db, bcrypt
 from src.fitnesstracker.models import User, Template, TemplateExercise, TrainingSession, Exercise, ExerciseDetails
 
 @pytest.fixture
 def app():
     app = create_app(environment='testing')
     with app.app_context():
-        db.create_all()
+        db.create_all()  # This is where the database is created
         yield app
         db.drop_all()
 
@@ -19,7 +19,7 @@ def client(app):
 def authenticated_user(app, client):
     with app.app_context():
         # Create a test user
-        user = User(username='testuser', email='testuser@example.com', password='password123')
+        user = User(username='testuser', email='testuser@example.com', password=bcrypt.generate_password_hash('password123'))
         db.session.add(user)
         db.session.commit()
         
@@ -72,31 +72,26 @@ def test_register_page(client):
     assert b'Register' in response.data
 
 def test_successful_registration(client, app):
-    # First, get the registration page to extract CSRF token if needed
-    reg_page = client.get('/register')
-    
-    # Create registration data
-    reg_data = {
+    response = client.get('/register')
+    response = client.post('/register', data={
         'username': 'newuser',
         'email': 'newuser@example.com',
         'password': 'password123',
-        'confirm_password': 'password123'
-    }
-    
-    # Submit the registration form
-    response = client.post('/register', data=reg_data, follow_redirects=True)
-    
-    # Print response for debugging
-    print(f"Response status: {response.status_code}")
-    print(f"Response data: {response.data.decode()}")
-    
-    # Check response
-    assert response.status_code == 200
+        'confirm_password': 'password123',
 
-    # Verify user was created
+    }, follow_redirects=True)
+    
+    assert response.status_code == 200
     with app.app_context():
         user = User.query.filter_by(email='newuser@example.com').first()
-        if user is None:
-            print("User not found in database")
         assert user is not None
-        assert user.username == 'newuser'
+
+def test_profile_page(client, authenticated_user):
+    response = client.get('/account')
+    assert response.status_code == 200
+    assert authenticated_user.username.encode() in response.data
+
+def test_logout(client, authenticated_user):
+    response = client.get('/logout', follow_redirects=True)
+    assert response.status_code == 200
+    assert b'Login' in response.data
