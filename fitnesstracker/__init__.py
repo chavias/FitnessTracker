@@ -39,12 +39,13 @@ def create_app(enviroment='development'):
     login_manager.init_app(app)
     mail.init_app(app)
 
-    with app.app_context():
-        db.create_all()
-
     @app.before_request
     def make_session_permanent():
         session.permanent = True
+        
+    @app.before_request
+    def create_database():
+        db.create_all()
 
     from fitnesstracker.main.routes import main
     from fitnesstracker.users.routes import users
