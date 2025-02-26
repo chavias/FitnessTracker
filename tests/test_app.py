@@ -54,7 +54,13 @@ def workout_template(app, authenticated_user):
         db.session.add_all(exercises)
         db.session.commit()
         
-        return template
+        yield template
+        
+        # Clean up
+        db.session.delete(template)
+        # Also delete related exercises
+        TemplateExercise.query.filter_by(template_id=template.id).delete()
+        db.session.commit()
 
 def test_home_redirect_when_not_logged_in(client):
     response = client.get('/')
@@ -106,9 +112,10 @@ def test_create_workout_template(client, authenticated_user):
     assert b'New Exercise' in response.data
 
 
-# def test_start_training_session(client, authenticated_user, workout_template):
-#     response = client.post('/create_session', data={
-#         'template_id': workout_template.id
-#     }, follow_redirects=True)
-#     assert response.status_code == 200
-#     assert b'Training Session' in response.data
+def test_start_training_session(client, authenticated_user, workout_template):
+    response = client.post('/create_session', data={
+        'template_id': workout_template.id,
+    }, follow_redirects=True)
+    assert response.status_code == 200
+    print(f"{response.data}")
+    assert b'Test Workout' in response.data
