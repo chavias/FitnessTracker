@@ -20,13 +20,13 @@ login_manager.login_message_category = 'info'
 mail = Mail()
 
 
-def create_app(enviroment='development'):
+def create_app(environment='development'):
 
     app = Flask(__name__)
     
-    if enviroment == 'production':
+    if environment == 'production':
         app.config.from_object(ProductionConfig)
-    elif enviroment == 'testing':
+    elif environment == 'testing':
         app.config.from_object(TestingConfig)
     else:
         app.config.from_object(DevelopmentConfig)
