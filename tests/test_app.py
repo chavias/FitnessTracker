@@ -95,3 +95,20 @@ def test_logout(client, authenticated_user):
     response = client.get('/logout', follow_redirects=True)
     assert response.status_code == 200
     assert b'Login' in response.data
+
+def test_create_workout_template(client, authenticated_user):
+    response = client.post('/create_template', data={
+        'template_name': 'New Template',
+        'exercises-0-exercise_name' : 'New Exercise'
+    }, follow_redirects=True)
+    assert response.status_code == 200
+    assert b'New Template' in response.data
+    assert b'New Exercise' in response.data
+
+
+# def test_start_training_session(client, authenticated_user, workout_template):
+#     response = client.post('/create_session', data={
+#         'template_id': workout_template.id
+#     }, follow_redirects=True)
+#     assert response.status_code == 200
+#     assert b'Training Session' in response.data
