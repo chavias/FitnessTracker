@@ -1,12 +1,13 @@
 from src.fitnesstracker import db, login_manager
 from itsdangerous.url_safe import URLSafeTimedSerializer as Serializer
-from flask import current_app
+from flask import current_app, session
 from datetime import datetime
 from flask_login import UserMixin
 
 @login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
+def get_user(user_id: int):
+    return db.session.get(User, int(user_id))
+
 
 class User(db.Model, UserMixin):
     __tablename__ = "users"
