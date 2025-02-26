@@ -1,8 +1,8 @@
 from flask import render_template, redirect, jsonify, flash, url_for, Blueprint, abort
 from flask_login import current_user, login_required
-from fitnesstracker import db
-from fitnesstracker.models import Exercise, ExerciseDetails, Template, TrainingSession
-from fitnesstracker.workout_sessions.forms import SessionForm
+from src.fitnesstracker import db
+from src.fitnesstracker.models import Exercise, ExerciseDetails, Template, TrainingSession
+from src.fitnesstracker.workout_sessions.forms import SessionForm
 from flask_wtf.csrf import generate_csrf
 
 

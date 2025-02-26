@@ -1,9 +1,9 @@
-from fitnesstracker import create_app
+from src.fitnesstracker import create_app
 
 from flask import session
 from datetime import datetime
 
-app = create_app(enviroment='production')
+app = create_app(enviroment='debug')
 
 if __name__ == "__main__":
 

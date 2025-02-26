@@ -8,7 +8,7 @@ from wtforms import (
 from wtforms.validators import (
     DataRequired,
 )
-from fitnesstracker.workout_sessions.forms import ExerciseForm
+from src.fitnesstracker.workout_sessions.forms import ExerciseForm
 
 
 class TemplateForm(FlaskForm):

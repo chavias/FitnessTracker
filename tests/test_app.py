@@ -1,5 +1,5 @@
 import pytest
-from fitnesstracker import create_app, db
+from src.fitnesstracker import create_app, db
 
 @pytest.fixture
 def app():

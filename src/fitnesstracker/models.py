@@ -1,4 +1,4 @@
-from fitnesstracker import db, login_manager
+from src.fitnesstracker import db, login_manager
 from itsdangerous.url_safe import URLSafeTimedSerializer as Serializer
 from flask import current_app
 from datetime import datetime

@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from fitnesstracker.models import User
+from src.fitnesstracker.models import User
 from flask_login import current_user
 from flask_wtf.file import FileField, FileAllowed
 from wtforms import (

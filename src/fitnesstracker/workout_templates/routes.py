@@ -1,8 +1,8 @@
 from flask import Blueprint, flash, jsonify, redirect, render_template, request, url_for, abort
 from flask_login import current_user, login_required
-from fitnesstracker import db
-from fitnesstracker.models import Exercise, ExerciseDetails, Template, TemplateExercise, TrainingSession
-from fitnesstracker.workout_templates.forms import TemplateForm
+from src.fitnesstracker import db
+from src.fitnesstracker.models import Exercise, ExerciseDetails, Template, TemplateExercise, TrainingSession
+from src.fitnesstracker.workout_templates.forms import TemplateForm
 
 
 workout_templates = Blueprint('workout_templates',
