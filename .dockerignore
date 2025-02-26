@@ -2,6 +2,7 @@
 
 
 # migrations/versions/da3a7ddf960c_add_user_support.py
+tests/
 instance/
 Readme.md
 .env.example

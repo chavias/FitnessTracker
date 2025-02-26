@@ -20,18 +20,17 @@ login_manager.login_message_category = 'info'
 mail = Mail()
 
 
-def create_app(enviroment='development'):
+def create_app(environment='development'):
 
     app = Flask(__name__)
     
-    if enviroment == 'production':
+    if environment == 'production':
         app.config.from_object(ProductionConfig)
-    elif enviroment == 'testing':
+    elif environment == 'testing':
         app.config.from_object(TestingConfig)
     else:
         app.config.from_object(DevelopmentConfig)
     
-
     # Initialize extensions
     db.init_app(app)
     migrate.init_app(app, db)
@@ -44,8 +43,9 @@ def create_app(enviroment='development'):
         session.permanent = True
         
     @app.before_request
-    def create_database():
-        db.create_all()
+    def upgrade_databank():
+        if environment != 'production':
+            db.create_all()
 
     from fitnesstracker.main.routes import main
     from fitnesstracker.users.routes import users

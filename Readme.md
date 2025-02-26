@@ -57,12 +57,12 @@ Pre-built Docker images are available:
 
 5. Switching Between SQLlite and Mariadb mode
 
-    The app can be run in either debug (SQLlight) or production (mariadb) mode. To switch modes, open the run.py file and set the enviroment variable to debug or production.
+    The app can be run in either debug (SQLlight) or production (mariadb) mode. To switch modes, open the run.py file and set the environment variable to debug or production.
 
     Example:
 
     ```python
-        app = create_app(enviroment='production') # use 'debug' for SQLlight
+        app = create_app(environment='production') # use 'debug' for SQLlight
     ```
 
 6. Access the App
