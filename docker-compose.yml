@@ -1,7 +1,7 @@
 services:
   flask:
     container_name: fitnesstracker
-    image: chavias/fitnesstracker:multi
+    image: chavias/fitnesstracker:latest
     restart: unless-stopped
     # build:
     #   context: .
