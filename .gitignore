@@ -5,6 +5,12 @@
 fitness.db
 package*.json
 
+# Editors and IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+
 ###############################################  Python 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -31,17 +31,21 @@ def create_app(environment='development'):
     else:
         app.config.from_object(DevelopmentConfig)
     
+
     # Initialize extensions
     db.init_app(app)
     migrate.init_app(app, db)
     bcrypt.init_app(app)
     login_manager.init_app(app)
     mail.init_app(app)
+    with app.app_context():
+        db.create_all()
 
     @app.before_request
     def make_session_permanent():
         session.permanent = True
 
+    
     from fitnesstracker.main.routes import main
     from fitnesstracker.users.routes import users
     from fitnesstracker.workout_templates.routes import workout_templates
