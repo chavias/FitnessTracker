@@ -1,6 +1,6 @@
 from fitnesstracker import create_app
 
-app = create_app(environment='debug')
+app = create_app(environment='production')
 
 if __name__ == "__main__":
 

@@ -8,7 +8,6 @@ from flask_login import UserMixin
 def get_user(user_id: int):
     return db.session.get(User, int(user_id))
 
-
 class User(db.Model, UserMixin):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
@@ -23,7 +22,6 @@ class User(db.Model, UserMixin):
         s = Serializer(current_app.config['SECRET_KEY'])
         return s.dumps({'user_id': self.id})
     
-
     @staticmethod
     def verify_reset_token(token, expires_sec=1800):
         s = Serializer(current_app.config['SECRET_KEY'])

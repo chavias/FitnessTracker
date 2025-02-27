@@ -17,6 +17,7 @@ def run_migrations():
     
     if context.get_current_revision() is None:
         # No migrations have been run, so run initial migration
+        subprocess.run(['flask', 'db', 'init'])
         subprocess.run(['flask', 'db', 'migrate', '-m', 'Initial migration'])
         subprocess.run(['flask', 'db', 'upgrade'])
     else:

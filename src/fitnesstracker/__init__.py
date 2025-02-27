@@ -7,7 +7,6 @@ from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_mail import Mail
 
-
 load_dotenv()
 
 db = SQLAlchemy()
@@ -31,21 +30,19 @@ def create_app(environment='development'):
     else:
         app.config.from_object(DevelopmentConfig)
     
+    print("Database URI:", app.config.get("SQLALCHEMY_DATABASE_URI"))
+
 
     # Initialize extensions
     db.init_app(app)
-    migrate.init_app(app, db)
     bcrypt.init_app(app)
     login_manager.init_app(app)
     mail.init_app(app)
-
-    with app.app_context():
-        db.create_all()
-
+    migrate.init_app(app, db)
+    
     @app.before_request
     def make_session_permanent():
         session.permanent = True
-
     
     from fitnesstracker.main.routes import main
     from fitnesstracker.users.routes import users

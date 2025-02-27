@@ -36,7 +36,7 @@ WORKDIR /app
 COPY . /app
 
 # Install dependencies with development dependencies excluded
-RUN poetry install --no-interaction --no-ansi
+RUN poetry install --no-interaction --no-ansi --no-root
 
 # Creates a non-root user with an explicit UID and adds permission to access the /app folder
 RUN adduser --uid 5678 --disabled-password --gecos "" appuser && chown -R appuser /app
