@@ -1,7 +1,7 @@
 import pytest
 from datetime import datetime, timedelta
-from src.fitnesstracker import create_app, db, bcrypt
-from src.fitnesstracker.models import User, Template, TemplateExercise, TrainingSession, Exercise, ExerciseDetails
+from fitnesstracker import create_app, db, bcrypt
+from fitnesstracker.models import User, Template, TemplateExercise, TrainingSession, Exercise, ExerciseDetails
 
 @pytest.fixture
 def app():
@@ -119,3 +119,55 @@ def test_start_training_session(client, authenticated_user, workout_template):
     assert response.status_code == 200
     print(f"{response.data}")
     assert b'Test Workout' in response.data
+
+
+def test_progression_api(client, authenticated_user, app):
+    # Create some test data for exercise progression
+    with app.app_context():
+        # Create training sessions with different dates
+        for i in range(3):
+            date = datetime.utcnow() - timedelta(days=10-i)
+            session = TrainingSession(
+                date=date,
+                user_id=authenticated_user.id
+            )
+            db.session.add(session)
+            db.session.flush()
+            
+            # Add bench press exercise to each session
+            bench_press = Exercise(
+                session_id=session.id,
+                exercise_name='Bench Press'
+            )
+            db.session.add(bench_press)
+            db.session.flush()
+            
+            # Add sets with increasing weights
+            for j in range(3):
+                details = ExerciseDetails(
+                    exercise_id=bench_press.id,
+                    repetitions=8,
+                    weight=60 + (i*5)  # Weight increases over sessions
+                )
+                db.session.add(details)
+        
+        db.session.commit()
+
+            # Test the API endpoint
+    response = client.get('/api/progression?exercise=Bench Press')
+    assert response.status_code == 200
+    data = response.get_json()
+    assert isinstance(data, list)
+    assert len(data) > 0
+    
+    # Check data structure
+    assert 'date' in data[0] or 'Date' in data[0]
+    assert 'weight' in data[0] or 'Weight' in data[0]
+    
+    # Check data is in ascending date order
+    dates = [entry.get('date', entry.get('Date')) for entry in data]
+    assert dates == sorted(dates)
+    
+    # Check weights are increasing
+    weights = [entry.get('weight', entry.get('Weight')) for entry in data]
+    assert weights[-1] > weights[0]

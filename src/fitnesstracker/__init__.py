@@ -1,7 +1,7 @@
 from flask import Flask, session
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
-from src.fitnesstracker.config import DevelopmentConfig, ProductionConfig, TestingConfig
+from fitnesstracker.config import DevelopmentConfig, ProductionConfig, TestingConfig
 from flask_migrate import Migrate
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
@@ -42,11 +42,11 @@ def create_app(environment='development'):
     def make_session_permanent():
         session.permanent = True
 
-    from src.fitnesstracker.main.routes import main
-    from src.fitnesstracker.users.routes import users
-    from src.fitnesstracker.workout_templates.routes import workout_templates
-    from src.fitnesstracker.workout_sessions.routes import workout_sessions
-    from src.fitnesstracker.workout_statistics.routes import workout_statistics
+    from fitnesstracker.main.routes import main
+    from fitnesstracker.users.routes import users
+    from fitnesstracker.workout_templates.routes import workout_templates
+    from fitnesstracker.workout_sessions.routes import workout_sessions
+    from fitnesstracker.workout_statistics.routes import workout_statistics
     
     app.register_blueprint(main)
     app.register_blueprint(users)

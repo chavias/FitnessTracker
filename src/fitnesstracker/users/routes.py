@@ -1,10 +1,10 @@
 from flask import render_template, url_for, flash, redirect, request, Blueprint
 from flask_login import login_user, current_user, logout_user, login_required
-from src.fitnesstracker import db, bcrypt
-from src.fitnesstracker.models import User
-from src.fitnesstracker.users.forms import (RegistrationForm, LoginForm, UpdateAccountForm,
+from fitnesstracker import db, bcrypt
+from fitnesstracker.models import User
+from fitnesstracker.users.forms import (RegistrationForm, LoginForm, UpdateAccountForm,
                                    RequestResetForm, ResetPasswordForm)
-from src.fitnesstracker.users.utils import save_picture, send_reset_email
+from fitnesstracker.users.utils import save_picture, send_reset_email
 
 users = Blueprint('users',
                   __name__,

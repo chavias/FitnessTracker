@@ -3,8 +3,8 @@ import plotly.express as px
 import pandas as pd
 from flask_login import login_required, current_user
 import json
-from src.fitnesstracker import db
-from src.fitnesstracker.models import Exercise, ExerciseDetails, TrainingSession, Template
+from fitnesstracker import db
+from fitnesstracker.models import Exercise, ExerciseDetails, TrainingSession, Template
 
 
 workout_statistics = Blueprint('workout_statistics',

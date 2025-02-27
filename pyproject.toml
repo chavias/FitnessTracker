@@ -1,23 +1,51 @@
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
 
 [project]
 name = "FitnessTracker"
 version = "0.0.1"
 authors = [
-  { name="Matías Chávez", email="matias.chavez@mail.ch" },
+  { name = "Matías Chávez", email = "matias.chavez@mail.ch" },
 ]
 description = "A simple application to track your workouts"
 readme = "Readme.md"
-requires-python = ">=3.8"
+requires-python = ">=3.10.12"
 classifiers = [
     "Programming Language :: Python :: 3",
     "Operating System :: OS Independent",
 ]
-license = "MIT"
-license-files = ["LICEN[CS]E*"]
+license = { text = "MIT" }
 
 [project.urls]
 Homepage = "https://github.com/chavias/FitnessTracker"
 Issues = "https://github.com/chavias/FitnessTracker/issues"
+
+[tool.poetry]
+name = "FitnessTracker"
+version = "0.0.1"
+description = "A simple application to track your workouts"
+authors = ["Matías Chávez <matias.chavez@mail.ch>"]
+readme = "Readme.md"
+packages = [{ include = "fitnesstracker", from = "src" }]  # Corrected package location
+
+[tool.poetry.dependencies]
+python = ">=3.10.12,<4.0" 
+flask = "^3.0.3"
+alembic = "^1.13.1"
+pandas = "^2.2.3"
+plotly = "^6.0.0"
+python-dotenv = "^1.0.1"
+sqlalchemy = "^2.0.38"
+flask-login = "^0.6.3"
+itsdangerous = "^2.2.0"
+wtforms = "^3.2.1"
+pillow = "^11.1.0"
+flask-sqlalchemy = "^3.1.1"
+flask-migrate = "^4.1.0"
+flask-wtf = "^1.2.2"
+flask-bcrypt = "^1.0.1"
+flask-mail = "^0.10.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.1.1"

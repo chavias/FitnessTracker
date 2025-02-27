@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for
-from src.fitnesstracker import db
+from fitnesstracker import db
 from flask_login import login_required, current_user
-from src.fitnesstracker.models import Template, TrainingSession
+from fitnesstracker.models import Template, TrainingSession
 import pandas as pd
 from datetime import datetime
 
