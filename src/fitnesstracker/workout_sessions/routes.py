@@ -45,10 +45,6 @@ def create_session():
         flash("Session created successfully!", "success")
         return redirect(url_for("main.homepage"))
 
-    else:
-        print(f"{form.errors = }")
-        print(f"{form.data = }")
-
     return render_template(
         "create_session.html", form=form, templates=Template.query.all()
     )
@@ -107,10 +103,6 @@ def update_session(session_id):
                 "An error occurred while creating the session. Please try again.",
                 "danger",
             )
-    else:
-        print(f"Form validation failed: {form.errors}")
-        print(f"Form data: {form.data}")
-        
 
     return render_template(
         "update_session.html", form=form, templates=templates, legend="Update Session"

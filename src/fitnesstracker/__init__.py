@@ -23,11 +23,11 @@ login_manager.login_message_category = 'info'
 mail = Mail()
 
 
-def create_app(environment='development'):
+def create_app(environment='sqlite'):
 
     app = Flask(__name__)
     
-    if environment == 'production':
+    if environment == 'mariadb':
         app.config.from_object(ProductionConfig)
     elif environment == 'testing':
         app.config.from_object(TestingConfig)
