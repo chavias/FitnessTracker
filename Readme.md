@@ -17,7 +17,7 @@ Deploy it easily with SQLlight or Mariadb using the included docker-compose.yml 
 1. **Clone the repository**
    ```bash
    git clone https://github.com/yourusername/workout-tracker.git
-   cd workout-tracker
+   cd training-tracker
    ```
 
 2. **Create a .env file**
