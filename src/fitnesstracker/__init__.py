@@ -11,10 +11,14 @@ load_dotenv()
 
 db = SQLAlchemy()
 migrate = Migrate()
-
 bcrypt = Bcrypt()
 login_manager = LoginManager()
-login_manager.login_view = 'users.login'
+# login_manager.login_view = 'users.login'
+
+login_manager.blueprint_login_views = {
+    'users': '/users/login',
+}
+
 login_manager.login_message_category = 'info'
 mail = Mail()
 
@@ -39,6 +43,10 @@ def create_app(environment='development'):
     login_manager.init_app(app)
     mail.init_app(app)
     migrate.init_app(app, db)
+
+    # Create database tables if they don't exist
+    with app.app_context():
+        db.create_all()
     
     @app.before_request
     def make_session_permanent():

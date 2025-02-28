@@ -32,8 +32,6 @@ services:
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
     volumes:
       - mariadb_data:/var/lib/mysql
-    # ports:
-    #   - "3306:3306"
     depends_on:
       - redis
 

@@ -4,6 +4,7 @@
 .env/
 fitness.db
 package*.json
+recreate_db.sh
 
 # Editors and IDEs
 .idea/

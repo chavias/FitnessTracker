@@ -1,6 +1,6 @@
 from fitnesstracker import create_app
 
-app = create_app(environment='production')
+app = create_app(environment='sqlite')
 
 if __name__ == "__main__":
 
