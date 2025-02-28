@@ -54,41 +54,6 @@ Deploy it easily with SQLlight or Mariadb using the included docker-compose.yml 
 5. **Access the App**
    Once the app is running, you can access it at http://localhost:5000 and start tracking your workouts.
 
-<<<<<<< HEAD
-3. Set up Docker
-
-    Ensure you have Docker and Docker Compose installed on your machine. You can check the installation with:
-
-    ```bash
-    docker --version
-    docker-compose --version
-    ```
-
-4. Run the App Using Docker Compose
-
-    Once you have the .env file set up, you can easily start the app by running:
-
-    ```bash
-    docker-compose up --build
-    ```
-
-    This will build the image (if necessary) and start the app.
-
-5. Switching Between SQLlite and Mariadb mode
-
-    The app can be run in either debug (SQLlight) or production (mariadb) mode. To switch modes, open the run.py file and set the environment variable to debug or production.
-
-    Example:
-
-    ```python
-        app = create_app(environment='production') # use 'debug' for SQLlight
-    ```
-
-6. Access the App
-
-    Once the app is running, you can access it at http://localhost:5000 and start tracking your workouts.
-=======
->>>>>>> testing
 
 ## License
 This project is licensed under the MIT License - see the LICENSE file for details.
