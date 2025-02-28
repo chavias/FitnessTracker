@@ -33,8 +33,6 @@ def create_app(environment='development'):
         app.config.from_object(TestingConfig)
     else:
         app.config.from_object(DevelopmentConfig)
-    
-    print("Database URI:", app.config.get("SQLALCHEMY_DATABASE_URI"))
 
 
     # Initialize extensions
