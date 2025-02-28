@@ -1,10 +1,11 @@
 from fitnesstracker import create_app
 import os
-import dotenv
+from dotenv import load_dotenv
 
-dotenv.load_dotenv()
+load_dotenv(override=True)
 
 environment = str(os.getenv('FLASK_ENV'))
+print("Environment: ", environment)
 debug=str(os.getenv('DEBUG_MODE', 'TRUE')).lower() in ('true', '1', 't')
 
 app = create_app(environment=environment)

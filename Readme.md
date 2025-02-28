@@ -10,64 +10,50 @@ Deploy it easily with SQLlight or Mariadb using the included docker-compose.yml 
 <img src="./images/app_graphic.png" alt="isolated"/>
 
 
-## Docker Images
+## Installation
 
-Pre-built Docker images are available:
+### Docker Container
 
-- Docker Hub: chavias/fitnesstracker
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/yourusername/workout-tracker.git
+   cd workout-tracker
+   ```
 
-## Getting Started
-<!-- To get started with the app, follow these steps: -->
+2. **Create a .env file**
+   Copy the example .env.example file to create your own .env file with the necessary configuration.
+   ```bash
+   cp .env.example .env
+   ```
+   Edit the .env file to include the appropriate settings for your environment (e.g., database credentials, secret keys).
 
-1. Clone the repository
+3. **Set up Docker**
+   Ensure you have Docker and Docker Compose installed on your machine. You can check the installation with:
+   ```bash
+   docker --version
+   docker-compose --version
+   ```
 
-    ```bash
-    git clone https://github.com/yourusername/workout-tracker.git
-    cd workout-tracker
-    ```
+4. **Run the App Using Docker Compose**
+   Once you have the .env file configured, you can start the app with one of the following commands based on your database configuration:
 
-2. Create a .env file
+   **For MariaDB configuration:**
+   If you've set `FLASK_ENV=mariadb` in your .env file:
+   ```bash
+   docker-compose up --build
+   ```
 
-    Copy the example .env.example file to create your own .env file with the necessary configuration.
+   **For SQLite configuration:**
+   If you've set `FLASK_ENV=sqlite` in your .env file:
+   ```bash
+   docker-compose -f docker-compose.sqlite.yml up --build
+   ```
 
-    ```bash
-    cp .env.example .env
-    ```
+   These commands will build the Docker image (if needed) and start the application.
 
-    Edit the .env file to include the appropriate settings for your environment (e.g., database credentials, secret keys).
+5. **Access the App**
+   Once the app is running, you can access it at http://localhost:5000 and start tracking your workouts.
 
-3. Set up Docker
-
-    Ensure you have Docker and Docker Compose installed on your machine. You can check the installation with:
-
-    ```bash
-    docker --version
-    docker-compose --version
-    ```
-
-4. Run the App Using Docker Compose
-
-    Once you have the .env file set up, you can easily start the app by running:
-
-    ```bash
-    docker-compose up --build
-    ```
-
-    This will build the image (if necessary) and start the app.
-
-5. Switching Between SQLlite and Mariadb mode
-
-    The app can be run in either debug (SQLlight) or production (mariadb) mode. To switch modes, open the run.py file and set the environment variable to debug or production.
-
-    Example:
-
-    ```python
-        app = create_app(environment='production') # use 'debug' for SQLlight
-    ```
-
-6. Access the App
-
-    Once the app is running, you can access it at http://localhost:5000 and start tracking your workouts.
 
 ## License
 This project is licensed under the MIT License - see the LICENSE file for details.

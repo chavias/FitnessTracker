@@ -8,7 +8,7 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 # Set Python path to include the src directory
-ENV PYTHONPATH="${PYTHONPATH}:/app:/app/src"
+ENV PYTHONPATH=/app:/app/src
 
 # Install system dependencies for building Python packages and libraries required by pillow
 RUN apt-get update && apt-get install -y --no-install-recommends \

@@ -8,6 +8,7 @@ services:
       dockerfile: ./Dockerfile
     ports:
       - "5000:5000"
+    env_file: .env
     environment:
       - EMAIL_USER=${EMAIL_USER}
       - EMAIL_PASS=${EMAIL_PASS}

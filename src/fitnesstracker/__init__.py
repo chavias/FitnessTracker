@@ -7,7 +7,7 @@ from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_mail import Mail
 
-load_dotenv()
+# load_dotenv()
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -23,15 +23,17 @@ login_manager.login_message_category = 'info'
 mail = Mail()
 
 
-def create_app(environment='sqlite'):
+def create_app(environment='mariadb'):
 
     app = Flask(__name__)
     
     if environment == 'mariadb':
+        print('Using MariaDB')
         app.config.from_object(ProductionConfig)
     elif environment == 'testing':
         app.config.from_object(TestingConfig)
     else:
+        print('Using SQLite')
         app.config.from_object(DevelopmentConfig)
 
 
