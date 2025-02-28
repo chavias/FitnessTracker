@@ -7,8 +7,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def run_migrations():
-    # Get database URL from environment or config
-    db_url = os.environ.get('SQLALCHEMY_DATABASE_URI', 'mysql+pymysql://user:password@db/fitnesstracker')
+
+    db_url = os.environ.get('SQLALCHEMY_DATABASE_URI', 'sqlite:///fitness.db')
     
     # Check if we need to run migrations
     engine = create_engine(db_url)
