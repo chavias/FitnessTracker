@@ -1,15 +1,11 @@
 services:
   flask:
     container_name: fitnesstracker
-<<<<<<< HEAD
     image: chavias/fitnesstracker:latest
-=======
-    # image: chavias/fitnesstracker:latest
->>>>>>> testing
     restart: unless-stopped
-    build:
-      context: .
-      dockerfile: ./Dockerfile
+    # build:
+    #   context: .
+    #   dockerfile: ./Dockerfile
     ports:
       - "5000:5000"
     env_file: .env

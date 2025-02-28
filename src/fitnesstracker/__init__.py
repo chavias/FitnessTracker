@@ -23,32 +23,19 @@ login_manager.login_message_category = 'info'
 mail = Mail()
 
 
-<<<<<<< HEAD:fitnesstracker/__init__.py
-def create_app(environment='development'):
-
-    app = Flask(__name__)
-    
-    if environment == 'production':
-=======
 def create_app(environment='mariadb'):
 
     app = Flask(__name__)
     
     if environment == 'mariadb':
         print('Using MariaDB')
->>>>>>> testing:src/fitnesstracker/__init__.py
         app.config.from_object(ProductionConfig)
     elif environment == 'testing':
         app.config.from_object(TestingConfig)
     else:
         print('Using SQLite')
         app.config.from_object(DevelopmentConfig)
-<<<<<<< HEAD:fitnesstracker/__init__.py
-    
-=======
 
-
->>>>>>> testing:src/fitnesstracker/__init__.py
     # Initialize extensions
     db.init_app(app)
     bcrypt.init_app(app)
@@ -56,17 +43,6 @@ def create_app(environment='mariadb'):
     mail.init_app(app)
     migrate.init_app(app, db)
 
-<<<<<<< HEAD:fitnesstracker/__init__.py
-    @app.before_request
-    def make_session_permanent():
-        session.permanent = True
-        
-    @app.before_request
-    def upgrade_databank():
-        if environment != 'production':
-            db.create_all()
-
-=======
     # Create database tables if they don't exist
     with app.app_context():
         db.create_all()
@@ -75,7 +51,6 @@ def create_app(environment='mariadb'):
     def make_session_permanent():
         session.permanent = True
     
->>>>>>> testing:src/fitnesstracker/__init__.py
     from fitnesstracker.main.routes import main
     from fitnesstracker.users.routes import users
     from fitnesstracker.workout_templates.routes import workout_templates
