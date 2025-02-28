@@ -1,12 +1,12 @@
 from fitnesstracker import db, login_manager
 from itsdangerous.url_safe import URLSafeTimedSerializer as Serializer
-from flask import current_app
+from flask import current_app, session
 from datetime import datetime
 from flask_login import UserMixin
 
 @login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
+def get_user(user_id: int):
+    return db.session.get(User, int(user_id))
 
 class User(db.Model, UserMixin):
     __tablename__ = "users"
@@ -22,7 +22,6 @@ class User(db.Model, UserMixin):
         s = Serializer(current_app.config['SECRET_KEY'])
         return s.dumps({'user_id': self.id})
     
-
     @staticmethod
     def verify_reset_token(token, expires_sec=1800):
         s = Serializer(current_app.config['SECRET_KEY'])
@@ -31,7 +30,6 @@ class User(db.Model, UserMixin):
         except:
             return None
         return User.query.get(user_id)
-
 
     def __repr__(self):
         return f"User('{self.username}', '{self.email}', '{self.image_file}')"

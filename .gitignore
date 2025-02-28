@@ -1,8 +1,17 @@
+
+.pytest_cache/
 .venv/
 .env/
 .vscode/
 fitness.db
 package*.json
+recreate_db.sh
+
+# Editors and IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
 
 ###############################################  Python 
 # Byte-compiled / optimized / DLL files

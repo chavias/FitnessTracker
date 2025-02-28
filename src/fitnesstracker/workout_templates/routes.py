@@ -53,7 +53,10 @@ def template(template_id):
     template = Template.query.get_or_404(template_id)
     return render_template("template.html", template=template)
 
+<<<<<<< HEAD:fitnesstracker/workout_templates/routes.py
 
+=======
+>>>>>>> testing:src/fitnesstracker/workout_templates/routes.py
 @workout_templates.route("/template/<int:template_id>/update", methods=["GET", "POST"])
 @login_required
 def update_template(template_id):
@@ -63,7 +66,10 @@ def update_template(template_id):
     if template.user_id != current_user.id:
         abort(403)
         
+<<<<<<< HEAD:fitnesstracker/workout_templates/routes.py
 
+=======
+>>>>>>> testing:src/fitnesstracker/workout_templates/routes.py
     form = TemplateForm()
     
     if form.validate_on_submit():

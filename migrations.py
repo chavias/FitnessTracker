@@ -7,8 +7,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def run_migrations():
-    # Get database URL from environment or config
-    db_url = os.environ.get('SQLALCHEMY_DATABASE_URI', 'mysql+pymysql://user:password@db/fitnesstracker')
+
+    db_url = os.environ.get('SQLALCHEMY_DATABASE_URI', 'sqlite:///fitness.db')
     
     # Check if we need to run migrations
     engine = create_engine(db_url)
@@ -17,10 +17,13 @@ def run_migrations():
     
     if context.get_current_revision() is None:
         # No migrations have been run, so run initial migration
+        print('Running initial migration')
+        subprocess.run(['flask', 'db', 'init'])
         subprocess.run(['flask', 'db', 'migrate', '-m', 'Initial migration'])
         subprocess.run(['flask', 'db', 'upgrade'])
     else:
         # Check if we need to run new migrations
+        print('Running migrations')
         subprocess.run(['flask', 'db', 'migrate', '-m', 'Auto-migration'])
         subprocess.run(['flask', 'db', 'upgrade'])
     

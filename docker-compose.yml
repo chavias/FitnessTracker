@@ -1,13 +1,18 @@
 services:
   flask:
     container_name: fitnesstracker
+<<<<<<< HEAD
     image: chavias/fitnesstracker:latest
+=======
+    # image: chavias/fitnesstracker:latest
+>>>>>>> testing
     restart: unless-stopped
-    # build:
-    #   context: .
-    #   dockerfile: ./Dockerfile
+    build:
+      context: .
+      dockerfile: ./Dockerfile
     ports:
       - "5000:5000"
+    env_file: .env
     environment:
       - EMAIL_USER=${EMAIL_USER}
       - EMAIL_PASS=${EMAIL_PASS}
@@ -32,8 +37,6 @@ services:
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
     volumes:
       - mariadb_data:/var/lib/mysql
-    # ports:
-    #   - "3306:3306"
     depends_on:
       - redis
 

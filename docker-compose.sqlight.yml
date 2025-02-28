@@ -1,0 +1,18 @@
+services:
+  flask:
+    container_name: fitnesstracker
+    # image: chavias/fitnesstracker:latest
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - "5000:5000"
+    env_file: .env
+    environment:
+      - EMAIL_USER=${EMAIL_USER}
+      - EMAIL_PASS=${EMAIL_PASS}
+      - TLS=${TLS}
+      - SSL=${SSL}
+      - SECRET_KEY=${SECRET_KEY}
+      - MAIL_SERVER=${MAIL_SERVER}
