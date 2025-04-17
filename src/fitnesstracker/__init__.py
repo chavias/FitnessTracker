@@ -1,19 +1,16 @@
 from flask import Flask, session
 from flask_sqlalchemy import SQLAlchemy
-from dotenv import load_dotenv
 from fitnesstracker.config import DevelopmentConfig, ProductionConfig, TestingConfig
 from flask_migrate import Migrate
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_mail import Mail
 
-# load_dotenv()
 
 db = SQLAlchemy()
 migrate = Migrate()
 bcrypt = Bcrypt()
 login_manager = LoginManager()
-# login_manager.login_view = 'users.login'
 
 login_manager.blueprint_login_views = {
     'users': '/users/login',
@@ -28,12 +25,10 @@ def create_app(environment='mariadb'):
     app = Flask(__name__)
     
     if environment == 'mariadb':
-        print('Using MariaDB')
         app.config.from_object(ProductionConfig)
     elif environment == 'testing':
         app.config.from_object(TestingConfig)
     else:
-        print('Using SQLite')
         app.config.from_object(DevelopmentConfig)
 
     # Initialize extensions

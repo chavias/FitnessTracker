@@ -15,6 +15,7 @@ Deploy it easily with SQLlight or Mariadb using the included docker-compose.yml 
 ### Docker Container
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/yourusername/workout-tracker.git
    cd training-tracker
@@ -22,13 +23,16 @@ Deploy it easily with SQLlight or Mariadb using the included docker-compose.yml 
 
 2. **Create a .env file**
    Copy the example .env.example file to create your own .env file with the necessary configuration.
+
    ```bash
    cp .env.example .env
    ```
+
    Edit the .env file to include the appropriate settings for your environment (e.g., database credentials, secret keys).
 
 3. **Set up Docker**
    Ensure you have Docker and Docker Compose installed on your machine. You can check the installation with:
+
    ```bash
    docker --version
    docker-compose --version
@@ -39,12 +43,14 @@ Deploy it easily with SQLlight or Mariadb using the included docker-compose.yml 
 
    **For MariaDB configuration:**
    If you've set `FLASK_ENV=mariadb` in your .env file:
+
    ```bash
    docker-compose up --build
    ```
 
    **For SQLite configuration:**
    If you've set `FLASK_ENV=sqlite` in your .env file:
+
    ```bash
    docker-compose -f docker-compose.sqlite.yml up --build
    ```
@@ -53,7 +59,6 @@ Deploy it easily with SQLlight or Mariadb using the included docker-compose.yml 
 
 5. **Access the App**
    Once the app is running, you can access it at http://localhost:5000 and start tracking your workouts.
-
 
 ## License
 This project is licensed under the MIT License - see the LICENSE file for details.
